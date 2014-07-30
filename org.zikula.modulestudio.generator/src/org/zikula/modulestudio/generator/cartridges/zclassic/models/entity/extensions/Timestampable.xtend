@@ -20,12 +20,12 @@ class Timestampable extends AbstractExtension implements EntityExtensionInterfac
      * Additional field annotations.
      */
     override columnAnnotations(DerivedField it) '''
-        «IF it instanceof AbstractDateField && (it as AbstractDateField).timestampable != EntityTimestampableType.NONE»
-            «' '»* @Gedmo\Timestampable(on="«(it as AbstractDateField).timestampable.literal»"«(it as AbstractDateField).timestampableDetails»)
-        «ENDIF»
+        IF it instanceof AbstractDateField && (it as AbstractDateField).timestampable != EntityTimestampableType.NONE
+            ' '* @Gedmo\Timestampable(on="(it as AbstractDateField).timestampable.literal"(it as AbstractDateField).timestampableDetails)
+        ENDIF
     '''
 
-    def private timestampableDetails(AbstractDateField it) '''«IF timestampable == EntityTimestampableType::CHANGE», field="«timestampableChangeTriggerField.formatForCode»"«IF timestampableChangeTriggerValue !== null && timestampableChangeTriggerValue != ''», value="«timestampableChangeTriggerValue.formatForCode»"«ENDIF»«ENDIF»'''
+    def private timestampableDetails(AbstractDateField it) '''IF timestampable == EntityTimestampableType::CHANGE, field="timestampableChangeTriggerField.formatForCode"IF timestampableChangeTriggerValue !== null && timestampableChangeTriggerValue != '', value="timestampableChangeTriggerValue.formatForCode"ENDIFENDIF'''
 
     /**
      * Generates additional entity properties.

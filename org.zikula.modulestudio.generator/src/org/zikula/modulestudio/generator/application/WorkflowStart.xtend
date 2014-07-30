@@ -79,9 +79,9 @@ class WorkflowStart {
 
     def validatorMessage(Diagnostic diag) 
         '''
-        «FOR c: diag.children»
-        - «c.message» at «EmfFormatter.objPath((c as FeatureBasedDiagnostic).sourceEObject)»
-        «ENDFOR»
+        FOR c: diag.children
+        - c.message at EmfFormatter.objPath((c as FeatureBasedDiagnostic).sourceEObject)
+        ENDFOR
         '''
 
     /**
@@ -191,8 +191,8 @@ class WorkflowStart {
      * @return String formatted for source code usage.
      */
     def private formatForCodeCapital(String s) {
-        s.replace('Ä', 'Ae').replace('ä', 'ae').replace('Ö', 'Oe')
-         .replace('ö', 'oe').replace('Ü', 'Ue').replace('ü', 'ue')
-         .replace('ß', 'ss').replaceAll('[\\W]', '').toFirstUpper
+        s.replace('', 'Ae').replace('', 'ae').replace('', 'Oe')
+         .replace('', 'oe').replace('', 'Ue').replace('', 'ue')
+         .replace('', 'ss').replaceAll('[\\W]', '').toFirstUpper
     }
 }

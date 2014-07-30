@@ -29,27 +29,27 @@ class TreeSelector {
     }
 
     def private treeSelectorBaseImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Form\Plugin\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Form\Plugin\Base;
 
-            use «appNamespace»\Form\Plugin\AbstractObjectSelector as BaseAbstractObjectSelector;
+            use appNamespace\Form\Plugin\AbstractObjectSelector as BaseAbstractObjectSelector;
 
             use ModUtil;
             use ServiceUtil;
             use Zikula_Form_View;
 
-        «ENDIF»
+        ENDIF
         /**
          * Tree selector.
          *
          * This plugin creates a nested tree selector using a dropdown list.
          * The selected value of the base dropdown list will be set to ID of the selected tree node.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Form_Plugin_Base_TreeSelector extends «appName»_Form_Plugin_AbstractObjectSelector
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Form_Plugin_Base_TreeSelector extends appName_Form_Plugin_AbstractObjectSelector
+        ELSE
         class TreeSelector extends BaseAbstractObjectSelector
-        «ENDIF»
+        ENDIF
         {
             /**
              * Root node id (when using multiple roots).
@@ -106,13 +106,13 @@ class TreeSelector {
 
                 parent::create($view, $params);
 
-                «IF targets('1.3.5')»
+                IF targets('1.3.5')
                     $entityClass = $this->name . '_Entity_' . ucfirst($this->objectType);
-                «ELSE»
-                    $entityClass = '«vendor.formatForCodeCapital»«name.formatForCodeCapital»Module:' . ucfirst($this->objectType) . 'Entity';
-                «ENDIF»
+                ELSE
+                    $entityClass = 'vendor.formatForCodeCapitalname.formatForCodeCapitalModule:' . ucfirst($this->objectType) . 'Entity';
+                ENDIF
                 $serviceManager = ServiceUtil::getManager();
-                $entityManager = $serviceManager->get«IF targets('1.3.5')»Service«ENDIF»('doctrine.entitymanager');
+                $entityManager = $serviceManager->getIF targets('1.3.5')ServiceENDIF('doctrine.entitymanager');
                 $this->repository = $entityManager->getRepository($entityClass);
             }
 
@@ -192,23 +192,23 @@ class TreeSelector {
     '''
 
     def private treeSelectorImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Form\Plugin;
+        IF !targets('1.3.5')
+            namespace appNamespace\Form\Plugin;
 
-            use «appNamespace»\Form\Plugin\Base\TreeSelector as BaseTreeSelector;
+            use appNamespace\Form\Plugin\Base\TreeSelector as BaseTreeSelector;
 
-        «ENDIF»
+        ENDIF
         /**
          * Tree selector.
          *
          * This plugin creates a nested tree selector using a dropdown list.
          * The selected value of the base dropdown list will be set to ID of the selected tree node.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Form_Plugin_TreeSelector extends «appName»_Form_Plugin_Base_TreeSelector
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Form_Plugin_TreeSelector extends appName_Form_Plugin_Base_TreeSelector
+        ELSE
         class TreeSelector extends BaseTreeSelector
-        «ENDIF»
+        ENDIF
         {
             // feel free to add your customisation here
         }
@@ -216,7 +216,7 @@ class TreeSelector {
 
     def private treeSelectorPluginImpl(Application it) '''
         /**
-         * The «appName.formatForDB»TreeSelector plugin cares for handling a dropdown list
+         * The appName.formatForDBTreeSelector plugin cares for handling a dropdown list
          * for an entity with tree structure.
          *
          * @param array            $params Parameters passed to this function from the template.
@@ -224,9 +224,9 @@ class TreeSelector {
          *
          * @return string The rendered output.
          */
-        function smarty_function_«appName.formatForDB»TreeSelector($params, $view)
+        function smarty_function_appName.formatForDBTreeSelector($params, $view)
         {
-            return $view->registerPlugin('«IF targets('1.3.5')»«appName»_Form_Plugin_TreeSelector«ELSE»\\«vendor.formatForCodeCapital»\\«name.formatForCodeCapital»Module\\Form\\Plugin\\TreeSelector«ENDIF»', $params);
+            return $view->registerPlugin('IF targets('1.3.5')appName_Form_Plugin_TreeSelectorELSE\\vendor.formatForCodeCapital\\name.formatForCodeCapitalModule\\Form\\Plugin\\TreeSelectorENDIF', $params);
         }
     '''
 }

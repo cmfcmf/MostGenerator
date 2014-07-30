@@ -61,15 +61,15 @@ class Definition {
     def private xmlSchema() '''
         <?xml version="1.0" encoding="UTF-8"?>
         <workflow>
-            «workflowInfo»
-            «statesImpl»
-            «actionsImpl»
+            workflowInfo
+            statesImpl
+            actionsImpl
         </workflow>
     '''
 
     def private workflowInfo() '''
-        <title>«wfType.textualName.formatForDisplayCapital» workflow («wfType.approvalType.formatForDisplay» approval)</title>
-        <description>«workflowDescription(wfType)»</description>
+        <title>wfType.textualName.formatForDisplayCapital workflow (wfType.approvalType.formatForDisplay approval)</title>
+        <description>workflowDescription(wfType)</description>
     '''
 
     def workflowDescription(EntityWorkflowType wfType) {
@@ -83,16 +83,16 @@ class Definition {
     def private statesImpl() '''
         <!-- define the available states -->
         <states>
-            «FOR state : states»
-                «state.stateImpl»
-            «ENDFOR»
+            FOR state : states
+                state.stateImpl
+            ENDFOR
         </states>
     '''
 
     def private stateImpl(ListFieldItem it) '''
-        <state id="«value»">
-            <title>«name»</title>
-            <description>«documentation»</description>
+        <state id="value">
+            <title>name</title>
+            <description>documentation</description>
         </state>
     '''
 
@@ -100,15 +100,15 @@ class Definition {
         <!-- define actions and assign their availability to certain states -->
         <!-- available permissions: overview, read, comment, moderate, edit, add, delete, admin -->
         <actions>
-            «FOR state : states»
-                <!-- From state: «state.name» -->
-                «state.actionsForStateImpl»
-            «ENDFOR»
+            FOR state : states
+                <!-- From state: state.name -->
+                state.actionsForStateImpl
+            ENDFOR
 
             <!-- Actions for destroying objects -->
-            «FOR state : states»
-                «state.actionsForDestructionImpl»
-            «ENDFOR»
+            FOR state : states
+                state.actionsForDestructionImpl
+            ENDFOR
         </actions>
     '''
 
@@ -127,182 +127,182 @@ class Definition {
     }
 
     def private actionsForInitial(ListFieldItem it) '''
-        «deferAction»
-        «submitAction»
-        «submitAndAcceptAction»
-        «submitAndApproveAction»
+        deferAction
+        submitAction
+        submitAndAcceptAction
+        submitAndApproveAction
     '''
 
     def private actionsForDeferred(ListFieldItem it) '''
-        «submitAction»
-        «updateAction»
+        submitAction
+        updateAction
     '''
 
     def private actionsForWaiting(ListFieldItem it) '''
-        «updateAction»
-        «rejectAction»
-        «acceptAction»
-        «approveAction»
+        updateAction
+        rejectAction
+        acceptAction
+        approveAction
     '''
 
     def private actionsForAccepted(ListFieldItem it) '''
-        «updateAction»
-        «approveAction»
+        updateAction
+        approveAction
     '''
 
     def private actionsForApproved(ListFieldItem it) '''
-        «updateAction»
-        «demoteAction»
-        «suspendAction»
-        «archiveAction»
+        updateAction
+        demoteAction
+        suspendAction
+        archiveAction
     '''
 
     def private actionsForSuspended(ListFieldItem it) '''
-        «updateAction»
-        «unsuspendAction»
-        «archiveAction»
+        updateAction
+        unsuspendAction
+        archiveAction
     '''
 
     def private deferAction(ListFieldItem it) '''
-        «IF app.hasWorkflowState(wfType, 'deferred')»
-            «val permission = if (wfType == EntityWorkflowType.NONE) 'edit' else 'comment'»
-            «actionImpl('defer', 'Defer', permission, it.value, 'deferred')»
-        «ENDIF»
+        IF app.hasWorkflowState(wfType, 'deferred')
+            val permission = if (wfType == EntityWorkflowType.NONE) 'edit' else 'comment'
+            actionImpl('defer', 'Defer', permission, it.value, 'deferred')
+        ENDIF
     '''
 
     def private submitAction(ListFieldItem it) '''
-        «IF wfType == EntityWorkflowType.NONE»
-            «actionImpl('submit', 'Submit', 'edit', it.value, 'approved')»
-        «ELSE»
-            «actionImpl('submit', 'Submit', 'comment', it.value, 'waiting')»
-        «ENDIF»
+        IF wfType == EntityWorkflowType.NONE
+            actionImpl('submit', 'Submit', 'edit', it.value, 'approved')
+        ELSE
+            actionImpl('submit', 'Submit', 'comment', it.value, 'waiting')
+        ENDIF
     '''
 
     def private updateAction(ListFieldItem it) '''
-        «actionImpl('update', 'Update', 'edit', it.value, it.value)»
+        actionImpl('update', 'Update', 'edit', it.value, it.value)
     '''
 
     def private rejectAction(ListFieldItem it) '''
-        «IF app.hasWorkflowState(wfType, 'deferred')»
-            «actionImpl('reject', 'Reject', 'edit', it.value, 'deferred')»
-        «ENDIF»
+        IF app.hasWorkflowState(wfType, 'deferred')
+            actionImpl('reject', 'Reject', 'edit', it.value, 'deferred')
+        ENDIF
     '''
 
     def private acceptAction(ListFieldItem it) '''
-        «IF app.hasWorkflowState(wfType, 'accepted')»
-            «actionImpl('accept', 'Accept', 'edit', it.value, 'accepted')»
-        «ENDIF»
+        IF app.hasWorkflowState(wfType, 'accepted')
+            actionImpl('accept', 'Accept', 'edit', it.value, 'accepted')
+        ENDIF
     '''
 
     def private approveAction(ListFieldItem it) '''
-        «actionImpl('approve', 'Approve', 'add', it.value, 'approved')»
+        actionImpl('approve', 'Approve', 'add', it.value, 'approved')
     '''
 
     def private submitAndAcceptAction(ListFieldItem it) '''
-        «IF app.hasWorkflowState(wfType, 'accepted')»
-            «actionImpl('accept', 'Submit and Accept', 'edit', it.value, 'accepted')»
-        «ENDIF»
+        IF app.hasWorkflowState(wfType, 'accepted')
+            actionImpl('accept', 'Submit and Accept', 'edit', it.value, 'accepted')
+        ENDIF
     '''
 
     def private submitAndApproveAction(ListFieldItem it) '''
-        «IF app.hasWorkflowState(wfType, 'waiting')»
-            «actionImpl('approve', 'Submit and Approve', 'add', it.value, 'approved')»
-        «ENDIF»
+        IF app.hasWorkflowState(wfType, 'waiting')
+            actionImpl('approve', 'Submit and Approve', 'add', it.value, 'approved')
+        ENDIF
     '''
 
     def private demoteAction(ListFieldItem it) '''
-        «IF app.hasWorkflowState(wfType, 'accepted')»
-            «actionImpl('demote', 'Demote', 'add', it.value, 'accepted')»
-        «ENDIF»
+        IF app.hasWorkflowState(wfType, 'accepted')
+            actionImpl('demote', 'Demote', 'add', it.value, 'accepted')
+        ENDIF
     '''
 
     def private suspendAction(ListFieldItem it) '''
-        «IF app.hasWorkflowState(wfType, 'suspended')»
-            «actionImpl('unpublish', 'Unpublish', 'edit', it.value, 'suspended')»
-        «ENDIF»
+        IF app.hasWorkflowState(wfType, 'suspended')
+            actionImpl('unpublish', 'Unpublish', 'edit', it.value, 'suspended')
+        ENDIF
     '''
 
     def private unsuspendAction(ListFieldItem it) '''
-        «IF it.value == 'suspended'»
-            «actionImpl('publish', 'Publish', 'edit', it.value, 'approved')»
-        «ENDIF»
+        IF it.value == 'suspended'
+            actionImpl('publish', 'Publish', 'edit', it.value, 'approved')
+        ENDIF
     '''
 
     def private archiveAction(ListFieldItem it) '''
-        «IF app.hasWorkflowState(wfType, 'archived')»
-            «actionImpl('archive', 'Archive', 'edit', it.value, 'archived')»
-        «ENDIF»
+        IF app.hasWorkflowState(wfType, 'archived')
+            actionImpl('archive', 'Archive', 'edit', it.value, 'archived')
+        ENDIF
     '''
 
     def private actionsForDestructionImpl(ListFieldItem it) '''
-        «IF it.value != 'initial' && it.value != 'deleted'»
-            «IF it.value != 'trashed' && app.hasWorkflowState(wfType, 'trashed')»
-                «trashAndRecoverActions»
-            «ENDIF»
-            «deleteAction»
-        «ENDIF»
+        IF it.value != 'initial' && it.value != 'deleted'
+            IF it.value != 'trashed' && app.hasWorkflowState(wfType, 'trashed')
+                trashAndRecoverActions
+            ENDIF
+            deleteAction
+        ENDIF
     '''
 
     def private trashAndRecoverActions(ListFieldItem it) '''
-        «actionImpl('trash', 'Trash', 'edit', it.value, 'trashed')»
-        «actionImpl('recover', 'Recover', 'edit', 'trashed', it.value)»
+        actionImpl('trash', 'Trash', 'edit', it.value, 'trashed')
+        actionImpl('recover', 'Recover', 'edit', 'trashed', it.value)
     '''
 
     def private deleteAction(ListFieldItem it) '''
-        «actionImpl('delete', 'Delete', 'delete', it.value, '')»
+        actionImpl('delete', 'Delete', 'delete', it.value, '')
     '''
 
     def private actionImpl(String id, String title, String permission, String state, String nextState) '''
-        <action id="«id»">
-            <title>«title»</title>
-            <description>«getWorkflowActionDescription(wfType, title)»</description>
-            <permission>«permission»</permission>
-            «IF state != '' && state != 'initial'»
-                <state>«state»</state>
-            «ENDIF»
-            «IF nextState != '' && nextState != state»
-                <nextState>«nextState»</nextState>
-            «ENDIF»
+        <action id="id">
+            <title>title</title>
+            <description>getWorkflowActionDescription(wfType, title)</description>
+            <permission>permission</permission>
+            IF state != '' && state != 'initial'
+                <state>state</state>
+            ENDIF
+            IF nextState != '' && nextState != state
+                <nextState>nextState</nextState>
+            ENDIF
 
-            «IF id == 'delete'»
+            IF id == 'delete'
                 <operation>delete</operation>
-            «ELSE»
+            ELSE
                 <operation>update</operation>
-            «ENDIF»
-            «IF wfType != EntityWorkflowType.NONE»
-                «notifyCall(id, state)»
-            «ENDIF»
+            ENDIF
+            IF wfType != EntityWorkflowType.NONE
+                notifyCall(id, state)
+            ENDIF
         </action>
 
     '''
 
     def private notifyCall(String id, String state) '''
-        «IF id == 'submit' && state == 'waiting'»
-            <operation recipientType="moderator" action="«id»">notify</operation>
-        «ELSEIF id == 'reject' && state == 'deferred'»
-            <operation recipientType="creator" action="«id»">notify</operation>
-        «ELSEIF id == 'accept' && state == 'accepted'»
-            <operation recipientType="creator" action="«id»">notify</operation>
-            <operation recipientType="superModerator" action="«id»">notify</operation>
-        «ELSEIF id == 'approve' && state == 'approved'»
-            <operation recipientType="creator" action="«id»">notify</operation>
-            «IF wfType == EntityWorkflowType.ENTERPRISE»
-                <operation recipientType="moderator" action="«id»">notify</operation>
-            «ENDIF»
-        «ELSEIF id == 'demote' && state == 'accepted'»
-            <operation recipientType="moderator" action="«id»">notify</operation>
-        «ELSEIF id == 'unpublish' && state == 'suspended'»
-            <operation recipientType="creator" action="«id»">notify</operation>
-        «ELSEIF id == 'publish' && state == 'approved'»
-            <operation recipientType="creator" action="«id»">notify</operation>
-        «ELSEIF id == 'archive' && state == 'archived'»
-            <operation recipientType="creator" action="«id»">notify</operation>
-        «ELSEIF id == 'trash' && state == 'trashed'»
-            <operation recipientType="creator" action="«id»">notify</operation>
-        «ELSEIF id == 'recover'»
-            <operation recipientType="creator" action="«id»">notify</operation>
-        «ELSEIF id == 'delete'»
-            <operation recipientType="creator" action="«id»">notify</operation>
-        «ENDIF»
+        IF id == 'submit' && state == 'waiting'
+            <operation recipientType="moderator" action="id">notify</operation>
+        ELSEIF id == 'reject' && state == 'deferred'
+            <operation recipientType="creator" action="id">notify</operation>
+        ELSEIF id == 'accept' && state == 'accepted'
+            <operation recipientType="creator" action="id">notify</operation>
+            <operation recipientType="superModerator" action="id">notify</operation>
+        ELSEIF id == 'approve' && state == 'approved'
+            <operation recipientType="creator" action="id">notify</operation>
+            IF wfType == EntityWorkflowType.ENTERPRISE
+                <operation recipientType="moderator" action="id">notify</operation>
+            ENDIF
+        ELSEIF id == 'demote' && state == 'accepted'
+            <operation recipientType="moderator" action="id">notify</operation>
+        ELSEIF id == 'unpublish' && state == 'suspended'
+            <operation recipientType="creator" action="id">notify</operation>
+        ELSEIF id == 'publish' && state == 'approved'
+            <operation recipientType="creator" action="id">notify</operation>
+        ELSEIF id == 'archive' && state == 'archived'
+            <operation recipientType="creator" action="id">notify</operation>
+        ELSEIF id == 'trash' && state == 'trashed'
+            <operation recipientType="creator" action="id">notify</operation>
+        ELSEIF id == 'recover'
+            <operation recipientType="creator" action="id">notify</operation>
+        ELSEIF id == 'delete'
+            <operation recipientType="creator" action="id">notify</operation>
+        ENDIF
     '''
 }

@@ -19,15 +19,15 @@ class Translatable extends AbstractExtension implements EntityExtensionInterface
      * Generates additional annotations on class level.
      */
     override classAnnotations(Entity it) '''
-         «' '»* @Gedmo\TranslationEntity(class="«IF !container.application.targets('1.3.5')»\«ENDIF»«entityClassName('translation', false)»")
+         ' '* @Gedmo\TranslationEntity(class="IF !container.application.targets('1.3.5')\ENDIFentityClassName('translation', false)")
     '''
 
     /**
      * Additional field annotations.
      */
     override columnAnnotations(DerivedField it) '''
-        «IF translatable» * @Gedmo\Translatable
-        «ENDIF»
+        IF translatable * @Gedmo\Translatable
+        ENDIF
     '''
 
     /**
@@ -39,13 +39,13 @@ class Translatable extends AbstractExtension implements EntityExtensionInterface
          * Field for storing the locale of this entity.
          * Overrides the locale set in translationListener (as pointed out in https://github.com/l3pp4rd/DoctrineExtensions/issues/130#issuecomment-1790206 ).
          *
-         «IF loggable»
+         IF loggable
              * @Gedmo\Versioned
-         «ENDIF»
-         «IF !container.application.targets('1.3.5')»
+         ENDIF
+         IF !container.application.targets('1.3.5')
              * Assert\Locale()
-         «ENDIF»
-         * @Gedmo\Locale«/*the same as @Gedmo\Language*/»
+         ENDIF
+         * @Gedmo\Locale/*the same as @Gedmo\Language*/
          * @var string $locale.
          */
         protected $locale;
@@ -55,8 +55,8 @@ class Translatable extends AbstractExtension implements EntityExtensionInterface
      * Generates additional accessor methods.
      */
     override accessors(Entity it) '''
-        «val fh = new FileHelper»
-        «fh.getterAndSetterMethods(it, 'locale', 'string', false, false, '', '')»
+        val fh = new FileHelper
+        fh.getterAndSetterMethods(it, 'locale', 'string', false, false, '', '')
     '''
 
     /**
@@ -70,7 +70,7 @@ class Translatable extends AbstractExtension implements EntityExtensionInterface
      * Returns the extension class import statements.
      */
     override extensionClassImports(Entity it) '''
-        use Gedmo\Translatable\Entity\«IF !container.application.targets('1.3.5')»MappedSuperclass\«ENDIF»«extensionBaseClass»;
+        use Gedmo\Translatable\Entity\IF !container.application.targets('1.3.5')MappedSuperclass\ENDIFextensionBaseClass;
     '''
 
     /**
@@ -91,19 +91,19 @@ class Translatable extends AbstractExtension implements EntityExtensionInterface
      * Returns the extension implementation class ORM annotations.
      */
     override extensionClassImplAnnotations(Entity it) '''
-         «' '»*
-         «' '»* @ORM\Entity(repositoryClass="«repositoryClass(extensionClassType)»")
-         «' '»* @ORM\Table(name="«fullEntityTableName»_translation",
-         «' '»*     indexes={
-         «' '»*         @ORM\Index(name="translations_lookup_idx", columns={
-         «' '»*             "locale", "object_class", "foreign_key"
-         «' '»*         })
-         «' '»*     }«/*,commented out because the length of these four fields * 3 is more than 1000 bytes with UTF-8 (requiring 3 bytes per char)
-         «' '»*     uniqueConstraints={
-         «' '»*         @ORM\UniqueConstraint(name="lookup_unique_idx", columns={
-         «' '»*             "locale", "object_class", "field", "foreign_key"
-         «' '»*         })
-         «' '»*     }*/»
-         «' '»* )
+         ' '*
+         ' '* @ORM\Entity(repositoryClass="repositoryClass(extensionClassType)")
+         ' '* @ORM\Table(name="fullEntityTableName_translation",
+         ' '*     indexes={
+         ' '*         @ORM\Index(name="translations_lookup_idx", columns={
+         ' '*             "locale", "object_class", "foreign_key"
+         ' '*         })
+         ' '*     }/*,commented out because the length of these four fields * 3 is more than 1000 bytes with UTF-8 (requiring 3 bytes per char)
+         ' '*     uniqueConstraints={
+         ' '*         @ORM\UniqueConstraint(name="lookup_unique_idx", columns={
+         ' '*             "locale", "object_class", "field", "foreign_key"
+         ' '*         })
+         ' '*     }*/
+         ' '* )
     '''
 }

@@ -25,62 +25,62 @@ class LinkTable {
     }
 
     def private modelRefRepositoryBaseImpl(ManyToManyRelationship it, Application app) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Entity\Repository\Base;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Entity\Repository\Base;
 
             use UserUtil;
 
-        «ENDIF»
+        ENDIF
         /**
          * Repository class used to implement own convenience methods for performing certain DQL queries.
          *
          * This is the base repository class for the many to many relationship
-         * between «source.name.formatForDisplay» and «target.name.formatForDisplay» entities.
+         * between source.name.formatForDisplay and target.name.formatForDisplay entities.
          */
-        «IF app.targets('1.3.5')»
-        class «app.appName»_Entity_Repository_Base_«refClass.formatForCodeCapital» extends EntityRepository
-        «ELSE»
-        class «refClass.formatForCodeCapital» extends \EntityRepository
-        «ENDIF»
+        IF app.targets('1.3.5')
+        class app.appName_Entity_Repository_Base_refClass.formatForCodeCapital extends EntityRepository
+        ELSE
+        class refClass.formatForCodeCapital extends \EntityRepository
+        ENDIF
         {
             public function truncateTable()
             {
                 $qb = $this->getEntityManager()->createQueryBuilder();
-                «IF app.targets('1.3.5')»
-                    $qb->delete('«app.appName»_Entity_«refClass.formatForCodeCapital»', 'tbl');
-                «ELSE»
-                    $qb->delete('\\«app.vendor.formatForCodeCapital»\\«app.name.formatForCodeCapital»Module\\Entity\\«refClass.formatForCodeCapital»', 'tbl');
-                «ENDIF»
+                IF app.targets('1.3.5')
+                    $qb->delete('app.appName_Entity_refClass.formatForCodeCapital', 'tbl');
+                ELSE
+                    $qb->delete('\\app.vendor.formatForCodeCapital\\app.name.formatForCodeCapitalModule\\Entity\\refClass.formatForCodeCapital', 'tbl');
+                ENDIF
                 $query = $qb->getQuery();
                 $query->execute();
-                «IF !app.targets('1.3.5')»
+                IF !app.targets('1.3.5')
 
                     $serviceManager = ServiceUtil::getManager();
                     $logger = $serviceManager->get('logger');
-                    $logger->debug('{app}: User {user} truncated the {entity} entity table.', array('app' => '«app.appName»', 'user' => UserUtil::getVar('uname'), 'entity' => '«refClass.formatForDisplay»'));
-                «ENDIF»
+                    $logger->debug('{app}: User {user} truncated the {entity} entity table.', array('app' => 'app.appName', 'user' => UserUtil::getVar('uname'), 'entity' => 'refClass.formatForDisplay'));
+                ENDIF
             }
         }
     '''
 
     def private modelRefRepositoryImpl(ManyToManyRelationship it, Application app) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Entity\Repository;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Entity\Repository;
 
-            use «app.appNamespace»\Entity\Repository\Base\«refClass.formatForCodeCapital» as Base«refClass.formatForCodeCapital»;
+            use app.appNamespace\Entity\Repository\Base\refClass.formatForCodeCapital as BaserefClass.formatForCodeCapital;
 
-        «ENDIF»
+        ENDIF
         /**
          * Repository class used to implement own convenience methods for performing certain DQL queries.
          *
          * This is the concrete repository class for the many to many relationship
-         * between «source.name.formatForDisplay» and «target.name.formatForDisplay» entities.
+         * between source.name.formatForDisplay and target.name.formatForDisplay entities.
          */
-        «IF app.targets('1.3.5')»
-        class «app.appName»_Entity_Repository_«refClass.formatForCodeCapital» extends «app.appName»_Entity_Repository_Base_«refClass.formatForCodeCapital»
-        «ELSE»
-        class «refClass.formatForCodeCapital» extends Base«refClass.formatForCodeCapital»
-        «ENDIF»
+        IF app.targets('1.3.5')
+        class app.appName_Entity_Repository_refClass.formatForCodeCapital extends app.appName_Entity_Repository_Base_refClass.formatForCodeCapital
+        ELSE
+        class refClass.formatForCodeCapital extends BaserefClass.formatForCodeCapital
+        ENDIF
         {
             // feel free to add your own methods here, like for example reusable DQL queries
         }

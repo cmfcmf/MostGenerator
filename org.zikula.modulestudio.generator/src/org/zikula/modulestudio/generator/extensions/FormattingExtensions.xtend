@@ -12,9 +12,9 @@ class FormattingExtensions {
      * @return String without special characters.
      */
     def replaceSpecialChars(String s) {
-        s.replace('Ä', 'Ae').replace('ä', 'ae').replace('Ö', 'Oe')
-         .replace('ö', 'oe').replace('Ü', 'Ue').replace('ü', 'ue')
-         .replace('ß', 'ss').replaceAll('[\\W]', '')
+        s.replace('', 'Ae').replace('', 'ae').replace('', 'Oe')
+         .replace('', 'oe').replace('', 'Ue').replace('', 'ue')
+         .replace('', 'ss').replaceAll('[\\W]', '')
     }
 
     /**

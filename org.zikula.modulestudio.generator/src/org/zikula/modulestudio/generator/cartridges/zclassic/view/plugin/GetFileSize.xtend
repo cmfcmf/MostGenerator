@@ -21,7 +21,7 @@ class GetFileSize {
 
     def private getFileSizeImpl(Application it) '''
         /**
-         * The «appName.formatForDB»GetFileSize modifier displays the size of a given file in a readable way.
+         * The appName.formatForDBGetFileSize modifier displays the size of a given file in a readable way.
          *
          * @param integer $size     File size in bytes.
          * @param string  $filepath The input file path including file name (if file size is not known).
@@ -30,7 +30,7 @@ class GetFileSize {
          *
          * @return string File size in a readable form.
          */
-        function smarty_modifier_«appName.formatForDB»GetFileSize($size = 0, $filepath = '', $nodesc = false, $onlydesc = false)
+        function smarty_modifier_appName.formatForDBGetFileSize($size = 0, $filepath = '', $nodesc = false, $onlydesc = false)
         {
             if (!is_numeric($size)) {
                 $size = (int) $size;
@@ -46,11 +46,11 @@ class GetFileSize {
             }
 
             $serviceManager = ServiceUtil::getManager();
-            «IF targets('1.3.5')»
-                $viewHelper = new «appName»_Util_View($serviceManager);
-            «ELSE»
-                $viewHelper = $serviceManager->get('«appName.formatForDB».view_helper');
-            «ENDIF»
+            IF targets('1.3.5')
+                $viewHelper = new appName_Util_View($serviceManager);
+            ELSE
+                $viewHelper = $serviceManager->get('appName.formatForDB.view_helper');
+            ENDIF
 
             $result = $viewHelper->getReadableFileSize($size, $nodesc, $onlydesc);
 

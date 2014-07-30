@@ -23,9 +23,9 @@ class ShortUrlsLegacy {
 
     def dispatch generate (UserController it) '''
 
-        «encodeUrl»
+        encodeUrl
 
-        «decodeUrl»
+        decodeUrl
     '''
 
     def encodeUrl (UserController it) '''
@@ -52,22 +52,22 @@ class ShortUrlsLegacy {
             }
 
             // return if function url scheme is not being customised
-            $customFuncs = array(«IF hasActions('view')»'view'«IF hasActions('display')», «ENDIF»«ENDIF»«IF hasActions('display')»'display'«ENDIF»);
+            $customFuncs = array(IF hasActions('view')'view'IF hasActions('display'), ENDIFENDIFIF hasActions('display')'display'ENDIF);
             if (!in_array($args['func'], $customFuncs)) {
                 return false;
             }
 
             // initialise url routing rules
-            $routerFacade = new «IF app.targets('1.3.5')»«app.appName»_«ENDIF»RouterFacade();
+            $routerFacade = new IF app.targets('1.3.5')app.appName_ENDIFRouterFacade();
             // get router itself for convenience
             $router = $routerFacade->getRouter();
 
             // initialise object type
-            «IF app.targets('1.3.5')»
-                $controllerHelper = new «app.appName»_Util_Controller($this->serviceManager);
-            «ELSE»
-                $controllerHelper = $this->serviceManager->get('«app.appName.formatForDB».controller_helper');
-            «ENDIF»
+            IF app.targets('1.3.5')
+                $controllerHelper = new app.appName_Util_Controller($this->serviceManager);
+            ELSE
+                $controllerHelper = $this->serviceManager->get('app.appName.formatForDB.controller_helper');
+            ENDIF
             $utilArgs = array('controller' => 'user', 'action' => 'encodeurl');
             $allowedObjectTypes = $controllerHelper->getObjectTypes('api', $utilArgs);
             $objectType = ((isset($args['args']['ot']) && in_array($args['args']['ot'], $allowedObjectTypes)) ? $args['args']['ot'] : $controllerHelper->getDefaultObjectType('api', $utilArgs));
@@ -169,7 +169,7 @@ class ShortUrlsLegacy {
             }
 
             // enforce url name of the module, but do only 1 replacement to avoid changing other params
-            $modInfo = ModUtil::getInfoFromName('«app.appName»');
+            $modInfo = ModUtil::getInfoFromName('app.appName');
             $result = preg_replace('/' . $modInfo['name'] . '/', $modInfo['url'], $result, 1);
 
             return $result;
@@ -192,15 +192,15 @@ class ShortUrlsLegacy {
             }
 
             // define the available user functions
-            $funcs = array(«FOR action : actions SEPARATOR ", "»'«IF !container.application.targets('1.3.5') && action.name.toLowerCase == 'main'»index«ELSE»«action.name.formatForCode.toFirstLower»«ENDIF»'«ENDFOR»);
+            $funcs = array(FOR action : actions SEPARATOR ", "'IF !container.application.targets('1.3.5') && action.name.toLowerCase == 'main'indexELSEaction.name.formatForCode.toFirstLowerENDIF'ENDFOR);
 
             // return if function url scheme is not being customised
-            $customFuncs = array(«IF hasActions('view')»'view'«IF hasActions('display')», «ENDIF»«ENDIF»«IF hasActions('display')»'display'«ENDIF»);
+            $customFuncs = array(IF hasActions('view')'view'IF hasActions('display'), ENDIFENDIFIF hasActions('display')'display'ENDIF);
 
             // set the correct function name based on our input
             if (empty($args['vars'][2])) {
-                // no func and no vars = «IF container.application.targets('1.3.5')»main«ELSE»index«ENDIF»
-                System::queryStringSetVar('func', '«IF container.application.targets('1.3.5')»main«ELSE»index«ENDIF»');
+                // no func and no vars = IF container.application.targets('1.3.5')mainELSEindexENDIF
+                System::queryStringSetVar('func', 'IF container.application.targets('1.3.5')mainELSEindexENDIF');
                 return true;
             } else if (in_array($args['vars'][2], $funcs) && !in_array($args['vars'][2], $customFuncs)) {
                 // normal url scheme, no need for special decoding
@@ -210,7 +210,7 @@ class ShortUrlsLegacy {
             $func = $args['vars'][2];
 
             // usually the language is in $args['vars'][0], except no mod name is in the url and we are set as start app
-            $modInfo = ModUtil::getInfoFromName('«app.appName»');
+            $modInfo = ModUtil::getInfoFromName('app.appName');
             $lang = (strtolower($args['vars'][0]) == $modInfo['url']) ? $args['vars'][1] : $args['vars'][0];
 
             // remove some unrequired parameters
@@ -238,7 +238,7 @@ class ShortUrlsLegacy {
             }
 
             // initialise url routing rules
-            $routerFacade = new «IF app.targets('1.3.5')»«app.appName»_«ENDIF»RouterFacade();
+            $routerFacade = new IF app.targets('1.3.5')app.appName_ENDIFRouterFacade();
             // get router itself for convenience
             $router = $routerFacade->getRouter();
 
@@ -252,7 +252,7 @@ class ShortUrlsLegacy {
 
             // post processing
             if (!isset($parameters['func'])) {
-                $parameters['func'] = '«IF hasActions('view')»view«ELSEIF hasActions('display')»display«ELSE»«IF container.application.targets('1.3.5')»main«ELSE»index«ENDIF»«ENDIF»';
+                $parameters['func'] = 'IF hasActions('view')viewELSEIF hasActions('display')displayELSEIF container.application.targets('1.3.5')mainELSEindexENDIFENDIF';
             }
 
             $func = $parameters['func'];

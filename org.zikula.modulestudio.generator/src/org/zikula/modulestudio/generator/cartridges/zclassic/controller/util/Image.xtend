@@ -23,21 +23,21 @@ class Image {
     }
 
     def private imageFunctionsBaseImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Util\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Util\Base;
 
             use SystemPlugin_Imagine_Preset;
             use Zikula_AbstractBase;
 
-        «ENDIF»
+        ENDIF
         /**
          * Utility base class for image helper methods.
          */
-        class «IF targets('1.3.5')»«appName»_Util_Base_Image«ELSE»ImageUtil«ENDIF» extends Zikula_AbstractBase
+        class IF targets('1.3.5')appName_Util_Base_ImageELSEImageUtilENDIF extends Zikula_AbstractBase
         {
-            «getPreset»
+            getPreset
 
-            «getCustomPreset»
+            getCustomPreset
         }
     '''
 
@@ -64,7 +64,7 @@ class Image {
                     $args['controller'] = 'user';
                 }
                 if (!isset($args['action'])) {
-                    $args['action'] = '«IF targets('1.3.5')»main«ELSE»index«ENDIF»';
+                    $args['action'] = 'IF targets('1.3.5')mainELSEindexENDIF';
                 }
 
                 if ($args['controller'] == 'ajax' && $args['action'] == 'getItemListAutoCompletion') {
@@ -127,20 +127,20 @@ class Image {
     '''
 
     def private imageFunctionsImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Util;
+        IF !targets('1.3.5')
+            namespace appNamespace\Util;
 
-            use «appNamespace»\Util\Base\ImageUtil as BaseImageUtil;
+            use appNamespace\Util\Base\ImageUtil as BaseImageUtil;
 
-        «ENDIF»
+        ENDIF
         /**
          * Utility implementation class for image helper methods.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Util_Image extends «appName»_Util_Base_Image
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Util_Image extends appName_Util_Base_Image
+        ELSE
         class ImageUtil extends BaseImageUtil
-        «ENDIF»
+        ENDIF
         {
             // feel free to add your own convenience methods here
         }

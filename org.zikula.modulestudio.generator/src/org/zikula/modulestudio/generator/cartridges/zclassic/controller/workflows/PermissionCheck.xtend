@@ -62,14 +62,14 @@ class PermissionCheck {
     }
 
     def private permissionCheckFile() '''
-        «permissionCheckImpl»
+        permissionCheckImpl
 
-        «gettextStrings»
+        gettextStrings
     '''
 
     def private permissionCheckImpl() '''
         /**
-         * Permission check for workflow schema '«wfType.textualName»'.
+         * Permission check for workflow schema 'wfType.textualName'.
          * This function allows to calculate complex permission checks.
          * It receives the object the workflow engine is being asked to process and the permission level the action requires.
          *
@@ -80,21 +80,21 @@ class PermissionCheck {
          *
          * @return bool Whether the current user is allowed to execute the action or not.
          */
-        function «app.appName»_workflow_«wfType.textualName»_permissioncheck($obj, $permLevel, $currentUser, $actionId)
+        function app.appName_workflow_wfType.textualName_permissioncheck($obj, $permLevel, $currentUser, $actionId)
         {
-            «IF !getAllEntities(app).filter[hasArchive && getEndDateField !== null].empty»
+            IF !getAllEntities(app).filter[hasArchive && getEndDateField !== null].empty
                 // every user is allowed to perform automatic archiving 
-                if (PageUtil::getVar('«app.appName»AutomaticArchiving', false) === true) {
+                if (PageUtil::getVar('app.appNameAutomaticArchiving', false) === true) {
                     return true;
                 }
-            «ENDIF»
+            ENDIF
 
             // calculate the permission component
             $objectType = $obj['_objectType'];
-            $component = '«app.appName»:' . ucfirst($objectType) . ':';
+            $component = 'app.appName:' . ucfirst($objectType) . ':';
 
             // calculate the permission instance
-            $idFields = ModUtil::apiFunc('«app.appName»', 'selection', 'getIdFields', array('ot' => $objectType));
+            $idFields = ModUtil::apiFunc('app.appName', 'selection', 'getIdFields', array('ot' => $objectType));
             $instanceId = '';
             foreach ($idFields as $idField) {
                 if (!empty($instanceId)) {
@@ -106,15 +106,15 @@ class PermissionCheck {
 
             // now perform the permission check
             $result = SecurityUtil::checkPermission($component, $instance, $permLevel, $currentUser);
-            «val entitiesWithOwnerPermission = app.getAllEntities.filter[standardFields && ownerPermission]»
-            «IF !entitiesWithOwnerPermission.empty»
+            val entitiesWithOwnerPermission = app.getAllEntities.filter[standardFields && ownerPermission]
+            IF !entitiesWithOwnerPermission.empty
 
                 // check whether the current user is the owner
                 if (!$result && isset($obj['createdUserId']) && $obj['createdUserId'] == $currentUser) {
                     // allow author update operations for all states which occur before 'approved' in the object's life cycle.
-                    $result = in_array($actionId, array('initial'«IF app.hasWorkflowState(wfType, 'deferred')», 'deferred'«ENDIF»«IF wfType != EntityWorkflowType.NONE», 'waiting'«ENDIF», 'accepted'));
+                    $result = in_array($actionId, array('initial'IF app.hasWorkflowState(wfType, 'deferred'), 'deferred'ENDIFIF wfType != EntityWorkflowType.NONE, 'waiting'ENDIF, 'accepted'));
                 }
-            «ENDIF»
+            ENDIF
 
             return $result;
         }
@@ -124,17 +124,17 @@ class PermissionCheck {
         /**
          * This helper functions cares for including the strings used in the workflow into translation.
          */
-        function «app.appName»_workflow_«wfType.textualName»_gettextstrings()
+        function app.appName_workflow_wfType.textualName_gettextstrings()
         {
-            «val wfDefinition = new Definition»
+            val wfDefinition = new Definition
             return array(
-                'title' => no__('«wfType.textualName.formatForDisplayCapital» workflow («wfType.approvalType.formatForDisplay» approval)'),
-                'description' => no__('«wfDefinition.workflowDescription(wfType)»'),
+                'title' => no__('wfType.textualName.formatForDisplayCapital workflow (wfType.approvalType.formatForDisplay approval)'),
+                'description' => no__('wfDefinition.workflowDescription(wfType)'),
 
-                «val lastState = states.last»
-                «gettextStates(lastState)»
+                val lastState = states.last
+                gettextStates(lastState)
 
-                «gettextActionsPerState(lastState)»
+                gettextActionsPerState(lastState)
             );
         }
     '''
@@ -142,28 +142,28 @@ class PermissionCheck {
     def private gettextStates(ListFieldItem lastState) '''
         // state titles
         'states' => array(
-            «FOR state : states»
-                «gettextState(state)»«IF state != lastState»,«ENDIF»
-            «ENDFOR»
+            FOR state : states
+                gettextState(state)IF state != lastState,ENDIF
+            ENDFOR
         ),
     '''
 
     def private gettextState(ListFieldItem it) '''
-        no__('«name»') => no__('«documentation»')'''
+        no__('name') => no__('documentation')'''
 
     def private gettextActionsPerState(ListFieldItem lastState) '''
         // action titles and descriptions for each state
         'actions' => array(
-            «FOR state : states»
-                «gettextActionsForState(state)»«IF state != lastState»,«ENDIF»
-            «ENDFOR»
+            FOR state : states
+                gettextActionsForState(state)IF state != lastState,ENDIF
+            ENDFOR
         )
     '''
 
     def private gettextActionsForState(ListFieldItem it) '''
-        '«value»' => array(
-            «actionsForStateImpl»
-            «actionsForDestructionImpl»
+        'value' => array(
+            actionsForStateImpl
+            actionsForDestructionImpl
         )
     '''
 
@@ -182,127 +182,127 @@ class PermissionCheck {
     }
 
     def private actionsForInitial(ListFieldItem it) '''
-        «submitAction»
-        «submitAndAcceptAction»
-        «submitAndApproveAction»
-        «deferAction»
+        submitAction
+        submitAndAcceptAction
+        submitAndApproveAction
+        deferAction
     '''
 
     def private actionsForDeferred(ListFieldItem it) '''
-        «submitAction»
-        «updateAction»
+        submitAction
+        updateAction
     '''
 
     def private actionsForWaiting(ListFieldItem it) '''
-        «updateAction»
-        «rejectAction»
-        «acceptAction»
-        «approveAction»
+        updateAction
+        rejectAction
+        acceptAction
+        approveAction
     '''
 
     def private actionsForAccepted(ListFieldItem it) '''
-        «updateAction»
-        «approveAction»
+        updateAction
+        approveAction
     '''
 
     def private actionsForApproved(ListFieldItem it) '''
-        «updateAction»
-        «demoteAction»
-        «suspendAction»
-        «archiveAction»
+        updateAction
+        demoteAction
+        suspendAction
+        archiveAction
     '''
 
     def private actionsForSuspended(ListFieldItem it) '''
-        «updateAction»
-        «unsuspendAction»
-        «archiveAction»
+        updateAction
+        unsuspendAction
+        archiveAction
     '''
 
     def private deferAction(ListFieldItem it) '''
-        «IF app.hasWorkflowState(wfType, 'deferred')»
-            «actionImpl('Defer')»
-        «ENDIF»
+        IF app.hasWorkflowState(wfType, 'deferred')
+            actionImpl('Defer')
+        ENDIF
     '''
 
     def private submitAction(ListFieldItem it) '''
-        «actionImpl('Submit')»
+        actionImpl('Submit')
     '''
 
     def private updateAction(ListFieldItem it) '''
-        «actionImpl('Update')»
+        actionImpl('Update')
     '''
 
     def private rejectAction(ListFieldItem it) '''
-        «IF app.hasWorkflowState(wfType, 'deferred')»
-            «actionImpl('Reject')»
-        «ENDIF»
+        IF app.hasWorkflowState(wfType, 'deferred')
+            actionImpl('Reject')
+        ENDIF
     '''
 
     def private acceptAction(ListFieldItem it) '''
-        «IF app.hasWorkflowState(wfType, 'accepted')»
-            «actionImpl('Accept')»
-        «ENDIF»
+        IF app.hasWorkflowState(wfType, 'accepted')
+            actionImpl('Accept')
+        ENDIF
     '''
 
     def private approveAction(ListFieldItem it) '''
-        «actionImpl('Approve')»
+        actionImpl('Approve')
     '''
 
     def private submitAndAcceptAction(ListFieldItem it) '''
-        «IF app.hasWorkflowState(wfType, 'accepted')»
-            «actionImpl('Submit and Accept')»
-        «ENDIF»
+        IF app.hasWorkflowState(wfType, 'accepted')
+            actionImpl('Submit and Accept')
+        ENDIF
     '''
 
     def private submitAndApproveAction(ListFieldItem it) '''
-        «IF app.hasWorkflowState(wfType, 'waiting')»
-            «actionImpl('Submit and Approve')»
-        «ENDIF»
+        IF app.hasWorkflowState(wfType, 'waiting')
+            actionImpl('Submit and Approve')
+        ENDIF
     '''
 
     def private demoteAction(ListFieldItem it) '''
-        «IF app.hasWorkflowState(wfType, 'accepted')»
-            «actionImpl('Demote')»
-        «ENDIF»
+        IF app.hasWorkflowState(wfType, 'accepted')
+            actionImpl('Demote')
+        ENDIF
     '''
 
     def private suspendAction(ListFieldItem it) '''
-        «IF app.hasWorkflowState(wfType, 'suspended')»
-            «actionImpl('Unpublish')»
-        «ENDIF»
+        IF app.hasWorkflowState(wfType, 'suspended')
+            actionImpl('Unpublish')
+        ENDIF
     '''
 
     def private unsuspendAction(ListFieldItem it) '''
-        «IF it.value == 'suspended'»
-            «actionImpl('Publish')»
-        «ENDIF»
+        IF it.value == 'suspended'
+            actionImpl('Publish')
+        ENDIF
     '''
 
     def private archiveAction(ListFieldItem it) '''
-        «IF app.hasWorkflowState(wfType, 'archived')»
-            «actionImpl('Archive')»
-        «ENDIF»
+        IF app.hasWorkflowState(wfType, 'archived')
+            actionImpl('Archive')
+        ENDIF
     '''
 
     def private actionsForDestructionImpl(ListFieldItem it) '''
-        «IF it.value != 'initial' && it.value != 'deleted'»
-            «IF it.value != 'trashed' && app.hasWorkflowState(wfType, 'trashed')»
-                «trashAndRecoverActions»
-            «ENDIF»
-            «deleteAction»
-        «ENDIF»
+        IF it.value != 'initial' && it.value != 'deleted'
+            IF it.value != 'trashed' && app.hasWorkflowState(wfType, 'trashed')
+                trashAndRecoverActions
+            ENDIF
+            deleteAction
+        ENDIF
     '''
 
     def private trashAndRecoverActions(ListFieldItem it) '''
-        «actionImpl('Trash')»
-        «actionImpl('Recover')»
+        actionImpl('Trash')
+        actionImpl('Recover')
     '''
 
     def private deleteAction(ListFieldItem it) '''
-        «actionImpl('Delete')»
+        actionImpl('Delete')
     '''
 
     def private actionImpl(String title) '''
-        no__('«title»') => no__('«getWorkflowActionDescription(wfType, title)»')«IF title != 'Delete'»,«ENDIF»
+        no__('title') => no__('getWorkflowActionDescription(wfType, title)')IF title != 'Delete',ENDIF
     '''
 }

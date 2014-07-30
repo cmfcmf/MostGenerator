@@ -11,14 +11,14 @@ class Kernel {
     CommonExample commonExample = new CommonExample()
 
     def generate(Application it, Boolean isBase) '''
-        «IF !targets('1.3.5')»
+        IF !targets('1.3.5')
 
             /**
              * Makes our handlers known to the event system.
              */
             public static function getSubscribedEvents()
             {
-                «IF isBase»
+                IF isBase
                     return array(
                         KernelEvents::REQUEST        => array('onRequest', 5),
                         KernelEvents::CONTROLLER     => array('onController', 5),
@@ -28,12 +28,12 @@ class Kernel {
                         KernelEvents::TERMINATE      => array('onTerminate', 5),
                         KernelEvents::EXCEPTION      => array('onException', 5)
                     );
-                «ELSE»
+                ELSE
                     return parent::getSubscribedEvents();
-                «ENDIF»
+                ENDIF
             }
 
-        «ENDIF»
+        ENDIF
         /**
          * Listener for the `kernel.request` event.
          *
@@ -49,7 +49,7 @@ class Kernel {
          */
         public function onRequest(GetResponseEvent $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::onRequest($event);
 
                 // if we return a response the system jumps to the kernel.response event
@@ -57,11 +57,11 @@ class Kernel {
                 // $event->setResponse(new Response('This site is currently not active!'));
 
                 // init stuff and add it to the request (for example a locale)
-                // $testMessage = 'Hello from «name.formatForDisplay» app';
-                // $event->getRequest()->attributes->set('«appName»_test', $testMessage);
+                // $testMessage = 'Hello from name.formatForDisplay app';
+                // $event->getRequest()->attributes->set('appName_test', $testMessage);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
 
         /**
@@ -78,7 +78,7 @@ class Kernel {
          */
         public function onController(FilterControllerEvent $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::onController($event);
 
                 // $controller = $event->getController();
@@ -101,8 +101,8 @@ class Kernel {
                 //     ...
                 // }
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
 
         /**
@@ -120,7 +120,7 @@ class Kernel {
          */
         public function onView(GetResponseForControllerResultEvent $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::onView($event);
 
                 // $val = $event->getControllerResult();
@@ -131,8 +131,8 @@ class Kernel {
 
                 // $event->setResponse($response);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
 
         /**
@@ -155,18 +155,18 @@ class Kernel {
          */
         public function onResponse(FilterResponseEvent $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::onResponse($event);
 
                 // $response = $event->getResponse();
 
                 // ... modify the response object
 
-                // $testMessage = $event->getRequest()->attributes->get('«appName»_test');
-                // now $testMessage should be: 'Hello from «name.formatForDisplay» app'
+                // $testMessage = $event->getRequest()->attributes->get('appName_test');
+                // now $testMessage should be: 'Hello from name.formatForDisplay app'
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
 
         /**
@@ -181,11 +181,11 @@ class Kernel {
          */
         public function onFinishRequest(FinishRequestEvent $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::onFinishRequest($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
 
         /**
@@ -203,11 +203,11 @@ class Kernel {
          */
         public function onTerminate(PostResponseEvent $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::onTerminate($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
 
         /**
@@ -222,7 +222,7 @@ class Kernel {
          */
         public function onException(GetResponseForExceptionEvent $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::onException($event);
 
                 // retrieve exception object from the received event
@@ -234,7 +234,7 @@ class Kernel {
                     // $response = new Response();
 
                     // $message = sprintf(
-                    //     '«name.formatForDisplay» App Error says: %s with code: %s',
+                    //     'name.formatForDisplay App Error says: %s with code: %s',
                     //     $exception->getMessage(),
                     //     $exception->getCode()
                     // );
@@ -258,8 +258,8 @@ class Kernel {
                 // $exception = new \Exception('Some special exception');
                 // $event->setException($exception);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
     '''
 }

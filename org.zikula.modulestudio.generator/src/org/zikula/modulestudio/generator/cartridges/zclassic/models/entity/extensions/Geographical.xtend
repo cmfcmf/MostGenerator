@@ -29,13 +29,13 @@ class Geographical extends AbstractExtension implements EntityExtensionInterface
         /**
          * The coordinate's latitude part.
          *
-         «IF loggable»
+         IF loggable
              * @Gedmo\Versioned
-         «ENDIF»
+         ENDIF
          * @ORM\Column(type="decimal", precision=10, scale=7)
-         «IF !container.application.targets('1.3.5')»
+         IF !container.application.targets('1.3.5')
          * @Assert\Type(type="float")
-         «ENDIF»
+         ENDIF
          * @var decimal $latitude.
          */
         protected $latitude = 0.00;
@@ -43,13 +43,13 @@ class Geographical extends AbstractExtension implements EntityExtensionInterface
         /**
          * The coordinate's longitude part.
          *
-         «IF loggable»
+         IF loggable
              * @Gedmo\Versioned
-         «ENDIF»
+         ENDIF
          * @ORM\Column(type="decimal", precision=10, scale=7)
-         «IF !container.application.targets('1.3.5')»
+         IF !container.application.targets('1.3.5')
          * @Assert\Type(type="float")
-         «ENDIF»
+         ENDIF
          * @var decimal $longitude.
          */
         protected $longitude = 0.00;
@@ -59,8 +59,8 @@ class Geographical extends AbstractExtension implements EntityExtensionInterface
      * Generates additional accessor methods.
      */
     override accessors(Entity it) '''
-        «val fh = new FileHelper»
-        «fh.getterAndSetterMethods(it, 'latitude', 'decimal', false, false, '', '')»
-        «fh.getterAndSetterMethods(it, 'longitude', 'decimal', false, false, '', '')»
+        val fh = new FileHelper
+        fh.getterAndSetterMethods(it, 'latitude', 'decimal', false, false, '', '')
+        fh.getterAndSetterMethods(it, 'longitude', 'decimal', false, false, '', '')
     '''
 }

@@ -35,11 +35,11 @@ class UploadProcessing {
             }
 
             // initialise the upload handler
-            «IF targets('1.3.5')»
-                $uploadManager = new «appName»_UploadHandler();
-            «ELSE»
-                $uploadManager = $this->view->getServiceManager()->get('«appName.formatForDB».upload_handler');
-            «ENDIF»
+            IF targets('1.3.5')
+                $uploadManager = new appName_UploadHandler();
+            ELSE
+                $uploadManager = $this->view->getServiceManager()->get('appName.formatForDB.upload_handler');
+            ENDIF
             $existingObjectData = $existingObject->toArray();
 
             $objectId = ($this->mode != 'create') ? $this->idValues[0] : 0;

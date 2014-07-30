@@ -69,44 +69,44 @@ class ExtensionManager {
      * Generates separate extension classes.
      */
     def extensionClasses(IFileSystemAccess fsa) '''
-        «FOR ext : this.extensions»
-            «ext.extensionClasses(entity, fsa)»
-        «ENDFOR»
+        FOR ext : this.extensions
+            ext.extensionClasses(entity, fsa)
+        ENDFOR
     '''
 
     /**
      * Additional class annotations.
      */
     def classAnnotations() '''
-        «FOR ext : this.extensions»
-            «ext.classAnnotations(entity)»
-        «ENDFOR»
+        FOR ext : this.extensions
+            ext.classAnnotations(entity)
+        ENDFOR
     '''
 
     /**
      * Additional field annotations.
      */
     def columnAnnotations(DerivedField it) '''
-        «FOR ext : this.extensions»
-            «ext.columnAnnotations(it)»
-        «ENDFOR»
+        FOR ext : this.extensions
+            ext.columnAnnotations(it)
+        ENDFOR
     '''
 
     /**
      * Additional column definitions.
      */
     def additionalProperties() '''
-        «FOR ext : this.extensions»
-            «ext.properties(entity)»
-        «ENDFOR»
+        FOR ext : this.extensions
+            ext.properties(entity)
+        ENDFOR
     '''
 
     /**
      * Additional accessor methods.
      */
     def additionalAccessors() '''
-        «FOR ext : this.extensions»
-            «ext.accessors(entity)»
-        «ENDFOR»
+        FOR ext : this.extensions
+            ext.accessors(entity)
+        ENDFOR
     '''
 }

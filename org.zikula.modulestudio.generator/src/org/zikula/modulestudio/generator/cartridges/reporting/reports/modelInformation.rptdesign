@@ -2682,7 +2682,7 @@
   </Interactivity>
   <EmptyMessage>
     <Caption>
-      <Value>Das Modell enthält keine Relationen.</Value>
+      <Value>Das Modell enthlt keine Relationen.</Value>
       <Font>
         <Alignment>
           <horizontalAlignment>Center</horizontalAlignment>

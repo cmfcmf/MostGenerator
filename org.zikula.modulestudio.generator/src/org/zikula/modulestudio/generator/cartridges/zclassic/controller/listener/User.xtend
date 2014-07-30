@@ -20,42 +20,42 @@ class User {
     CommonExample commonExample = new CommonExample()
 
     def generate(Application it, Boolean isBase) '''
-        «IF !targets('1.3.5')»
+        IF !targets('1.3.5')
             /**
              * Makes our handlers known to the event system.
              */
             public static function getSubscribedEvents()
             {
-                «IF isBase»
+                IF isBase
                     return array(
                         'user.gettheme'       => array('getTheme', 5),
                         'user.account.create' => array('create', 5),
                         'user.account.update' => array('update', 5),
                         'user.account.delete' => array('delete', 5)
                     );
-                «ELSE»
+                ELSE
                     return parent::getSubscribedEvents();
-                «ENDIF»
+                ENDIF
             }
 
-        «ENDIF»
+        ENDIF
         /**
          * Listener for the `user.gettheme` event.
          *
          * Called during UserUtil::getTheme() and is used to filter the results.
          * Receives arg['type'] with the type of result to be filtered
          * and the $themeName in the $event->data which can be modified.
-         * Must $event->stop«IF !targets('1.3.5')»Propagation«ENDIF»() if handler performs filter.
+         * Must $event->stopIF !targets('1.3.5')PropagationENDIF() if handler performs filter.
          *
-         * @param «IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event The event instance.
+         * @param IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event The event instance.
          */
-        public «IF targets('1.3.5')»static «ENDIF»function getTheme(«IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event)
+        public IF targets('1.3.5')static ENDIFfunction getTheme(IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::getTheme($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
 
         /**
@@ -67,15 +67,15 @@ class User {
          * This is a storage-level event, not a UI event. It should not be used for UI-level actions such as redirects.
          * The subject of the event is set to the user record that was created.
          *
-         * @param «IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event The event instance.
+         * @param IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event The event instance.
          */
-        public «IF targets('1.3.5')»static «ENDIF»function create(«IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event)
+        public IF targets('1.3.5')static ENDIFfunction create(IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::create($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
 
         /**
@@ -86,15 +86,15 @@ class User {
          * This is a storage-level event, not a UI event. It should not be used for UI-level actions such as redirects.
          * The subject of the event is set to the user record, with the updated values.
          *
-         * @param «IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event The event instance.
+         * @param IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event The event instance.
          */
-        public «IF targets('1.3.5')»static «ENDIF»function update(«IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event)
+        public IF targets('1.3.5')static ENDIFfunction update(IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::update($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
 
         /**
@@ -106,69 +106,69 @@ class User {
          * This is a storage-level event, not a UI event. It should not be used for UI-level actions such as redirects.
          * The subject of the event is set to the user record that is being deleted.
          *
-         * @param «IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event The event instance.
+         * @param IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event The event instance.
          */
-        public «IF targets('1.3.5')»static «ENDIF»function delete(«IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event)
+        public IF targets('1.3.5')static ENDIFfunction delete(IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::delete($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ELSE»
-                «IF hasStandardFieldEntities || hasUserFields»
-                    ModUtil::initOOModule('«appName»');
+                commonExample.generalEventProperties(it)
+            ELSE
+                IF hasStandardFieldEntities || hasUserFields
+                    ModUtil::initOOModule('appName');
 
                     $userRecord = $event->getSubject();
                     $uid = $userRecord['uid'];
                     $serviceManager = ServiceUtil::getManager();
-                    $entityManager = $serviceManager->get«IF targets('1.3.5')»Service«ENDIF»('doctrine.entitymanager');
-                    «FOR entity : getAllEntities»«entity.userDelete»«ENDFOR»
-                «ENDIF»
-            «ENDIF»
+                    $entityManager = $serviceManager->getIF targets('1.3.5')ServiceENDIF('doctrine.entitymanager');
+                    FOR entity : getAllEntitiesentity.userDeleteENDFOR
+                ENDIF
+            ENDIF
         }
     '''
 
     def private userDelete(Entity it) '''
-        «IF standardFields || hasUserFieldsEntity»
+        IF standardFields || hasUserFieldsEntity
 
-            $repo = $entityManager->getRepository('«entityClassName('', false)»');
-            «IF standardFields»
-                «IF onAccountDeletionCreator != AccountDeletionHandler.DELETE»
-                    // set creator to «onAccountDeletionCreator.adhAsConstant» («onAccountDeletionCreator.adhUid») for all «nameMultiple.formatForDisplay» created by this user
-                    $repo->updateCreator($uid, «onAccountDeletionCreator.adhUid»);
-                «ELSE»
-                    // delete all «nameMultiple.formatForDisplay» created by this user
+            $repo = $entityManager->getRepository('entityClassName('', false)');
+            IF standardFields
+                IF onAccountDeletionCreator != AccountDeletionHandler.DELETE
+                    // set creator to onAccountDeletionCreator.adhAsConstant (onAccountDeletionCreator.adhUid) for all nameMultiple.formatForDisplay created by this user
+                    $repo->updateCreator($uid, onAccountDeletionCreator.adhUid);
+                ELSE
+                    // delete all nameMultiple.formatForDisplay created by this user
                     $repo->deleteByCreator($uid);
-                «ENDIF»
+                ENDIF
 
-                «IF onAccountDeletionLastEditor != AccountDeletionHandler.DELETE»
-                    // set last editor to «onAccountDeletionLastEditor.adhAsConstant» («onAccountDeletionLastEditor.adhUid») for all «nameMultiple.formatForDisplay» updated by this user
-                    $repo->updateLastEditor($uid, «onAccountDeletionLastEditor.adhUid»);
-                «ELSE»
-                    // delete all «nameMultiple.formatForDisplay» recently updated by this user
+                IF onAccountDeletionLastEditor != AccountDeletionHandler.DELETE
+                    // set last editor to onAccountDeletionLastEditor.adhAsConstant (onAccountDeletionLastEditor.adhUid) for all nameMultiple.formatForDisplay updated by this user
+                    $repo->updateLastEditor($uid, onAccountDeletionLastEditor.adhUid);
+                ELSE
+                    // delete all nameMultiple.formatForDisplay recently updated by this user
                     $repo->deleteByLastEditor($uid);
-                «ENDIF»
-            «ENDIF»
-            «IF hasUserFieldsEntity»
-                «FOR userField: getUserFieldsEntity»
-                    «userField.onAccountDeletionHandler»
-                «ENDFOR»
-            «ENDIF»
-            «IF !container.application.targets('1.3.5')»
+                ENDIF
+            ENDIF
+            IF hasUserFieldsEntity
+                FOR userField: getUserFieldsEntity
+                    userField.onAccountDeletionHandler
+                ENDFOR
+            ENDIF
+            IF !container.application.targets('1.3.5')
 
                 $logger = $serviceManager->get('logger');
-                $logger->notice('{app}: User {user} has been deleted, so we deleted corresponding {entities}, too.', array('app' => '«container.application.appName»', 'user' => UserUtil::getVar('uname'), 'entities' => '«nameMultiple.formatForDisplay»'));
-            «ENDIF»
-        «ENDIF»
+                $logger->notice('{app}: User {user} has been deleted, so we deleted corresponding {entities}, too.', array('app' => 'container.application.appName', 'user' => UserUtil::getVar('uname'), 'entities' => 'nameMultiple.formatForDisplay'));
+            ENDIF
+        ENDIF
     '''
 
     def private onAccountDeletionHandler(UserField it) '''
-        «IF onAccountDeletion != AccountDeletionHandler.DELETE»
-            // set last editor to «onAccountDeletion.adhAsConstant» («onAccountDeletion.adhUid») for all «entity.nameMultiple.formatForDisplay» affected by this user
-            $repo->updateUserField('«name.formatForCode»', $uid, «onAccountDeletion.adhUid»);
-        «ELSE»
-            // delete all «entity.nameMultiple.formatForDisplay» affected by this user
-            $repo->deleteByUserField('«name.formatForCode»', $uid);
-        «ENDIF»
+        IF onAccountDeletion != AccountDeletionHandler.DELETE
+            // set last editor to onAccountDeletion.adhAsConstant (onAccountDeletion.adhUid) for all entity.nameMultiple.formatForDisplay affected by this user
+            $repo->updateUserField('name.formatForCode', $uid, onAccountDeletion.adhUid);
+        ELSE
+            // delete all entity.nameMultiple.formatForDisplay affected by this user
+            $repo->deleteByUserField('name.formatForCode', $uid);
+        ENDIF
     '''
 }

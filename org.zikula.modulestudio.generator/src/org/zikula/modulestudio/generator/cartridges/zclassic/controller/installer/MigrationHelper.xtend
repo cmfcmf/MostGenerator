@@ -32,23 +32,23 @@ class MigrationHelper {
     '''
 
     def generate(Application it) '''
-        «updateModVarsTo140»
+        updateModVarsTo140
 
-        «updateExtensionInfoFor140»
+        updateExtensionInfoFor140
 
-        «renamePermissionsFor140»
+        renamePermissionsFor140
 
-        «renameCategoryRegistriesFor140»
+        renameCategoryRegistriesFor140
 
-        «renameTablesFor140»
+        renameTablesFor140
 
-        «dropEventHandlersFromDatabase»
+        dropEventHandlersFromDatabase
 
-        «updateHookNamesFor140»
+        updateHookNamesFor140
 
-        «getConnection»
+        getConnection
 
-        «getDbName»
+        getDbName
     '''
 
     def private updateModVarsTo140(Application it) '''
@@ -61,8 +61,8 @@ class MigrationHelper {
             $conn = $this->getConnection();
 
             $conn->executeQuery("UPDATE $dbName.module_vars
-                                 SET modname = '«appName»'
-                                 WHERE modname = '«name.formatForCodeCapital»';
+                                 SET modname = 'appName'
+                                 WHERE modname = 'name.formatForCodeCapital';
             ");
         }
     '''
@@ -77,9 +77,9 @@ class MigrationHelper {
             $dbName = $this->getDbName();
 
             $conn->executeQuery("UPDATE $dbName.modules
-                                 SET name = '«appName»',
-                                     directory = '«vendor.formatForCodeCapital»/«name.formatForCodeCapital»Module'
-                                 WHERE name = '«name.formatForCodeCapital»';
+                                 SET name = 'appName',
+                                     directory = 'vendor.formatForCodeCapital/name.formatForCodeCapitalModule'
+                                 WHERE name = 'name.formatForCodeCapital';
             ");
         }
     '''
@@ -93,11 +93,11 @@ class MigrationHelper {
             $conn = $this->getConnection();
             $dbName = $this->getDbName();
 
-            $componentLength = strlen('«name.formatForCodeCapital»') + 1;
+            $componentLength = strlen('name.formatForCodeCapital') + 1;
 
             $conn->executeQuery("UPDATE $dbName.group_perms
-                                 SET component = CONCAT('«appName»', SUBSTRING(component, $componentLength))
-                                 WHERE component LIKE '«name.formatForCodeCapital»%';
+                                 SET component = CONCAT('appName', SUBSTRING(component, $componentLength))
+                                 WHERE component LIKE 'name.formatForCodeCapital%';
             ");
         }
     '''
@@ -111,11 +111,11 @@ class MigrationHelper {
             $conn = $this->getConnection();
             $dbName = $this->getDbName();
 
-            $componentLength = strlen('«name.formatForCodeCapital»') + 1;
+            $componentLength = strlen('name.formatForCodeCapital') + 1;
 
             $conn->executeQuery("UPDATE $dbName.categories_registry
-                                 SET modname = CONCAT('«appName»', SUBSTRING(component, $componentLength))
-                                 WHERE modname LIKE '«name.formatForCodeCapital»%';
+                                 SET modname = CONCAT('appName', SUBSTRING(component, $componentLength))
+                                 WHERE modname LIKE 'name.formatForCodeCapital%';
             ");
         }
     '''
@@ -129,9 +129,9 @@ class MigrationHelper {
             $conn = $this->getConnection();
             $dbName = $this->getDbName();
 
-            $oldPrefix = '«prefix()»_';
+            $oldPrefix = 'prefix()_';
             $oldPrefixLength = strlen($oldPrefix);
-            $newPrefix = '«vendor.formatForDB»_«prefix()»_';
+            $newPrefix = 'vendor.formatForDB_prefix()_';
 
             $sm = $conn->getSchemaManager();
             $tables = $sm->listTables();
@@ -156,7 +156,7 @@ class MigrationHelper {
          */
         protected function dropEventHandlersFromDatabase()
         {
-            EventUtil::unregisterPersistentModuleHandlers('«name.formatForCodeCapital»');
+            EventUtil::unregisterPersistentModuleHandlers('name.formatForCodeCapital');
         }
     '''
 
@@ -170,41 +170,41 @@ class MigrationHelper {
             $dbName = $this->getDbName();
 
             $conn->executeQuery("UPDATE $dbName.hook_area
-                                 SET owner = '«appName»'
-                                 WHERE owner = '«name.formatForCodeCapital»';
+                                 SET owner = 'appName'
+                                 WHERE owner = 'name.formatForCodeCapital';
             ");
 
-            $componentLength = strlen('subscriber.«name.formatForDB»') + 1;
+            $componentLength = strlen('subscriber.name.formatForDB') + 1;
             $conn->executeQuery("UPDATE $dbName.hook_area
-                                 SET areaname = CONCAT('subscriber.«appName.formatForDB»', SUBSTRING(areaname, $componentLength))
-                                 WHERE areaname LIKE 'subscriber.«name.formatForDB»%';
+                                 SET areaname = CONCAT('subscriber.appName.formatForDB', SUBSTRING(areaname, $componentLength))
+                                 WHERE areaname LIKE 'subscriber.name.formatForDB%';
             ");
 
             $conn->executeQuery("UPDATE $dbName.hook_binding
-                                 SET sowner = '«appName»'
-                                 WHERE sowner = '«name.formatForCodeCapital»';
+                                 SET sowner = 'appName'
+                                 WHERE sowner = 'name.formatForCodeCapital';
             ");
 
             $conn->executeQuery("UPDATE $dbName.hook_runtime
-                                 SET sowner = '«appName»'
-                                 WHERE sowner = '«name.formatForCodeCapital»';
+                                 SET sowner = 'appName'
+                                 WHERE sowner = 'name.formatForCodeCapital';
             ");
 
-            $componentLength = strlen('«name.formatForDB»') + 1;
+            $componentLength = strlen('name.formatForDB') + 1;
             $conn->executeQuery("UPDATE $dbName.hook_runtime
-                                 SET eventname = CONCAT('«appName.formatForDB»', SUBSTRING(eventname, $componentLength))
-                                 WHERE eventname LIKE '«name.formatForDB»%';
+                                 SET eventname = CONCAT('appName.formatForDB', SUBSTRING(eventname, $componentLength))
+                                 WHERE eventname LIKE 'name.formatForDB%';
             ");
 
             $conn->executeQuery("UPDATE $dbName.hook_subscriber
-                                 SET owner = '«appName»'
-                                 WHERE owner = '«name.formatForCodeCapital»';
+                                 SET owner = 'appName'
+                                 WHERE owner = 'name.formatForCodeCapital';
             ");
 
-            $componentLength = strlen('«name.formatForDB»') + 1;
+            $componentLength = strlen('name.formatForDB') + 1;
             $conn->executeQuery("UPDATE $dbName.hook_subscriber
-                                 SET eventname = CONCAT('«appName.formatForDB»', SUBSTRING(eventname, $componentLength))
-                                 WHERE eventname LIKE '«name.formatForDB»%';
+                                 SET eventname = CONCAT('appName.formatForDB', SUBSTRING(eventname, $componentLength))
+                                 WHERE eventname LIKE 'name.formatForDB%';
             ");
         }
     '''

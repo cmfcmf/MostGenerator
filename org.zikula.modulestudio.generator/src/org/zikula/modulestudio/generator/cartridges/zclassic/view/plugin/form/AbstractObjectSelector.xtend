@@ -21,31 +21,31 @@ class AbstractObjectSelector {
     }
 
     def private selectorBaseImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Form\Plugin\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Form\Plugin\Base;
 
-        «ENDIF»
+        ENDIF
         use Doctrine\Common\Collections\Collection;
         use Doctrine\ORM\QueryBuilder;
-        «IF !targets('1.3.5')»
+        IF !targets('1.3.5')
             use FormUtil;
             use ModUtil;
             use ServiceUtil;
             use Zikula_EntityAccess;
             use Zikula_Form_Plugin_DropdownList;
             use Zikula_Form_View;
-        «ENDIF»
+        ENDIF
 
         /**
          * Abstract object selector plugin base class.
          */
-        «IF targets('1.3.5')»
-        abstract class «appName»_Form_Plugin_Base_AbstractObjectSelector extends Zikula_Form_Plugin_DropdownList
-        «ELSE»
+        IF targets('1.3.5')
+        abstract class appName_Form_Plugin_Base_AbstractObjectSelector extends Zikula_Form_Plugin_DropdownList
+        ELSE
         class AbstractObjectSelector extends Zikula_Form_Plugin_DropdownList
-        «ENDIF»
+        ENDIF
         {
-            «memberVars»
+            memberVars
 
             /**
              * Get filename of this file.
@@ -58,25 +58,25 @@ class AbstractObjectSelector {
                 return __FILE__;
             }
 
-            «createPlugin»
+            createPlugin
 
-            «load»
+            load
 
-            «renderAttributes»
+            renderAttributes
 
-            «loadItems»
+            loadItems
 
-            «validate»
+            validate
 
-            «setSelectedValue»
+            setSelectedValue
 
-            «relationPreProcess»
+            relationPreProcess
 
-            «relationPostProcess»
+            relationPostProcess
 
-            «buildWhereClause»
+            buildWhereClause
 
-            «helperMethods»
+            helperMethods
         }
     '''
 
@@ -86,7 +86,7 @@ class AbstractObjectSelector {
          *
          * @var string
          */
-        public $name = '«appName»';
+        public $name = 'appName';
 
         /**
          * The treated object type.
@@ -173,7 +173,7 @@ class AbstractObjectSelector {
         public function create(Zikula_Form_View $view, &$params)
         {
             if (!isset($params['objectType']) || empty($params['objectType'])) {
-                $view->trigger_error(__f('Error! in %1$s: the %2$s parameter must be specified.', array('«appName.formatForDB»RelationSelectorList', 'objectType')));
+                $view->trigger_error(__f('Error! in %1$s: the %2$s parameter must be specified.', array('appName.formatForDBRelationSelectorList', 'objectType')));
             }
             $this->objectType = $params['objectType'];
             unset($params['objectType']);
@@ -428,16 +428,16 @@ class AbstractObjectSelector {
             $alias = $this->id;
             $many = ($this->selectionMode == 'multiple');
 
-            «IF targets('1.3.5')»
+            IF targets('1.3.5')
                 $entityClass = $this->name . '_Entity_' . ucfirst($this->objectType);
-            «ENDIF»
+            ENDIF
             $serviceManager = ServiceUtil::getManager();
-            «IF targets('1.3.5')»
-                $entityManager = $serviceManager->get«IF targets('1.3.5')»Service«ENDIF»('doctrine.entitymanager');
+            IF targets('1.3.5')
+                $entityManager = $serviceManager->getIF targets('1.3.5')ServiceENDIF('doctrine.entitymanager');
                 $repository = $entityManager->getRepository($entityClass);
-            «ELSE»
-                $repository = $serviceManager->get('«appName.formatForDB».' . $this->objectType . '_factory')->getRepository();
-            «ENDIF»
+            ELSE
+                $repository = $serviceManager->get('appName.formatForDB.' . $this->objectType . '_factory')->getRepository();
+            ENDIF
 
             $inputValue = $this->getSelectedValue();
             if (empty($inputValue) || !$inputValue) {
@@ -473,16 +473,16 @@ class AbstractObjectSelector {
          */
         protected function fetchRelatedItems($view, $inputValue)
         {
-            «IF targets('1.3.5')»
-                $entityClass = '«appName»_Entity_' . ucfirst($this->objectType);
-            «ENDIF»
+            IF targets('1.3.5')
+                $entityClass = 'appName_Entity_' . ucfirst($this->objectType);
+            ENDIF
             $serviceManager = ServiceUtil::getManager();
-            «IF targets('1.3.5')»
-                $entityManager = $serviceManager->get«IF targets('1.3.5')»Service«ENDIF»('doctrine.entitymanager');
+            IF targets('1.3.5')
+                $entityManager = $serviceManager->getIF targets('1.3.5')ServiceENDIF('doctrine.entitymanager');
                 $repository = $entityManager->getRepository($entityClass);
-            «ELSE»
-                $repository = $serviceManager->get('«appName.formatForDB».' . $this->objectType . '_factory')->getRepository();
-            «ENDIF»
+            ELSE
+                $repository = $serviceManager->get('appName.formatForDB.' . $this->objectType . '_factory')->getRepository();
+            ENDIF
 
             $qb = $repository->genericBaseQuery('', '', false);
             $qb = $this->buildWhereClause($inputValue, $qb);
@@ -552,7 +552,7 @@ class AbstractObjectSelector {
         public function persistRelatedItems()
         {
             $serviceManager = ServiceUtil::getManager();
-            $entityManager = $serviceManager->get«IF targets('1.3.5')»Service«ENDIF»('doctrine.entitymanager');
+            $entityManager = $serviceManager->getIF targets('1.3.5')ServiceENDIF('doctrine.entitymanager');
         
             foreach ($this->selectedItems as $relatedItem) {
                 $entityManager->persist($relatedItem);
@@ -673,20 +673,20 @@ class AbstractObjectSelector {
     '''
 
     def private selectorImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Form\Plugin;
+        IF !targets('1.3.5')
+            namespace appNamespace\Form\Plugin;
 
-            use «appNamespace»\Form\Plugin\Base\AbstractObjectSelector as BaseAbstractObjectSelector;
+            use appNamespace\Form\Plugin\Base\AbstractObjectSelector as BaseAbstractObjectSelector;
 
-        «ENDIF»
+        ENDIF
         /**
          * Abstract object selector plugin implementation class.
          */
-        «IF targets('1.3.5')»
-        abstract class «appName»_Form_Plugin_AbstractObjectSelector extends «appName»_Form_Plugin_Base_AbstractObjectSelector
-        «ELSE»
+        IF targets('1.3.5')
+        abstract class appName_Form_Plugin_AbstractObjectSelector extends appName_Form_Plugin_Base_AbstractObjectSelector
+        ELSE
         class AbstractObjectSelector extends BaseAbstractObjectSelector
-        «ENDIF»
+        ENDIF
         {
             // feel free to add your customisation here
         }

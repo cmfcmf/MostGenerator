@@ -21,13 +21,13 @@ class FormatGeoData {
 
     def private formatGeoDataImpl(Application it) '''
         /**
-         * The «appName.formatForDB»FormatGeoData modifier formats geo data.
+         * The appName.formatForDBFormatGeoData modifier formats geo data.
          *
          * @param string $string The data to be formatted.
          *
          * @return string The formatted output.
          */
-        function smarty_modifier_«appName.formatForDB»FormatGeoData($string)
+        function smarty_modifier_appName.formatForDBFormatGeoData($string)
         {
             return number_format($string, 7, '.', '');
         }

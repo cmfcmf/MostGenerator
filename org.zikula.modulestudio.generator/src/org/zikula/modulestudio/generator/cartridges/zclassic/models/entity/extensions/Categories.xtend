@@ -33,10 +33,10 @@ class Categories extends AbstractExtension implements EntityExtensionInterface {
     override properties(Entity it) '''
 
         /**
-         * @ORM\OneToMany(targetEntity="«IF !container.application.targets('1.3.5')»\«ENDIF»«entityClassName('category', false)»", 
+         * @ORM\OneToMany(targetEntity="IF !container.application.targets('1.3.5')\ENDIFentityClassName('category', false)", 
          *                mappedBy="entity", cascade={"all"}, 
-         *                orphanRemoval=true«/*commented out as this causes only one category to be selected (#349)   , indexBy="categoryRegistryId"*/»)
-         * @var «IF !container.application.targets('1.3.5')»\«ENDIF»«entityClassName('category', false)»
+         *                orphanRemoval=true/*commented out as this causes only one category to be selected (#349)   , indexBy="categoryRegistryId"*/)
+         * @var IF !container.application.targets('1.3.5')\ENDIFentityClassName('category', false)
          */
         protected $categories = null;
     '''
@@ -45,8 +45,8 @@ class Categories extends AbstractExtension implements EntityExtensionInterface {
      * Generates additional accessor methods.
      */
     override accessors(Entity it) '''
-        «val fh = new FileHelper»
-        «fh.getterAndSetterMethods(it, 'categories', 'array', true, false, '', '')»
+        val fh = new FileHelper
+        fh.getterAndSetterMethods(it, 'categories', 'array', true, false, '', '')
     '''
 
     /**
@@ -61,9 +61,9 @@ class Categories extends AbstractExtension implements EntityExtensionInterface {
      */
     override extensionClassImports(Entity it) '''
         use Doctrine\ORM\Mapping as ORM;
-        «IF !container.application.targets('1.3.5')»
-            use Zikula\Core\Doctrine\Entity\«extensionBaseClass»;
-        «ENDIF»
+        IF !container.application.targets('1.3.5')
+            use Zikula\Core\Doctrine\Entity\extensionBaseClass;
+        ENDIF
     '''
 
     /**
@@ -89,24 +89,24 @@ class Categories extends AbstractExtension implements EntityExtensionInterface {
      */
     override extensionClassBaseAnnotations(Entity it) '''
         /**
-         * @ORM\ManyToOne(targetEntity="«IF !container.application.targets('1.3.5')»\«ENDIF»«entityClassName('', false)»", inversedBy="categories")
-         * @ORM\JoinColumn(name="entityId", referencedColumnName="«getPrimaryKeyFields.head.name.formatForCode»")
-         * @var «IF !container.application.targets('1.3.5')»\«ENDIF»«entityClassName('', false)»
+         * @ORM\ManyToOne(targetEntity="IF !container.application.targets('1.3.5')\ENDIFentityClassName('', false)", inversedBy="categories")
+         * @ORM\JoinColumn(name="entityId", referencedColumnName="getPrimaryKeyFields.head.name.formatForCode")
+         * @var IF !container.application.targets('1.3.5')\ENDIFentityClassName('', false)
          */
         protected $entity;
 
-        «extensionClassEntityAccessors»
+        extensionClassEntityAccessors
     '''
 
     /**
      * Returns the extension implementation class ORM annotations.
      */
     override extensionClassImplAnnotations(Entity it) '''
-         «' '»* @ORM\Entity(repositoryClass="«IF !container.application.targets('1.3.5')»\«ENDIF»«repositoryClass(extensionClassType)»")
-         «' '»* @ORM\Table(name="«fullEntityTableName»_category",
-         «' '»*     uniqueConstraints={
-         «' '»*         @ORM\UniqueConstraint(name="cat_unq", columns={"registryId", "categoryId", "entityId"})
-         «' '»*     }
-         «' '»* )
+         ' '* @ORM\Entity(repositoryClass="IF !container.application.targets('1.3.5')\ENDIFrepositoryClass(extensionClassType)")
+         ' '* @ORM\Table(name="fullEntityTableName_category",
+         ' '*     uniqueConstraints={
+         ' '*         @ORM\UniqueConstraint(name="cat_unq", columns={"registryId", "categoryId", "entityId"})
+         ' '*     }
+         ' '* )
     '''
 }

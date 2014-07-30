@@ -60,39 +60,39 @@ class Property {
 
     def dispatch persistentProperty(UploadField it) '''
         /**
-         * «name.formatForDisplayCapital» meta data array.
+         * name.formatForDisplayCapital meta data array.
          *
          * @ORM\Column(type="array")
-         «IF translatable»
+         IF translatable
           * @Gedmo\Translatable
-         «ENDIF»
-         «IF !entity.container.application.targets('1.3.5')»
+         ENDIF
+         IF !entity.container.application.targets('1.3.5')
          * @Assert\Type(type="array")
-         «ENDIF»
-         * @var array $«name.formatForCode»Meta.
+         ENDIF
+         * @var array $name.formatForCodeMeta.
          */
-        protected $«name.formatForCode»Meta = array();
+        protected $name.formatForCodeMeta = array();
 
-        «persistentProperty(name.formatForCode, fieldTypeAsString, '')»
+        persistentProperty(name.formatForCode, fieldTypeAsString, '')
         /**
-         * The full path to the «name.formatForDisplay».
+         * The full path to the name.formatForDisplay.
          *
-         «IF !entity.container.application.targets('1.3.5')»
+         IF !entity.container.application.targets('1.3.5')
          * @Assert\Type(type="string")
-         «ENDIF»
-         * @var string $«name.formatForCode»FullPath.
+         ENDIF
+         * @var string $name.formatForCodeFullPath.
          */
-        protected $«name.formatForCode»FullPath = '';
+        protected $name.formatForCodeFullPath = '';
 
         /**
-         * Full «name.formatForDisplay» path as url.
+         * Full name.formatForDisplay path as url.
          *
-         «IF !entity.container.application.targets('1.3.5')»
+         IF !entity.container.application.targets('1.3.5')
          * @Assert\Type(type="string")
-         «ENDIF»
-         * @var string $«name.formatForCode»FullPathUrl.
+         ENDIF
+         * @var string $name.formatForCodeFullPathUrl.
          */
-        protected $«name.formatForCode»FullPathUrl = '';
+        protected $name.formatForCodeFullPathUrl = '';
     '''
 
     def dispatch persistentProperty(ArrayField it) {
@@ -109,45 +109,45 @@ class Property {
 
     def persistentProperty(DerivedField it, String name, String type, String init, String modifier) '''
         /**
-         «IF primaryKey»
-             «IF !entity.hasCompositeKeys»«/* || entity.identifierStrategy == EntityIdentifierStrategy::ASSIGNED-»*/»
+         IF primaryKey
+             IF !entity.hasCompositeKeys/* || entity.identifierStrategy == EntityIdentifierStrategy::ASSIGNED-*/
               * @ORM\Id
-              «IF entity.identifierStrategy != EntityIdentifierStrategy::NONE»
-               * @ORM\GeneratedValue(strategy="«entity.identifierStrategy.literal»")
-              «ENDIF»
-            «ELSE»
+              IF entity.identifierStrategy != EntityIdentifierStrategy::NONE
+               * @ORM\GeneratedValue(strategy="entity.identifierStrategy.literal")
+              ENDIF
+            ELSE
               * @ORM\Id
-          «ENDIF»
-        «ENDIF»
-        «extMan.columnAnnotations(it)»
-         * @ORM\Column(«IF dbName !== null && dbName != ''»name="«dbName.formatForCode»", «ENDIF»«persistentPropertyImpl(type.toLowerCase)»«IF unique», unique=true«ENDIF»«IF nullable», nullable=true«ENDIF»)
-        «persistentPropertyAdditions»
-        «IF !entity.container.application.targets('1.3.5')»
-            «thVal.fieldAnnotations(it)»
-        «ENDIF»
-         * @var «IF type == 'bigint' || type == 'smallint'»integer«ELSE»«type»«ENDIF» $«name.formatForCode».
+          ENDIF
+        ENDIF
+        extMan.columnAnnotations(it)
+         * @ORM\Column(IF dbName !== null && dbName != ''name="dbName.formatForCode", ENDIFpersistentPropertyImpl(type.toLowerCase)IF unique, unique=trueENDIFIF nullable, nullable=trueENDIF)
+        persistentPropertyAdditions
+        IF !entity.container.application.targets('1.3.5')
+            thVal.fieldAnnotations(it)
+        ENDIF
+         * @var IF type == 'bigint' || type == 'smallint'integerELSEtypeENDIF $name.formatForCode.
          */
-        «modifier» $«name.formatForCode»«IF init != ''»«init»«ELSE» = «defaultFieldData»«ENDIF»;
-        «/* this last line is on purpose */»
+        modifier $name.formatForCodeIF init != ''initELSE = defaultFieldDataENDIF;
+        /* this last line is on purpose */
     '''
 
     def private persistentPropertyImpl(DerivedField it, String type) {
         switch it {
-            DecimalField: '''type="«type»", precision=«it.length», scale=«it.scale»'''
-            TextField: '''type="«type»", length=«it.length»'''
+            DecimalField: '''type="type", precision=it.length, scale=it.scale'''
+            TextField: '''type="type", length=it.length'''
             StringField:
-                '''«/*type="«type»", */»length=«it.length»'''
+                '''/*type="type", */length=it.length'''
             EmailField:
-                '''«/*type="«type»", */»length=«it.length»'''
+                '''/*type="type", */length=it.length'''
             UrlField:
-                '''«/*type="«type»", */»length=«it.length»'''
+                '''/*type="type", */length=it.length'''
             ArrayField:
-                '''type="«IF entity.container.application.targets('1.3.5')»array«ELSE»«arrayType.literal.toLowerCase»«ENDIF»"«/*», length=«it.length*/»'''
+                '''type="IF entity.container.application.targets('1.3.5')arrayELSEarrayType.literal.toLowerCaseENDIF"/*, length=it.length*/'''
             UploadField:
-                '''«/*type="«type»", */»length=«it.length»'''
+                '''/*type="type", */length=it.length'''
             ListField:
-                '''«/*type="«type»", */»length=«it.length»'''
-            default: '''type="«type»"'''
+                '''/*type="type", */length=it.length'''
+            default: '''type="type"'''
         }
     }
 
@@ -155,11 +155,11 @@ class Property {
         switch it {
             IntegerField:
                 if (it.version && entity.hasOptimisticLock) '''
-                    «''» * @ORM\Version
+                    '' * @ORM\Version
                 '''
             DatetimeField:
                 if (it.version && entity.hasOptimisticLock) '''
-                    «''» * @ORM\Version
+                    '' * @ORM\Version
                 '''
         }
     }
@@ -185,29 +185,29 @@ class Property {
     }
 
     def private fieldAccessorDefault(DerivedField it) '''
-        «IF isIndexByField»
-            «fh.getterMethod(it, name.formatForCode, fieldTypeAsString, false)»
-        «ELSE»
-            «fh.getterAndSetterMethods(it, name.formatForCode, fieldTypeAsString, false, false, '', '')»
-        «ENDIF»
+        IF isIndexByField
+            fh.getterMethod(it, name.formatForCode, fieldTypeAsString, false)
+        ELSE
+            fh.getterAndSetterMethods(it, name.formatForCode, fieldTypeAsString, false, false, '', '')
+        ENDIF
     '''
 
     def dispatch fieldAccessor(DerivedField it) '''
-        «fieldAccessorDefault»
+        fieldAccessorDefault
     '''
 
     def dispatch fieldAccessor(IntegerField it) '''
-        «IF isIndexByField/* || (aggregateFor != null && aggregateFor != ''*/»
-            «fh.getterMethod(it, name.formatForCode, fieldTypeAsString, false)»
-        «ELSE»
-            «fh.getterAndSetterMethods(it, name.formatForCode, fieldTypeAsString, false, false, '', '')»
-        «ENDIF»
+        IF isIndexByField/* || (aggregateFor != null && aggregateFor != ''*/
+            fh.getterMethod(it, name.formatForCode, fieldTypeAsString, false)
+        ELSE
+            fh.getterAndSetterMethods(it, name.formatForCode, fieldTypeAsString, false, false, '', '')
+        ENDIF
     '''
 
     def dispatch fieldAccessor(UploadField it) '''
-        «fieldAccessorDefault»
-        «fh.getterAndSetterMethods(it, name.formatForCode + 'FullPath', 'string', false, false, '', '')»
-        «fh.getterAndSetterMethods(it, name.formatForCode + 'FullPathUrl', 'string', false, false, '', '')»
-        «fh.getterAndSetterMethods(it, name.formatForCode + 'Meta', 'array', true, false, 'Array()', '')»
+        fieldAccessorDefault
+        fh.getterAndSetterMethods(it, name.formatForCode + 'FullPath', 'string', false, false, '', '')
+        fh.getterAndSetterMethods(it, name.formatForCode + 'FullPathUrl', 'string', false, false, '', '')
+        fh.getterAndSetterMethods(it, name.formatForCode + 'Meta', 'array', true, false, 'Array()', '')
     '''
 }

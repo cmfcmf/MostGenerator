@@ -57,7 +57,7 @@ class Tests {
 
             public static function suite()
             {
-                $suite = new PHPUnit_Framework_TestSuite('«appName» - All Tests');
+                $suite = new PHPUnit_Framework_TestSuite('appName - All Tests');
 
                 return $suite;
             }

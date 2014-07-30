@@ -24,19 +24,19 @@ class Selection {
     }
 
     def private selectionBaseClass(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Api\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Api\Base;
 
             use ModUtil;
             use Zikula_AbstractApi;
 
-        «ENDIF»
+        ENDIF
         /**
          * Selection api base class.
          */
-        class «IF targets('1.3.5')»«appName»_Api_Base_Selection«ELSE»SelectionApi«ENDIF» extends Zikula_AbstractApi
+        class IF targets('1.3.5')appName_Api_Base_SelectionELSESelectionApiENDIF extends Zikula_AbstractApi
         {
-            «selectionBaseImpl»
+            selectionBaseImpl
         }
     '''
 
@@ -51,11 +51,11 @@ class Selection {
         public function getIdFields(array $args = array())
         {
             $objectType = $this->determineObjectType($args, 'getIdFields');
-            «IF targets('1.3.5')»
-                $entityClass = '«appName»_Entity_' . ucfirst($objectType);
-            «ELSE»
-                $entityClass = '«vendor.formatForCodeCapital»«name.formatForCodeCapital»Module:' . ucfirst($objectType) . 'Entity';
-            «ENDIF»
+            IF targets('1.3.5')
+                $entityClass = 'appName_Entity_' . ucfirst($objectType);
+            ELSE
+                $entityClass = 'vendor.formatForCodeCapitalname.formatForCodeCapitalModule:' . ucfirst($objectType) . 'Entity';
+            ENDIF
 
             $meta = $this->entityManager->getClassMetadata($entityClass);
             if ($this->hasCompositeKeys($objectType)) {
@@ -76,11 +76,11 @@ class Selection {
          */
         protected function hasCompositeKeys($objectType)
         {
-            «IF targets('1.3.5')»
-                $controllerHelper = new «appName»_Util_Controller($this->serviceManager);
-            «ELSE»
-                $controllerHelper = $this->serviceManager->get('«appName.formatForDB».controller_helper');
-            «ENDIF»
+            IF targets('1.3.5')
+                $controllerHelper = new appName_Util_Controller($this->serviceManager);
+            ELSE
+                $controllerHelper = $this->serviceManager->get('appName.formatForDB.controller_helper');
+            ENDIF
 
             return $controllerHelper->hasCompositeKeys($objectType);
         }
@@ -90,9 +90,9 @@ class Selection {
          *
          * @param string  $args['ot']       The object type to retrieve (optional).
          * @param mixed   $args['id']       The id (or array of ids) to use to retrieve the object (default=null).
-         «IF hasSluggable»
+         IF hasSluggable
           * @param string  $args['slug']     Slug to use as selection criteria instead of id (optional) (default=null).
-         «ENDIF»
+         ENDIF
          * @param boolean $args['useJoins'] Whether to include joining related objects (optional) (default=true).
          * @param boolean $args['slimMode'] If activated only some basic fields are selected without using any joins (optional) (default=false).
          *
@@ -100,29 +100,29 @@ class Selection {
          */
         public function getEntity(array $args = array())
         {
-            if (!isset($args['id'])«IF hasSluggable» && !isset($args['slug'])«ENDIF») {
+            if (!isset($args['id'])IF hasSluggable && !isset($args['slug'])ENDIF) {
                 throw new \InvalidArgumentException(__('Invalid identifier received.'));
             }
             $objectType = $this->determineObjectType($args, 'getEntity');
             $repository = $this->getRepository($objectType);
 
             $idValues = $args['id'];
-            «IF hasSluggable»
+            IF hasSluggable
                 $slug = isset($args['slug']) ? $args['slug'] : null;
-            «ENDIF»
+            ENDIF
             $useJoins = isset($args['useJoins']) ? ((bool) $args['useJoins']) : true;
             $slimMode = isset($args['slimMode']) ? ((bool) $args['slimMode']) : false;
 
-            «IF hasSluggable»
+            IF hasSluggable
                 $entity = null;
                 if ($slug != null) {
                     $entity = $repository->selectBySlug($slug, $useJoins, $slimMode);
                 } else {
                     $entity = $repository->selectById($idValues, $useJoins, $slimMode);
                 }
-            «ELSE»
+            ELSE
                 $entity = $repository->selectById($idValues, $useJoins, $slimMode);
-            «ENDIF»
+            ENDIF
 
             return $entity;
         }
@@ -196,11 +196,11 @@ class Selection {
         protected function determineObjectType(array $args = array(), $methodName = '')
         {
             $objectType = isset($args['ot']) ? $args['ot'] : '';
-            «IF targets('1.3.5')»
-                $controllerHelper = new «appName»_Util_Controller($this->serviceManager);
-            «ELSE»
-                $controllerHelper = $this->serviceManager->get('«appName.formatForDB».controller_helper');
-            «ENDIF»
+            IF targets('1.3.5')
+                $controllerHelper = new appName_Util_Controller($this->serviceManager);
+            ELSE
+                $controllerHelper = $this->serviceManager->get('appName.formatForDB.controller_helper');
+            ENDIF
             $utilArgs = array('api' => 'selection', 'action' => $methodName);
             if (!in_array($objectType, $controllerHelper->getObjectTypes('api', $utilArgs))) {
                 $objectType = $controllerHelper->getDefaultObjectType('api', $utilArgs);
@@ -222,16 +222,16 @@ class Selection {
                 throw new \InvalidArgumentException(__('Invalid object type received.'));
             }
 
-            «IF targets('1.3.5')»
-                $entityClass = '«appName»_Entity_' . ucfirst($objectType);
+            IF targets('1.3.5')
+                $entityClass = 'appName_Entity_' . ucfirst($objectType);
                 $repository = $this->entityManager->getRepository($entityClass);
-            «ELSE»
-                $repository = $this->serviceManager->get('«appName.formatForDB».' . $objectType . '_factory')->getRepository();
-            «ENDIF»
+            ELSE
+                $repository = $this->serviceManager->get('appName.formatForDB.' . $objectType . '_factory')->getRepository();
+            ENDIF
 
             return $repository;
         }
-        «IF hasTrees»
+        IF hasTrees
 
             /**
              * Selects tree of given object type.
@@ -274,24 +274,24 @@ class Selection {
 
                 return $repository->selectAllTrees($useJoins);
             }
-        «ENDIF»
+        ENDIF
     '''
 
     def private selectionImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Api;
+        IF !targets('1.3.5')
+            namespace appNamespace\Api;
 
-            use «appNamespace»\Api\Base\SelectionApi as BaseSelectionApi;
+            use appNamespace\Api\Base\SelectionApi as BaseSelectionApi;
 
-        «ENDIF»
+        ENDIF
         /**
          * Selection api implementation class.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Api_Selection extends «appName»_Api_Base_Selection
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Api_Selection extends appName_Api_Base_Selection
+        ELSE
         class SelectionApi extends BaseSelectionApi
-        «ENDIF»
+        ENDIF
         {
             // feel free to extend the selection api here
         }

@@ -37,7 +37,7 @@ class PhpUnitXmlDist {
                  bootstrap="vendor/autoload.php"
         >
             <testsuites>
-                <testsuite name="«appName» Module Test Suite">
+                <testsuite name="appName Module Test Suite">
                     <directory>./Tests/</directory>
                 </testsuite>
             </testsuites>

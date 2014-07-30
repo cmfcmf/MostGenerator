@@ -13,31 +13,31 @@ class UserDeletion {
     extension Utils = new Utils
 
     def generate(Entity it) '''
-        «IF standardFields»
-            «userDeletionStandardFields»
-            «IF hasUserFieldsEntity»
+        IF standardFields
+            userDeletionStandardFields
+            IF hasUserFieldsEntity
 
-            «ENDIF»
-        «ENDIF»
-        «IF hasUserFieldsEntity»
-            «userDeletionUserFields»
-        «ENDIF»
+            ENDIF
+        ENDIF
+        IF hasUserFieldsEntity
+            userDeletionUserFields
+        ENDIF
     '''
 
     def private userDeletionStandardFields(Entity it) '''
-        «updateCreator»
+        updateCreator
 
-        «updateLastEditor»
+        updateLastEditor
 
-        «deleteByCreator»
+        deleteByCreator
 
-        «deleteByLastEditor»
+        deleteByLastEditor
     '''
 
     def private userDeletionUserFields(Entity it) '''
-        «updateUserField»
+        updateUserField
 
-        «deleteByUserField»
+        deleteByUserField
     '''
 
     def private updateCreator(Entity it) '''
@@ -60,21 +60,21 @@ class UserDeletion {
             }
 
             $qb = $this->getEntityManager()->createQueryBuilder();
-            $qb->update('«entityClassName('', false)»', 'tbl')
+            $qb->update('entityClassName('', false)', 'tbl')
                ->set('tbl.createdUserId', $newUserId)
                ->where('tbl.createdUserId = :creator')
                ->setParameter('creator', $userId);
             $query = $qb->getQuery();
-            «IF hasPessimisticWriteLock»
-                $query->setLockMode(LockMode::«lockType.lockTypeAsConstant»);
-            «ENDIF»
+            IF hasPessimisticWriteLock
+                $query->setLockMode(LockMode::lockType.lockTypeAsConstant);
+            ENDIF
             $query->execute();
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
 
                 $serviceManager = ServiceUtil::getManager();
                 $logger = $serviceManager->get('logger');
-                $logger->debug('{app}: User {user} updated {entities} created by user id {userid}.', array('app' => '«container.application.appName»', 'user' => UserUtil::getVar('uname'), 'entities' => '«nameMultiple.formatForDisplay»', 'userid' => $userId));
-            «ENDIF»
+                $logger->debug('{app}: User {user} updated {entities} created by user id {userid}.', array('app' => 'container.application.appName', 'user' => UserUtil::getVar('uname'), 'entities' => 'nameMultiple.formatForDisplay', 'userid' => $userId));
+            ENDIF
         }
     '''
 
@@ -98,21 +98,21 @@ class UserDeletion {
             }
 
             $qb = $this->getEntityManager()->createQueryBuilder();
-            $qb->update('«entityClassName('', false)»', 'tbl')
+            $qb->update('entityClassName('', false)', 'tbl')
                ->set('tbl.updatedUserId', $newUserId)
                ->where('tbl.updatedUserId = :editor')
                ->setParameter('editor', $userId);
             $query = $qb->getQuery();
-            «IF hasPessimisticWriteLock»
-                $query->setLockMode(LockMode::«lockType.lockTypeAsConstant»);
-            «ENDIF»
+            IF hasPessimisticWriteLock
+                $query->setLockMode(LockMode::lockType.lockTypeAsConstant);
+            ENDIF
             $query->execute();
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
 
                 $serviceManager = ServiceUtil::getManager();
                 $logger = $serviceManager->get('logger');
-                $logger->debug('{app}: User {user} updated {entities} edited by user id {userid}.', array('app' => '«container.application.appName»', 'user' => UserUtil::getVar('uname'), 'entities' => '«nameMultiple.formatForDisplay»', 'userid' => $userId));
-            «ENDIF»
+                $logger->debug('{app}: User {user} updated {entities} edited by user id {userid}.', array('app' => 'container.application.appName', 'user' => UserUtil::getVar('uname'), 'entities' => 'nameMultiple.formatForDisplay', 'userid' => $userId));
+            ENDIF
         }
     '''
 
@@ -134,19 +134,19 @@ class UserDeletion {
             }
 
             $qb = $this->getEntityManager()->createQueryBuilder();
-            $qb->delete('«entityClassName('', false)»', 'tbl')
+            $qb->delete('entityClassName('', false)', 'tbl')
                ->where('tbl.createdUserId = :creator')
                ->setParameter('creator', $userId);
             $query = $qb->getQuery();
-            «initDeleteQueryAdditions»
+            initDeleteQueryAdditions
 
             $query->execute();
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
 
                 $serviceManager = ServiceUtil::getManager();
                 $logger = $serviceManager->get('logger');
-                $logger->debug('{app}: User {user} deleted {entities} created by user id {userid}.', array('app' => '«container.application.appName»', 'user' => UserUtil::getVar('uname'), 'entities' => '«nameMultiple.formatForDisplay»', 'userid' => $userId));
-            «ENDIF»
+                $logger->debug('{app}: User {user} deleted {entities} created by user id {userid}.', array('app' => 'container.application.appName', 'user' => UserUtil::getVar('uname'), 'entities' => 'nameMultiple.formatForDisplay', 'userid' => $userId));
+            ENDIF
         }
     '''
 
@@ -168,19 +168,19 @@ class UserDeletion {
             }
 
             $qb = $this->getEntityManager()->createQueryBuilder();
-            $qb->delete('«entityClassName('', false)»', 'tbl')
+            $qb->delete('entityClassName('', false)', 'tbl')
                ->where('tbl.updatedUserId = :editor')
                ->setParameter('editor', $userId);
             $query = $qb->getQuery();
-            «initDeleteQueryAdditions»
+            initDeleteQueryAdditions
 
             $query->execute();
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
 
                 $serviceManager = ServiceUtil::getManager();
                 $logger = $serviceManager->get('logger');
-                $logger->debug('{app}: User {user} deleted {entities} edited by user id {userid}.', array('app' => '«container.application.appName»', 'user' => UserUtil::getVar('uname'), 'entities' => '«nameMultiple.formatForDisplay»', 'userid' => $userId));
-            «ENDIF»
+                $logger->debug('{app}: User {user} deleted {entities} edited by user id {userid}.', array('app' => 'container.application.appName', 'user' => UserUtil::getVar('uname'), 'entities' => 'nameMultiple.formatForDisplay', 'userid' => $userId));
+            ENDIF
         }
     '''
 
@@ -199,7 +199,7 @@ class UserDeletion {
         public function updateUserField($userFieldName, $userId, $newUserId)
         {
             // check field parameter
-            if (empty($userFieldName) || !in_array($userFieldName, array(«FOR field : getUserFieldsEntity SEPARATOR ', '»'«field.name.formatForCode»'«ENDFOR»))) {
+            if (empty($userFieldName) || !in_array($userFieldName, array(FOR field : getUserFieldsEntity SEPARATOR ', ''field.name.formatForCode'ENDFOR))) {
                 throw new \InvalidArgumentException(__('Invalid user field name received.'));
             }
             // check id parameter
@@ -209,21 +209,21 @@ class UserDeletion {
             }
 
             $qb = $this->getEntityManager()->createQueryBuilder();
-            $qb->update('«entityClassName('', false)»', 'tbl')
+            $qb->update('entityClassName('', false)', 'tbl')
                ->set('tbl.' . $userFieldName, $newUserId)
                ->where('tbl.' . $userFieldName . ' = :user')
                ->setParameter('user', $userId);
             $query = $qb->getQuery();
-            «IF hasPessimisticWriteLock»
-                $query->setLockMode(LockMode::«lockType.lockTypeAsConstant»);
-            «ENDIF»
+            IF hasPessimisticWriteLock
+                $query->setLockMode(LockMode::lockType.lockTypeAsConstant);
+            ENDIF
             $query->execute();
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
 
                 $serviceManager = ServiceUtil::getManager();
                 $logger = $serviceManager->get('logger');
-                $logger->debug('{app}: User {user} updated {entities} setting {field} from {userid} to {newuserid}.', array('app' => '«container.application.appName»', 'user' => UserUtil::getVar('uname'), 'entities' => '«nameMultiple.formatForDisplay»', 'field' => $userFieldName, 'userid' => $userId, 'newuserid' => $newUserId));
-            «ENDIF»
+                $logger->debug('{app}: User {user} updated {entities} setting {field} from {userid} to {newuserid}.', array('app' => 'container.application.appName', 'user' => UserUtil::getVar('uname'), 'entities' => 'nameMultiple.formatForDisplay', 'field' => $userFieldName, 'userid' => $userId, 'newuserid' => $newUserId));
+            ENDIF
         }
     '''
 
@@ -241,7 +241,7 @@ class UserDeletion {
         public function deleteByUserField($userFieldName, $userId)
         {
             // check field parameter
-            if (empty($userFieldName) || !in_array($userFieldName, array(«FOR field : getUserFieldsEntity SEPARATOR ', '»'«field.name.formatForCode»'«ENDFOR»))) {
+            if (empty($userFieldName) || !in_array($userFieldName, array(FOR field : getUserFieldsEntity SEPARATOR ', ''field.name.formatForCode'ENDFOR))) {
                 throw new \InvalidArgumentException(__('Invalid user field name received.'));
             }
             // check id parameter
@@ -250,34 +250,34 @@ class UserDeletion {
             }
 
             $qb = $this->getEntityManager()->createQueryBuilder();
-            $qb->delete('«entityClassName('', false)»', 'tbl')
+            $qb->delete('entityClassName('', false)', 'tbl')
                ->where('tbl.' . $userFieldName . ' = :user')
                ->setParameter('user', $userId);
             $query = $qb->getQuery();
-            «initDeleteQueryAdditions»
+            initDeleteQueryAdditions
 
             $query->execute();
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
 
                 $serviceManager = ServiceUtil::getManager();
                 $logger = $serviceManager->get('logger');
-                $logger->debug('{app}: User {user} deleted {entities} edited by user id {userid}.', array('app' => '«container.application.appName»', 'user' => UserUtil::getVar('uname'), 'entities' => '«nameMultiple.formatForDisplay»', 'userid' => $userId));
-            «ENDIF»
+                $logger->debug('{app}: User {user} deleted {entities} edited by user id {userid}.', array('app' => 'container.application.appName', 'user' => UserUtil::getVar('uname'), 'entities' => 'nameMultiple.formatForDisplay', 'userid' => $userId));
+            ENDIF
         }
     '''
 
     def private initDeleteQueryAdditions(Entity it) '''
-        «IF softDeleteable»
+        IF softDeleteable
 
             // set the softdeletable query hint
             $query->setHint(
                 Query::HINT_CUSTOM_OUTPUT_WALKER,
                 'Gedmo\\SoftDeleteable\\Query\\TreeWalker\\SoftDeleteableWalker'
             );
-        «ENDIF»
-        «IF hasPessimisticWriteLock»
+        ENDIF
+        IF hasPessimisticWriteLock
 
-            $query->setLockMode(LockMode::«lockType.lockTypeAsConstant»);
-        «ENDIF»
+            $query->setLockMode(LockMode::lockType.lockTypeAsConstant);
+        ENDIF
     '''
 }

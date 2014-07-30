@@ -13,9 +13,9 @@ class SoftDeleteable extends AbstractExtension implements EntityExtensionInterfa
      * Generates additional annotations on class level.
      */
     override classAnnotations(Entity it) '''
-         «IF !container.application.targets('1.3.5')»
-            «' '»* @Gedmo\SoftDeleteable(fieldName="deletedAt")
-         «ENDIF»
+         IF !container.application.targets('1.3.5')
+            ' '* @Gedmo\SoftDeleteable(fieldName="deletedAt")
+         ENDIF
     '''
 
     /**
@@ -32,13 +32,13 @@ class SoftDeleteable extends AbstractExtension implements EntityExtensionInterfa
         /**
          * Date of when this item has been marked as deleted.
          *
-         «IF loggable»
+         IF loggable
              * @Gedmo\Versioned
-         «ENDIF»
+         ENDIF
          * @ORM\Column(type="datetime", nullable=true)
-         «IF !container.application.targets('1.3.5')»
+         IF !container.application.targets('1.3.5')
          * @Assert\DateTime()
-         «ENDIF»
+         ENDIF
          * @var datetime $deletedAt.
          */
         protected $deletedAt;
@@ -48,7 +48,7 @@ class SoftDeleteable extends AbstractExtension implements EntityExtensionInterfa
      * Generates additional accessor methods.
      */
     override accessors(Entity it) '''
-        «val fh = new FileHelper»
-        «fh.getterAndSetterMethods(it, 'deletedAt', 'datetime', false, false, '', '')»
+        val fh = new FileHelper
+        fh.getterAndSetterMethods(it, 'deletedAt', 'datetime', false, false, '', '')
     '''
 }

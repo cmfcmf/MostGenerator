@@ -57,23 +57,23 @@ class Factory {
     }
 
     def private modelFactoryBaseImpl(Entity it) '''
-        namespace «app.appNamespace»\Entity\Factory\Base;
+        namespace app.appNamespace\Entity\Factory\Base;
 
         use Doctrine\Common\Persistence\ObjectManager;
 
         /**
          * Factory class used to retrieve entity and repository instances.
          *
-         * This is the base factory class for «name.formatForDisplay» entities.
+         * This is the base factory class for name.formatForDisplay entities.
          */
-        «IF app.targets('1.3.5')»
-        class «app.appName»_Entity_Factory_Base_«name.formatForCodeCapital»
-        «ELSE»
-        class «name.formatForCodeCapital»Factory
-        «ENDIF»
+        IF app.targets('1.3.5')
+        class app.appName_Entity_Factory_Base_name.formatForCodeCapital
+        ELSE
+        class name.formatForCodeCapitalFactory
+        ENDIF
         {
             /**
-             * @var String Full qualified class name to be used for «nameMultiple.formatForDisplay».
+             * @var String Full qualified class name to be used for nameMultiple.formatForDisplay.
              */
             protected $className;
 
@@ -91,7 +91,7 @@ class Factory {
              * Constructor.
              *
              * @param ObjectManager $om        The object manager to be used for determining the repository.
-             * @param String        $className Full qualified class name to be used for «nameMultiple.formatForDisplay».
+             * @param String        $className Full qualified class name to be used for nameMultiple.formatForDisplay.
              */
             public function __construct(ObjectManager $om, $className)
             {
@@ -100,36 +100,36 @@ class Factory {
                 $this->repository = $this->om->getRepository($className);
             }
 
-            public function create«name.formatForCodeCapital»()
+            public function createname.formatForCodeCapital()
             {
                 $entityClass = $this->className;
 
-                return new $entityClass(«/* TODO consider any arguments */»);
+                return new $entityClass(/* TODO consider any arguments */);
             }
 
-            «fh.getterAndSetterMethods(it, 'className', 'string', false, false, '', '')»
-            «fh.getterAndSetterMethods(it, 'objectManager', 'ObjectManager', false, false, '', '')»
-            «fh.getterAndSetterMethods(it, 'repository', 'EntityRepository', false, false, '', '')»
+            fh.getterAndSetterMethods(it, 'className', 'string', false, false, '', '')
+            fh.getterAndSetterMethods(it, 'objectManager', 'ObjectManager', false, false, '', '')
+            fh.getterAndSetterMethods(it, 'repository', 'EntityRepository', false, false, '', '')
         }
     '''
 
     def private modelFactoryImpl(Entity it) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Entity\Factory;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Entity\Factory;
 
-            use «app.appNamespace»\Entity\Factory\«IF isInheriting»«parentType.name.formatForCodeCapital»«ELSE»Base\«name.formatForCodeCapital»«ENDIF»Factory as Base«IF isInheriting»«parentType.name.formatForCodeCapital»«ELSE»«name.formatForCodeCapital»«ENDIF»Factory;
+            use app.appNamespace\Entity\Factory\IF isInheritingparentType.name.formatForCodeCapitalELSEBase\name.formatForCodeCapitalENDIFFactory as BaseIF isInheritingparentType.name.formatForCodeCapitalELSEname.formatForCodeCapitalENDIFFactory;
 
-        «ENDIF»
+        ENDIF
         /**
          * Factory class used to retrieve entity and repository instances.
          *
-         * This is the concrete factory class for «name.formatForDisplay» entities.
+         * This is the concrete factory class for name.formatForDisplay entities.
          */
-        «IF app.targets('1.3.5')»
-        class «app.appName»_Entity_Factory_«name.formatForCodeCapital» extends «IF isInheriting»«app.appName»_Entity_Factory_«parentType.name.formatForCodeCapital»«ELSE»«app.appName»_Entity_Factory_Base_«name.formatForCodeCapital»«ENDIF»
-        «ELSE»
-        class «name.formatForCodeCapital»Factory extends Base«IF isInheriting»«parentType.name.formatForCodeCapital»«ELSE»«name.formatForCodeCapital»«ENDIF»Factory
-        «ENDIF»
+        IF app.targets('1.3.5')
+        class app.appName_Entity_Factory_name.formatForCodeCapital extends IF isInheritingapp.appName_Entity_Factory_parentType.name.formatForCodeCapitalELSEapp.appName_Entity_Factory_Base_name.formatForCodeCapitalENDIF
+        ELSE
+        class name.formatForCodeCapitalFactory extends BaseIF isInheritingparentType.name.formatForCodeCapitalELSEname.formatForCodeCapitalENDIFFactory
+        ENDIF
         {
             // feel free to customise the manager
         }

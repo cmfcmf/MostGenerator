@@ -36,14 +36,14 @@ class Search {
         /**
          * Search api base class.
          */
-        class «appName»_Api_Base_Search extends Zikula_AbstractApi
+        class appName_Api_Base_Search extends Zikula_AbstractApi
         {
-            «searchApiBaseImpl»
+            searchApiBaseImpl
         }
     '''
 
     def private searchHelperBaseClass(Application it) '''
-        namespace «appNamespace»\Helper\Base;
+        namespace appNamespace\Helper\Base;
 
         use ModUtil;
         use SecurityUtil;
@@ -58,24 +58,24 @@ class Search {
          */
         class SearchHelper extends AbstractSearchable
         {
-            «searchHelperBaseImpl»
+            searchHelperBaseImpl
         }
     '''
 
     def private searchApiBaseImpl(Application it) '''
-        «infoLegacy»
+        infoLegacy
 
-        «optionsLegacy»
+        optionsLegacy
 
-        «searchLegacy»
+        searchLegacy
 
-        «searchCheckLegacy»
+        searchCheckLegacy
     '''
 
     def private searchHelperBaseImpl(Application it) '''
-        «getOptions»
+        getOptions
 
-        «getResults»
+        getResults
     '''
 
     def private infoLegacy(Application it) '''
@@ -107,10 +107,10 @@ class Search {
 
             $view = Zikula_View::getInstance($this->name);
 
-            «FOR entity : getAllEntities.filter[hasAbstractStringFieldsEntity]»
-                «val fieldName = 'active_' + entity.name.formatForCode»
-                $view->assign('«fieldName»', (!isset($args['«fieldName»']) || isset($args['active']['«fieldName»'])));
-            «ENDFOR»
+            FOR entity : getAllEntities.filter[hasAbstractStringFieldsEntity]
+                val fieldName = 'active_' + entity.name.formatForCode
+                $view->assign('fieldName', (!isset($args['fieldName']) || isset($args['active']['fieldName'])));
+            ENDFOR
 
             return $view->fetch('search/options.tpl');
         }
@@ -131,10 +131,10 @@ class Search {
                 return '';
             }
 
-            «FOR entity : getAllEntities.filter[hasAbstractStringFieldsEntity]»
-                «val fieldName = 'active_' + entity.name.formatForCode»
-                $this->view->assign('«fieldName»', (!isset($args['«fieldName»']) || isset($args['active']['«fieldName»'])));
-            «ENDFOR»
+            FOR entity : getAllEntities.filter[hasAbstractStringFieldsEntity]
+                val fieldName = 'active_' + entity.name.formatForCode
+                $this->view->assign('fieldName', (!isset($args['fieldName']) || isset($args['active']['fieldName'])));
+            ENDFOR
 
             return $this->view->fetch('Search/options.tpl');
         }
@@ -163,14 +163,14 @@ class Search {
             $sessionId  = session_id();
 
             // retrieve list of activated object types
-            $searchTypes = isset($args['objectTypes']) ? (array)$args['objectTypes'] : (array) FormUtil::getPassedValue('«appName.toFirstLower»SearchTypes', array(), 'GETPOST');
+            $searchTypes = isset($args['objectTypes']) ? (array)$args['objectTypes'] : (array) FormUtil::getPassedValue('appName.toFirstLowerSearchTypes', array(), 'GETPOST');
 
-            $controllerHelper = new «appName»_Util_Controller($this->serviceManager);
+            $controllerHelper = new appName_Util_Controller($this->serviceManager);
             $utilArgs = array('api' => 'search', 'action' => 'search');
             $allowedTypes = $controllerHelper->getObjectTypes('api', $utilArgs);
-            «IF targets('1.3.5')»
-                $entityManager = ServiceUtil::get«IF targets('1.3.5')»Service«ENDIF»('doctrine.entitymanager');
-            «ENDIF»
+            IF targets('1.3.5')
+                $entityManager = ServiceUtil::getIF targets('1.3.5')ServiceENDIF('doctrine.entitymanager');
+            ENDIF
             $currentPage = 1;
             $resultsPerPage = 50;
 
@@ -182,16 +182,16 @@ class Search {
                 $whereArray = array();
                 $languageField = null;
                 switch ($objectType) {
-                    «FOR entity : getAllEntities.filter[hasAbstractStringFieldsEntity]»
-                        case '«entity.name.formatForCode»':
-                            «FOR field : entity.getAbstractStringFieldsEntity»
-                                $whereArray[] = 'tbl.«field.name.formatForCode»';
-                            «ENDFOR»
-                            «IF entity.hasLanguageFieldsEntity»
-                                $languageField = '«entity.getLanguageFieldsEntity.head.name.formatForCode»';
-                            «ENDIF»
+                    FOR entity : getAllEntities.filter[hasAbstractStringFieldsEntity]
+                        case 'entity.name.formatForCode':
+                            FOR field : entity.getAbstractStringFieldsEntity
+                                $whereArray[] = 'tbl.field.name.formatForCode';
+                            ENDFOR
+                            IF entity.hasLanguageFieldsEntity
+                                $languageField = 'entity.getLanguageFieldsEntity.head.name.formatForCode';
+                            ENDIF
                             break;
-                    «ENDFOR»
+                    ENDFOR
                 }
                 $where = Search_Api_User::construct_where($args, $whereArray, $languageField);
 
@@ -207,18 +207,18 @@ class Search {
 
                 $idFields = ModUtil::apiFunc($this->name, 'selection', 'getIdFields', array('ot' => $objectType));
                 $descriptionField = $repository->getDescriptionFieldName();
-                «val hasUserDisplay = !getAllUserControllers.filter[hasActions('display')].empty»
+                val hasUserDisplay = !getAllUserControllers.filter[hasActions('display')].empty
                 foreach ($entities as $entity) {
-                    «IF hasUserDisplay»
+                    IF hasUserDisplay
                         $urlArgs = $entity->createUrlArgs();
-                    «ENDIF»
+                    ENDIF
                     $instanceId = $entity->createCompositeIdentifier();
-                    «IF hasUserDisplay»
+                    IF hasUserDisplay
                         // could exceed the maximum length of the 'extra' field, improved in 1.4.0
                         if (isset($urlArgs['slug'])) {
                             unset($urlArgs['slug']);
                         }
-                    «ENDIF»
+                    ENDIF
 
                     // perform permission check
                     if (!SecurityUtil::checkPermission($this->name . ':' . ucfirst($objectType) . ':', $instanceId . '::', ACCESS_OVERVIEW)) {
@@ -232,7 +232,7 @@ class Search {
                     $searchItemData = array(
                         'title'   => $title,
                         'text'    => $description,
-                        'extra'   => «IF hasUserDisplay»serialize($urlArgs)«ELSE»''«ENDIF»,
+                        'extra'   => IF hasUserDisplayserialize($urlArgs)ELSE''ENDIF,
                         'created' => $created,
                         'module'  => $this->name,
                         'session' => $sessionId
@@ -258,14 +258,14 @@ class Search {
          */
         public function search_check(array $args = array())
         {
-            «val hasUserDisplay = !getAllUserControllers.filter[hasActions('display')].empty»
-            «IF hasUserDisplay»
+            val hasUserDisplay = !getAllUserControllers.filter[hasActions('display')].empty
+            IF hasUserDisplay
                 $datarow = &$args['datarow'];
                 $urlArgs = unserialize($datarow['extra']);
                 $datarow['url'] = ModUtil::url($this->name, 'user', 'display', $urlArgs);
-            «ELSE»
+            ELSE
                 // nothing to do as we have no display pages which could be linked
-            «ENDIF»
+            ENDIF
 
             return true;
         }
@@ -302,7 +302,7 @@ class Search {
             // retrieve list of activated object types
             $searchTypes = isset($modVars['objectTypes']) ? (array)$modVars['objectTypes'] : array();
 
-            $controllerHelper = $serviceManager->get('«appName.formatForDB».controller_helper');
+            $controllerHelper = $serviceManager->get('appName.formatForDB.controller_helper');
             $utilArgs = array('helper' => 'search', 'action' => 'getResults');
             $allowedTypes = $controllerHelper->getObjectTypes('helper', $utilArgs);
 
@@ -314,19 +314,19 @@ class Search {
                 $whereArray = array();
                 $languageField = null;
                 switch ($objectType) {
-                    «FOR entity : getAllEntities.filter[hasAbstractStringFieldsEntity]»
-                        case '«entity.name.formatForCode»':
-                            «FOR field : entity.getAbstractStringFieldsEntity»
-                                $whereArray[] = 'tbl.«field.name.formatForCode»';
-                            «ENDFOR»
-                            «IF entity.hasLanguageFieldsEntity»
-                                $languageField = '«entity.getLanguageFieldsEntity.head.name.formatForCode»';
-                            «ENDIF»
+                    FOR entity : getAllEntities.filter[hasAbstractStringFieldsEntity]
+                        case 'entity.name.formatForCode':
+                            FOR field : entity.getAbstractStringFieldsEntity
+                                $whereArray[] = 'tbl.field.name.formatForCode';
+                            ENDFOR
+                            IF entity.hasLanguageFieldsEntity
+                                $languageField = 'entity.getLanguageFieldsEntity.head.name.formatForCode';
+                            ENDIF
                             break;
-                    «ENDFOR»
+                    ENDFOR
                 }
 
-                $repository = $serviceManager->get('«appName.formatForDB».' . $objectType . '_factory')->getRepository();
+                $repository = $serviceManager->get('appName.formatForDB.' . $objectType . '_factory')->getRepository();
 
                 // build the search query without any joins
                 $qb = $repository->genericBaseQuery('', '', false);
@@ -350,12 +350,12 @@ class Search {
 
                 $idFields = ModUtil::apiFunc($this->name, 'selection', 'getIdFields', array('ot' => $objectType));
                 $descriptionField = $repository->getDescriptionFieldName();
-                «val hasUserDisplay = !getAllUserControllers.filter[hasActions('display')].empty»
+                val hasUserDisplay = !getAllUserControllers.filter[hasActions('display')].empty
 
                 foreach ($entities as $entity) {
-                    «IF hasUserDisplay»
+                    IF hasUserDisplay
                         $urlArgs = $entity->createUrlArgs();
-                    «ENDIF»
+                    ENDIF
                     $instanceId = $entity->createCompositeIdentifier();
 
                     // perform permission check
@@ -376,8 +376,8 @@ class Search {
                         'text' => $description,
                         'module' => $this->name,
                         'sesid' => $sessionId,
-                        'created' => $created«IF hasUserDisplay»,
-                        'url' => new ModUrl($this->name, $objectType, 'display', $languageCode, $urlArgs)«ENDIF»
+                        'created' => $createdIF hasUserDisplay,
+                        'url' => new ModUrl($this->name, $objectType, 'display', $languageCode, $urlArgs)ENDIF
                     );
                 }
             }
@@ -390,16 +390,16 @@ class Search {
         /**
          * Search api implementation class.
          */
-        class «appName»_Api_Search extends «appName»_Api_Base_Search
+        class appName_Api_Search extends appName_Api_Base_Search
         {
             // feel free to extend the search api here
         }
     '''
 
     def private searchHelperImpl(Application it) '''
-        namespace «appNamespace»\Helper;
+        namespace appNamespace\Helper;
 
-        use «appNamespace»\Helper\Base\SearchHelper as BaseSearchHelper;
+        use appNamespace\Helper\Base\SearchHelper as BaseSearchHelper;
 
         /**
          * Search helper implementation class.

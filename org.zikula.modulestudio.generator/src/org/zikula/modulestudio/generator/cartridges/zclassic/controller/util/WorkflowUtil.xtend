@@ -32,31 +32,31 @@ class WorkflowUtil {
     }
 
     def private workflowFunctionsBaseImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Util\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Util\Base;
 
             use ModUtil;
             use SecurityUtil;
             use Zikula_AbstractBase;
             use Zikula_Workflow_Util;
 
-        «ENDIF»
+        ENDIF
         /**
          * Utility base class for workflow helper methods.
          */
-        class «IF targets('1.3.5')»«appName»_Util_Base_Workflow«ELSE»WorkflowUtil«ENDIF» extends Zikula_AbstractBase
+        class IF targets('1.3.5')appName_Util_Base_WorkflowELSEWorkflowUtilENDIF extends Zikula_AbstractBase
         {
-            «getObjectStates»
-            «getStateInfo»
-            «getWorkflowName»
-            «getWorkflowSchema»
-            «getActionsForObject»
-            «executeAction»
-            «IF !targets('1.3.5')»
-                «normaliseWorkflowData»
-            «ENDIF»
-            «collectAmountOfModerationItems»
-            «getAmountOfModerationItems»
+            getObjectStates
+            getStateInfo
+            getWorkflowName
+            getWorkflowSchema
+            getActionsForObject
+            executeAction
+            IF !targets('1.3.5')
+                normaliseWorkflowData
+            ENDIF
+            collectAmountOfModerationItems
+            getAmountOfModerationItems
         }
     '''
 
@@ -69,10 +69,10 @@ class WorkflowUtil {
         public function getObjectStates()
         {
             $states = array();
-            «val states = getRequiredStateList»
-            «FOR state : states»
-                «stateInfo(state)»
-            «ENDFOR»
+            val states = getRequiredStateList
+            FOR state : states
+                stateInfo(state)
+            ENDFOR
 
             return $states;
         }
@@ -80,9 +80,9 @@ class WorkflowUtil {
     '''
 
     def private stateInfo(Application it, ListFieldItem item) '''
-        $states[] = array('value' => '«item.value»',
-                          'text' => $this->__('«item.name»'),
-                          'ui' => '«uiFeedback(item)»');
+        $states[] = array('value' => 'item.value',
+                          'text' => $this->__('item.name'),
+                          'ui' => 'uiFeedback(item)');
     '''
 
     def private uiFeedback(Application it, ListFieldItem item) {
@@ -160,11 +160,11 @@ class WorkflowUtil {
         {
             $result = '';
             switch ($objectType) {
-                «FOR entity: getAllEntities»
-                    case '«entity.name.formatForCode»':
-                        $result = '«entity.workflow.textualName»';
+                FOR entity: getAllEntities
+                    case 'entity.name.formatForCode':
+                        $result = 'entity.workflow.textualName';
                         break;
-                «ENDFOR»
+                ENDFOR
             }
 
             return $result;
@@ -205,20 +205,20 @@ class WorkflowUtil {
         {
             // get possible actions for this object in it's current workflow state
             $objectType = $entity['_objectType'];
-            «IF !targets('1.3.5')»
+            IF !targets('1.3.5')
 
                 $this->normaliseWorkflowData($entity);
-            «ENDIF»
+            ENDIF
 
-            $idcolumn = $entity['__WORKFLOW__']['«IF targets('1.3.5')»obj_idcolumn«ELSE»objIdcolumn«ENDIF»'];
+            $idcolumn = $entity['__WORKFLOW__']['IF targets('1.3.5')obj_idcolumnELSEobjIdcolumnENDIF'];
             $wfActions = Zikula_Workflow_Util::getActionsForObject($entity, $objectType, $idcolumn, $this->name);
 
             // as we use the workflows for multiple object types we must maybe filter out some actions
-            «IF targets('1.3.5')»
-                $listHelper = new «appName»_Util_ListEntries($this->serviceManager);
-            «ELSE»
-                $listHelper = $this->serviceManager->get('«appName.formatForDB».listentries_helper');
-            «ENDIF»
+            IF targets('1.3.5')
+                $listHelper = new appName_Util_ListEntries($this->serviceManager);
+            ELSE
+                $listHelper = $this->serviceManager->get('appName.formatForDB.listentries_helper');
+            ENDIF
             $states = $listHelper->getEntries($objectType, 'workflowState');
             $allowedStates = array();
             foreach ($states as $state) {
@@ -248,74 +248,74 @@ class WorkflowUtil {
         {
             $buttonClass = '';
             switch ($actionId) {
-                «IF hasWorkflowState('deferred')»
+                IF hasWorkflowState('deferred')
                     case 'defer':
                         $buttonClass = '';
                         break;
-                «ENDIF»
+                ENDIF
                 case 'submit':
-                    $buttonClass = '«IF targets('1.3.5')»ok«ELSE»success«ENDIF»';
+                    $buttonClass = 'IF targets('1.3.5')okELSEsuccessENDIF';
                     break;
                 case 'update':
-                    $buttonClass = '«IF targets('1.3.5')»ok«ELSE»success«ENDIF»';
+                    $buttonClass = 'IF targets('1.3.5')okELSEsuccessENDIF';
                     break;
-                «IF hasWorkflowState('deferred')»
+                IF hasWorkflowState('deferred')
                     case 'reject':
                         $buttonClass = '';
                         break;
-                «ENDIF»
-                «IF hasWorkflowState('accepted')»
+                ENDIF
+                IF hasWorkflowState('accepted')
                     case 'accept':
-                        $buttonClass = '«IF targets('1.3.5')»ok«ELSE»default«ENDIF»';
+                        $buttonClass = 'IF targets('1.3.5')okELSEdefaultENDIF';
                         break;
-                «ENDIF»
-                «IF hasWorkflow(EntityWorkflowType::STANDARD) || hasWorkflow(EntityWorkflowType::ENTERPRISE)»
+                ENDIF
+                IF hasWorkflow(EntityWorkflowType::STANDARD) || hasWorkflow(EntityWorkflowType::ENTERPRISE)
                     case 'approve':
-                        $buttonClass = '«IF targets('1.3.5')»ok«ENDIF»';
+                        $buttonClass = 'IF targets('1.3.5')okENDIF';
                         break;
-                «ENDIF»
-                «IF hasWorkflowState('accepted')»
+                ENDIF
+                IF hasWorkflowState('accepted')
                     case 'demote':
                         $buttonClass = '';
                         break;
-                «ENDIF»
-                «IF hasWorkflowState('suspended')»
+                ENDIF
+                IF hasWorkflowState('suspended')
                     case 'unpublish':
                         $buttonClass = '';
                         break;
                     case 'publish':
-                        $buttonClass = '«IF targets('1.3.5')»ok«ENDIF»';
+                        $buttonClass = 'IF targets('1.3.5')okENDIF';
                         break;
-                «ENDIF»
-                «IF hasWorkflowState('archived')»
+                ENDIF
+                IF hasWorkflowState('archived')
                     case 'archive':
-                        $buttonClass = '«IF targets('1.3.5')»archive«ENDIF»';
+                        $buttonClass = 'IF targets('1.3.5')archiveENDIF';
                         break;
-                «ENDIF»
-                «IF hasWorkflowState('trashed')»
+                ENDIF
+                IF hasWorkflowState('trashed')
                     case 'trash':
                         $buttonClass = '';
                         break;
                     case 'recover':
-                        $buttonClass = '«IF targets('1.3.5')»ok«ENDIF»';
+                        $buttonClass = 'IF targets('1.3.5')okENDIF';
                         break;
-                «ENDIF»
+                ENDIF
                 case 'delete':
-                    $buttonClass = '«IF targets('1.3.5')»delete z-btred«ELSE»danger«ENDIF»';
+                    $buttonClass = 'IF targets('1.3.5')delete z-btredELSEdangerENDIF';
                     break;
             }
 
-            «IF targets('1.3.5')»
+            IF targets('1.3.5')
                 if (!empty($buttonClass)) {
                     $buttonClass = 'z-bt-' . $buttonClass;
                 }
-            «ELSE»
+            ELSE
                 if (empty($buttonClass)) {
                     $buttonClass = 'default';
                 }
 
                 $buttonClass = 'btn btn-' . $buttonClass;
-            «ENDIF»
+            ENDIF
 
             return $buttonClass;
         }
@@ -338,11 +338,11 @@ class WorkflowUtil {
             $schemaName = $this->getWorkflowName($objectType);
 
             $entity->initWorkflow(true);
-            $idcolumn = $entity['__WORKFLOW__']['«IF targets('1.3.5')»obj_idcolumn«ELSE»objIdcolumn«ENDIF»'];
-            «IF !targets('1.3.5')»
+            $idcolumn = $entity['__WORKFLOW__']['IF targets('1.3.5')obj_idcolumnELSEobjIdcolumnENDIF'];
+            IF !targets('1.3.5')
 
                 $this->normaliseWorkflowData($entity);
-            «ENDIF»
+            ENDIF
 
             $result = Zikula_Workflow_Util::executeAction($schemaName, $entity, $actionId, $objectType, $this->name, $idcolumn);
 
@@ -379,25 +379,25 @@ class WorkflowUtil {
             }
 
             if (!is_object($workflow)) {
-                $workflow['module'] = '«appName»';
+                $workflow['module'] = 'appName';
                 $entity['__WORKFLOW__'] = $workflow;
 
                 return true;
             }
 
             $entity['__WORKFLOW__'] = array(
-                'module'        => '«appName»',
+                'module'        => 'appName',
                 'id'            => $workflow->getId(),
                 'state'         => $workflow->getState(),
-                «IF targets('1.3.5')»
+                IF targets('1.3.5')
                     'obj_table'     => $workflow->getObjTable(),
                     'obj_idcolumn'  => $workflow->getObjIdcolumn(),
                     'obj_id'        => $workflow->getObjId(),
-                «ELSE»
+                ELSE
                     'objTable'      => $workflow->getObjTable(),
                     'objIdcolumn'   => $workflow->getObjIdcolumn(),
                     'objId'         => $workflow->getObjId(),
-                «ENDIF»
+                ENDIF
                 'schemaname'    => $workflow->getSchemaname()
             );
 
@@ -415,34 +415,34 @@ class WorkflowUtil {
         public function collectAmountOfModerationItems()
         {
             $amounts = array();
-            $modname = '«appName»';
+            $modname = 'appName';
 
-            «val entitiesStandard = getEntitiesForWorkflow(EntityWorkflowType::STANDARD)»
-            «val entitiesEnterprise = getEntitiesForWorkflow(EntityWorkflowType::ENTERPRISE)»
-            «val entitiesNotNone = entitiesStandard + entitiesEnterprise»
-            «IF entitiesNotNone.empty»
+            val entitiesStandard = getEntitiesForWorkflow(EntityWorkflowType::STANDARD)
+            val entitiesEnterprise = getEntitiesForWorkflow(EntityWorkflowType::ENTERPRISE)
+            val entitiesNotNone = entitiesStandard + entitiesEnterprise
+            IF entitiesNotNone.empty
                 // nothing required here as no entities use enhanced workflows including approval actions
-            «ELSE»
-                «IF !targets('1.3.5')»
+            ELSE
+                IF !targets('1.3.5')
                     $logger = $serviceManager->get('logger');
 
-                «ENDIF»
-                // check if objects are waiting for«IF !entitiesEnterprise.empty» acceptance or«ENDIF» approval
+                ENDIF
+                // check if objects are waiting forIF !entitiesEnterprise.empty acceptance orENDIF approval
                 $state = 'waiting';
-                «FOR entity : entitiesStandard»
-                    «entity.readAmountForObjectTypeAndState('approval')»
-                «ENDFOR»
-                «FOR entity : entitiesEnterprise»
-                    «entity.readAmountForObjectTypeAndState('acceptance')»
-                «ENDFOR»
-                «IF !entitiesEnterprise.empty»
+                FOR entity : entitiesStandard
+                    entity.readAmountForObjectTypeAndState('approval')
+                ENDFOR
+                FOR entity : entitiesEnterprise
+                    entity.readAmountForObjectTypeAndState('acceptance')
+                ENDFOR
+                IF !entitiesEnterprise.empty
                     // check if objects are waiting for approval
                     $state = 'accepted';
-                    «FOR entity : entitiesEnterprise»
-                        «entity.readAmountForObjectTypeAndState('approval')»
-                    «ENDFOR»
-                «ENDIF»
-            «ENDIF»
+                    FOR entity : entitiesEnterprise
+                        entity.readAmountForObjectTypeAndState('approval')
+                    ENDFOR
+                ENDIF
+            ENDIF
 
             return $amounts;
         }
@@ -450,25 +450,25 @@ class WorkflowUtil {
     '''
 
     def private readAmountForObjectTypeAndState(Entity it, String requiredAction) '''
-        $objectType = '«name.formatForCode»';
-        «val permissionLevel = if (requiredAction == 'approval') 'ADD' else if (requiredAction == 'acceptance') 'EDIT' else 'MODERATE'»
-        if (SecurityUtil::checkPermission($modname . ':' . ucfirst($objectType) . ':', '::', ACCESS_«permissionLevel»)) {
+        $objectType = 'name.formatForCode';
+        val permissionLevel = if (requiredAction == 'approval') 'ADD' else if (requiredAction == 'acceptance') 'EDIT' else 'MODERATE'
+        if (SecurityUtil::checkPermission($modname . ':' . ucfirst($objectType) . ':', '::', ACCESS_permissionLevel)) {
             $amount = $this->getAmountOfModerationItems($objectType, $state);
             if ($amount > 0) {
                 $amounts[] = array(
-                    'aggregateType' => '«nameMultiple.formatForCode»«requiredAction.toFirstUpper»',
-                    'description' => $this->__('«nameMultiple.formatForCodeCapital» pending «requiredAction»'),
+                    'aggregateType' => 'nameMultiple.formatForCoderequiredAction.toFirstUpper',
+                    'description' => $this->__('nameMultiple.formatForCodeCapital pending requiredAction'),
                     'amount' => $amount,
                     'objectType' => $objectType,
                     'state' => $state,
-                    'message' => $this->_fn('One «name.formatForDisplay» is waiting for «requiredAction».', '%s «nameMultiple.formatForDisplay» are waiting for «requiredAction».', $amount, array($amount))
+                    'message' => $this->_fn('One name.formatForDisplay is waiting for requiredAction.', '%s nameMultiple.formatForDisplay are waiting for requiredAction.', $amount, array($amount))
                 );
-                «IF !container.application.targets('1.3.5')»
+                IF !container.application.targets('1.3.5')
 
                     if ($amounts > 0) {
-                        $logger->info('{app}: There are {amount} {entities} waiting for approval.', array('app' => '«container.application.appName»', 'amount' => $amount, 'entities' => '«nameMultiple.formatForDisplay»'));
+                        $logger->info('{app}: There are {amount} {entities} waiting for approval.', array('app' => 'container.application.appName', 'amount' => $amount, 'entities' => 'nameMultiple.formatForDisplay'));
                     }
-                «ENDIF»
+                ENDIF
             }
         }
     '''
@@ -485,13 +485,13 @@ class WorkflowUtil {
          */
         public function getAmountOfModerationItems($objectType, $state)
         {
-            «IF targets('1.3.5')»
+            IF targets('1.3.5')
                 $entityClass = $this->name . '_Entity_' . ucfirst($objectType);
-                $entityManager = $this->serviceManager->get«IF targets('1.3.5')»Service«ENDIF»('doctrine.entitymanager');
+                $entityManager = $this->serviceManager->getIF targets('1.3.5')ServiceENDIF('doctrine.entitymanager');
                 $repository = $entityManager->getRepository($entityClass);
-            «ELSE»
-                $repository = $this->serviceManager->get('«appName.formatForDB».' . $objectType . '_factory')->getRepository();
-            «ENDIF»
+            ELSE
+                $repository = $this->serviceManager->get('appName.formatForDB.' . $objectType . '_factory')->getRepository();
+            ENDIF
 
             $where = 'tbl.workflowState = \'' . $state . '\'';
             $parameters = array('workflowState' => $state);
@@ -503,20 +503,20 @@ class WorkflowUtil {
     '''
 
     def private workflowFunctionsImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Util;
+        IF !targets('1.3.5')
+            namespace appNamespace\Util;
 
-            use «appNamespace»\Util\Base\WorkflowUtil as BaseWorkflowUtil;
+            use appNamespace\Util\Base\WorkflowUtil as BaseWorkflowUtil;
 
-        «ENDIF»
+        ENDIF
         /**
          * Utility implementation class for workflow helper methods.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Util_Workflow extends «appName»_Util_Base_Workflow
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Util_Workflow extends appName_Util_Base_Workflow
+        ELSE
         class WorkflowUtil extends BaseWorkflowUtil
-        «ENDIF»
+        ENDIF
         {
             // feel free to add your own convenience methods here
         }

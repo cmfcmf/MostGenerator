@@ -34,14 +34,14 @@ class Kml {
     }
 
     def private kmlView(Entity it, String appName) '''
-        {* purpose of this template: «nameMultiple.formatForDisplay» view kml view *}
-        «IF container.application.targets('1.3.5')»{«appName.formatForDB»TemplateHeaders contentType='application/vnd.google-earth.kml+xml'}«ENDIF»<?xml version="1.0" encoding="UTF-8"?>
+        {* purpose of this template: nameMultiple.formatForDisplay view kml view *}
+        IF container.application.targets('1.3.5'){appName.formatForDBTemplateHeaders contentType='application/vnd.google-earth.kml+xml'}ENDIF<?xml version="1.0" encoding="UTF-8"?>
         <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
         <Document>
         {foreach item='item' from=$items}
             <Placemark>
-                «val stringFields = fields.filter(StringField) + fields.filter(TextField)»
-                <name>«IF !stringFields.empty»{$item->get«stringFields.head.name.formatForCodeCapital»()}«ELSE»{gt text='«name.formatForDisplayCapital»'}«ENDIF»</name>
+                val stringFields = fields.filter(StringField) + fields.filter(TextField)
+                <name>IF !stringFields.empty{$item->getstringFields.head.name.formatForCodeCapital()}ELSE{gt text='name.formatForDisplayCapital'}ENDIF</name>
                 <Point>
                     <coordinates>{$item->getLongitude()}, {$item->getLatitude()}, 0</coordinates>
                 </Point>
@@ -52,16 +52,16 @@ class Kml {
     '''
 
     def private kmlDisplay(Entity it, String appName) '''
-        «val objName = name.formatForCode»
-        {* purpose of this template: «nameMultiple.formatForDisplay» display kml view *}
-        «IF container.application.targets('1.3.5')»{«appName.formatForDB»TemplateHeaders contentType='application/vnd.google-earth.kml+xml'}«ENDIF»<?xml version="1.0" encoding="UTF-8"?>
+        val objName = name.formatForCode
+        {* purpose of this template: nameMultiple.formatForDisplay display kml view *}
+        IF container.application.targets('1.3.5'){appName.formatForDBTemplateHeaders contentType='application/vnd.google-earth.kml+xml'}ENDIF<?xml version="1.0" encoding="UTF-8"?>
         <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
         <Document>
             <Placemark>
-                «val stringFields = fields.filter(StringField) + fields.filter(TextField)»
-                <name>«IF !stringFields.empty»{$«objName»->get«stringFields.head.name.formatForCodeCapital»()}«ELSE»{gt text='«name.formatForDisplayCapital»'}«ENDIF»</name>
+                val stringFields = fields.filter(StringField) + fields.filter(TextField)
+                <name>IF !stringFields.empty{$objName->getstringFields.head.name.formatForCodeCapital()}ELSE{gt text='name.formatForDisplayCapital'}ENDIF</name>
                 <Point>
-                    <coordinates>{$«objName»->getLongitude()}, {$«objName»->getLatitude()}, 0</coordinates>
+                    <coordinates>{$objName->getLongitude()}, {$objName->getLatitude()}, 0</coordinates>
                 </Point>
             </Placemark>
         </Document>

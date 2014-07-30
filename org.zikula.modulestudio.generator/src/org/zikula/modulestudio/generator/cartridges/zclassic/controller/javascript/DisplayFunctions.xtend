@@ -36,43 +36,43 @@ class DisplayFunctions {
 
     def private generate(Application it) '''
         'use strict';
-        «IF targets('1.3.5')»
+        IF targets('1.3.5')
 
-            «initItemActions»
-        «ENDIF»
-        «IF !getAllControllers.map[hasActions('view')].empty»
+            initItemActions
+        ENDIF
+        IF !getAllControllers.map[hasActions('view')].empty
 
-            «initQuickNavigation»
-        «ENDIF»
-        «IF !getJoinRelations.empty»
+            initQuickNavigation
+        ENDIF
+        IF !getJoinRelations.empty
 
-            «initRelationWindow»
-        «ENDIF»
-        «IF hasBooleansWithAjaxToggle»
+            initRelationWindow
+        ENDIF
+        IF hasBooleansWithAjaxToggle
 
-            «initToggle»
+            initToggle
 
-            «toggleFlag»
-        «ENDIF»
-        «IF !targets('1.3.5')»
+            toggleFlag
+        ENDIF
+        IF !targets('1.3.5')
 
-            «simpleAlert»
-        «ENDIF»
+            simpleAlert
+        ENDIF
     '''
 
     def private initItemActions(Application it) '''
-        var «prefix()»ContextMenu;
+        var prefix()ContextMenu;
 
-        «prefix()»ContextMenu = Class.create(Zikula.UI.ContextMenu, {
+        prefix()ContextMenu = Class.create(Zikula.UI.ContextMenu, {
             selectMenuItem: function ($super, event, item, item_container) {
                 // open in new tab / window when right-clicked
                 if (event.isRightClick()) {
                     item.callback(this.clicked, true);
-                    «IF targets('1.3.5')»
+                    IF targets('1.3.5')
                         event.stop(); // close the menu
-                    «ELSE»
+                    ELSE
                         event.stopPropagation(); // close the menu
-                    «ENDIF»
+                    ENDIF
                     return;
                 }
                 // open in current window when left-clicked
@@ -83,44 +83,44 @@ class DisplayFunctions {
         /**
          * Initialises the context menu for item actions.
          */
-        function «prefix()»InitItemActions(objectType, func, containerId)
+        function prefix()InitItemActions(objectType, func, containerId)
         {
             var triggerId, contextMenu, icon;
 
             triggerId = containerId + 'Trigger';
 
             // attach context menu
-            contextMenu = new «prefix()»ContextMenu(triggerId, { leftClick: true, animation: false });
+            contextMenu = new prefix()ContextMenu(triggerId, { leftClick: true, animation: false });
 
             // process normal links
-            «IF targets('1.3.5')»$«ENDIF»$('#' + containerId + ' a').each(function (elem) {
-                «IF !targets('1.3.5')»
+            IF targets('1.3.5')$ENDIF$('#' + containerId + ' a').each(function (elem) {
+                IF !targets('1.3.5')
                     // save css class before hiding (#428)
                     var elemClass = elem.attr('class');
-                «ENDIF»
+                ENDIF
                 // hide it
-                «IF targets('1.3.5')»
+                IF targets('1.3.5')
                     elem.addClassName('z-hide');
-                «ELSE»
+                ELSE
                     elem.addClass('hidden');
-                «ENDIF»
+                ENDIF
                 // determine the link text
                 var linkText = '';
                 if (func === 'display') {
                     linkText = elem.innerHTML;
                 } else if (func === 'view') {
-                    «IF targets('1.3.5')»
+                    IF targets('1.3.5')
                         elem.select('img').each(function (imgElem) {
                             linkText = imgElem.readAttribute('alt');
                         });
-                    «ELSE»
+                    ELSE
                         linkText = elem.attr('data-linktext');
-                    «ENDIF»
+                    ENDIF
                 }
 
                 // determine the icon
                 icon = '';
-                «IF targets('1.3.5')»
+                IF targets('1.3.5')
                     if (func === 'display') {
                         if (elem.hasClassName('z-icon-es-preview')) {
                             icon = 'xeyes.png';
@@ -146,22 +146,22 @@ class DisplayFunctions {
                     if (icon !== '') {
                         icon = '<img src="' + icon + '" width="16" height="16" alt="' + linkText + '" /> ';
                     }
-                «ELSE»
+                ELSE
                     if (elem.hasClass('fa')) {
                         icon = $('<i>', { class: elemClass });
                     }
-                «ENDIF»
+                ENDIF
 
                 contextMenu.addItem({
                     label: icon + linkText,
                     callback: function (selectedMenuItem, isRightClick) {
                         var url;
 
-                        «IF targets('1.3.5')»
+                        IF targets('1.3.5')
                             url = elem.readAttribute('href');
-                        «ELSE»
+                        ELSE
                             url = elem.attr('href');
-                        «ENDIF»
+                        ENDIF
                         if (isRightClick) {
                             window.open(url);
                         } else {
@@ -170,16 +170,16 @@ class DisplayFunctions {
                     }
                 });
             });
-            «IF targets('1.3.5')»
+            IF targets('1.3.5')
                 $(triggerId).removeClassName('z-hide');
-            «ELSE»
+            ELSE
                 $('#' + triggerId).removeClass('hidden');
-            «ENDIF»
+            ENDIF
         }
     '''
 
     def private initQuickNavigation(Application it) '''
-        function «prefix()»CapitaliseFirstLetter(string)
+        function prefix()CapitaliseFirstLetter(string)
         {
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
@@ -187,156 +187,156 @@ class DisplayFunctions {
         /**
          * Submits a quick navigation form.
          */
-        function «prefix()»SubmitQuickNavForm(objectType)
+        function prefix()SubmitQuickNavForm(objectType)
         {
-            $('«IF !targets('1.3.5')»#«ENDIF»«appName.toLowerCase»' + «prefix()»CapitaliseFirstLetter(objectType) + 'QuickNavForm').submit();
+            $('IF !targets('1.3.5')#ENDIFappName.toLowerCase' + prefix()CapitaliseFirstLetter(objectType) + 'QuickNavForm').submit();
         }
 
         /**
          * Initialise the quick navigation panel in list views.
          */
-        function «prefix()»InitQuickNavigation(objectType)
+        function prefix()InitQuickNavigation(objectType)
         {
-            «IF targets('1.3.5')»
-                if ($('«appName.toLowerCase»' + «prefix()»CapitaliseFirstLetter(objectType) + 'QuickNavForm') == undefined) {
+            IF targets('1.3.5')
+                if ($('appName.toLowerCase' + prefix()CapitaliseFirstLetter(objectType) + 'QuickNavForm') == undefined) {
                     return;
                 }
-            «ELSE»
-                if ($('#«appName.toLowerCase»' + «prefix()»CapitaliseFirstLetter(objectType) + 'QuickNavForm').size() < 1) {
+            ELSE
+                if ($('#appName.toLowerCase' + prefix()CapitaliseFirstLetter(objectType) + 'QuickNavForm').size() < 1) {
                     return;
                 }
-            «ENDIF»
+            ENDIF
 
-            «IF targets('1.3.5')»
+            IF targets('1.3.5')
                 if ($('catid') != undefined) {
-                    $('catid').observe('change', «initQuickNavigationSubmitCall(prefix())»);
+                    $('catid').observe('change', initQuickNavigationSubmitCall(prefix()));
                 }
                 if ($('sortby') != undefined) {
-                    $('sortby').observe('change', «initQuickNavigationSubmitCall(prefix())»);
+                    $('sortby').observe('change', initQuickNavigationSubmitCall(prefix()));
                 }
                 if ($('sortdir') != undefined) {
-                    $('sortdir').observe('change', «initQuickNavigationSubmitCall(prefix())»);
+                    $('sortdir').observe('change', initQuickNavigationSubmitCall(prefix()));
                 }
                 if ($('num') != undefined) {
-                    $('num').observe('change', «initQuickNavigationSubmitCall(prefix())»);
+                    $('num').observe('change', initQuickNavigationSubmitCall(prefix()));
                 }
-            «ELSE»
+            ELSE
                 if ($('#catid').size() > 0) {
-                    $('#catid').change(«initQuickNavigationSubmitCall(prefix())»);
+                    $('#catid').change(initQuickNavigationSubmitCall(prefix()));
                 }
                 if ($('#sortby').size() > 0) {
-                    $('#sortby').change(«initQuickNavigationSubmitCall(prefix())»);
+                    $('#sortby').change(initQuickNavigationSubmitCall(prefix()));
                 }
                 if ($('#sortdir').size() > 0) {
-                    $('#sortdir').change(«initQuickNavigationSubmitCall(prefix())»);
+                    $('#sortdir').change(initQuickNavigationSubmitCall(prefix()));
                 }
                 if ($('#num').size() > 0) {
-                    $('#num').change(«initQuickNavigationSubmitCall(prefix())»);
+                    $('#num').change(initQuickNavigationSubmitCall(prefix()));
                 }
-            «ENDIF»
+            ENDIF
 
             switch (objectType) {
-            «FOR entity : getAllEntities»
-                «entity.initQuickNavigationEntity»
-            «ENDFOR»
+            FOR entity : getAllEntities
+                entity.initQuickNavigationEntity
+            ENDFOR
             default:
                 break;
             }
         }
     '''
 
-    def private initQuickNavigationSubmitCall(String prefix) '''function () { «prefix»SubmitQuickNavForm(objectType); }'''
+    def private initQuickNavigationSubmitCall(String prefix) '''function () { prefixSubmitQuickNavForm(objectType); }'''
 
     def private initQuickNavigationEntity(Entity it) '''
-        case '«name.formatForCode»':
-            «IF !getBidirectionalIncomingJoinRelationsWithOneSource.empty»
-                «FOR relation: getBidirectionalIncomingJoinRelationsWithOneSource»
-                    «relation.jsInit»
-                «ENDFOR»
-            «ENDIF»
-            «IF hasListFieldsEntity»
-                «FOR field : getListFieldsEntity»
-                    «field.jsInit»
-                «ENDFOR»
-            «ENDIF»
-            «IF hasUserFieldsEntity»
-                «FOR field : getUserFieldsEntity»
-                    «field.jsInit»
-                «ENDFOR»
-            «ENDIF»
-            «IF hasCountryFieldsEntity»
-                «FOR field : getCountryFieldsEntity»
-                    «field.jsInit»
-                «ENDFOR»
-            «ENDIF»
-            «IF hasLanguageFieldsEntity»
-                «FOR field : getLanguageFieldsEntity»
-                    «field.jsInit»
-                «ENDFOR»
-            «ENDIF»
-            «IF hasLocaleFieldsEntity»
-                «FOR field : getLocaleFieldsEntity»
-                    «field.jsInit»
-                «ENDFOR»
-            «ENDIF»
-            «IF hasBooleanFieldsEntity»
-                «FOR field : getBooleanFieldsEntity»
-                    «field.jsInit»
-                «ENDFOR»
-            «ENDIF»
+        case 'name.formatForCode':
+            IF !getBidirectionalIncomingJoinRelationsWithOneSource.empty
+                FOR relation: getBidirectionalIncomingJoinRelationsWithOneSource
+                    relation.jsInit
+                ENDFOR
+            ENDIF
+            IF hasListFieldsEntity
+                FOR field : getListFieldsEntity
+                    field.jsInit
+                ENDFOR
+            ENDIF
+            IF hasUserFieldsEntity
+                FOR field : getUserFieldsEntity
+                    field.jsInit
+                ENDFOR
+            ENDIF
+            IF hasCountryFieldsEntity
+                FOR field : getCountryFieldsEntity
+                    field.jsInit
+                ENDFOR
+            ENDIF
+            IF hasLanguageFieldsEntity
+                FOR field : getLanguageFieldsEntity
+                    field.jsInit
+                ENDFOR
+            ENDIF
+            IF hasLocaleFieldsEntity
+                FOR field : getLocaleFieldsEntity
+                    field.jsInit
+                ENDFOR
+            ENDIF
+            IF hasBooleanFieldsEntity
+                FOR field : getBooleanFieldsEntity
+                    field.jsInit
+                ENDFOR
+            ENDIF
             break;
     '''
 
     def private dispatch jsInit(DerivedField it) '''
-        «IF entity.container.application.targets('1.3.5')»
-            if ($('«name.formatForCode»') != undefined) {
-                $('«name.formatForCode»').observe('change', «initQuickNavigationSubmitCall(entity.container.application.prefix())»);
+        IF entity.container.application.targets('1.3.5')
+            if ($('name.formatForCode') != undefined) {
+                $('name.formatForCode').observe('change', initQuickNavigationSubmitCall(entity.container.application.prefix()));
             }
-        «ELSE»
-            if ($('#«name.formatForCode»').size() > 0) {
-                $('#«name.formatForCode»').change(«initQuickNavigationSubmitCall(entity.container.application.prefix())»);
+        ELSE
+            if ($('#name.formatForCode').size() > 0) {
+                $('#name.formatForCode').change(initQuickNavigationSubmitCall(entity.container.application.prefix()));
             }
-        «ENDIF»
+        ENDIF
     '''
 
     def private dispatch jsInit(JoinRelationship it) '''
-        «val sourceAliasName = getRelationAliasName(false)»
-        «IF container.application.targets('1.3.5')»
-            if ($('«sourceAliasName»') != undefined) {
-                $('«sourceAliasName»').observe('change', «initQuickNavigationSubmitCall(container.application.prefix())»);
+        val sourceAliasName = getRelationAliasName(false)
+        IF container.application.targets('1.3.5')
+            if ($('sourceAliasName') != undefined) {
+                $('sourceAliasName').observe('change', initQuickNavigationSubmitCall(container.application.prefix()));
             }
-        «ELSE»
-            if ($('#«sourceAliasName»').size() > 0) {
-                $('#«sourceAliasName»').change(«initQuickNavigationSubmitCall(container.application.prefix())»);
+        ELSE
+            if ($('#sourceAliasName').size() > 0) {
+                $('#sourceAliasName').change(initQuickNavigationSubmitCall(container.application.prefix()));
             }
-        «ENDIF»
+        ENDIF
     '''
 
     def private initRelationWindow(Application it) '''
-        «IF targets('1.3.5')»
+        IF targets('1.3.5')
             /**
              * Helper function to create new Zikula.UI.Window instances.
              * For edit forms we use "iframe: true" to ensure file uploads work without problems.
              * For all other windows we use "iframe: false" because we want the escape key working.
              */
-         «ELSE»
+         ELSE
             /**
              * Helper function to create new Bootstrap modal window instances.
              */
-         «ENDIF»
-        function «prefix()»InitInlineWindow(containerElem, title)
+         ENDIF
+        function prefix()InitInlineWindow(containerElem, title)
         {
-            var newWindow«IF !targets('1.3.5')»Id«ENDIF»;
+            var newWindowIF !targets('1.3.5')IdENDIF;
 
             // show the container (hidden for users without JavaScript)
-            «IF targets('1.3.5')»
+            IF targets('1.3.5')
                 containerElem.removeClassName('z-hide');
-            «ELSE»
+            ELSE
                 containerElem.removeClass('hidden');
-            «ENDIF»
+            ENDIF
 
             // define the new window instance
-            «IF targets('1.3.5')»
+            IF targets('1.3.5')
                 newWindow = new Zikula.UI.Window(
                     containerElem,
                     {
@@ -349,10 +349,10 @@ class DisplayFunctions {
                         iframe: false
                     }
                 );
-            «ELSE»
+            ELSE
                 newWindowId = containerElem.attr('id') + 'Dialog';
                 $('<div id="' + newWindowId + "></div>')
-                    .append($('<iframe«/* width="100%" height="100%" marginWidth="0" marginHeight="0" frameBorder="0" scrolling="auto"*/» />').attr('src', containerElem.attr('href')))
+                    .append($('<iframe/* width="100%" height="100%" marginWidth="0" marginHeight="0" frameBorder="0" scrolling="auto"*/ />').attr('src', containerElem.attr('href')))
                     .dialog({
                         autoOpen: false,
                         show: {
@@ -369,10 +369,10 @@ class DisplayFunctions {
                         modal: false
                     })
                     .dialog('open');
-            «ENDIF»
+            ENDIF
 
-            // return the «IF targets('1.3.5')»instance«ELSE»dialog selector id«ENDIF»;
-            return newWindow«IF !targets('1.3.5')»Id«ENDIF»;
+            // return the IF targets('1.3.5')instanceELSEdialog selector idENDIF;
+            return newWindowIF !targets('1.3.5')IdENDIF;
         }
 
     '''
@@ -381,24 +381,24 @@ class DisplayFunctions {
         /**
          * Initialise ajax-based toggle for boolean fields.
          */
-        function «prefix()»InitToggle(objectType, fieldName, itemId)
+        function prefix()InitToggle(objectType, fieldName, itemId)
         {
-            var idSuffix = «prefix()»CapitaliseFirstLetter(fieldName) + itemId;
-            «IF targets('1.3.5')»
+            var idSuffix = prefix()CapitaliseFirstLetter(fieldName) + itemId;
+            IF targets('1.3.5')
                 if ($('toggle' + idSuffix) == undefined) {
                     return;
                 }
                 $('toggle' + idSuffix).observe('click', function() {
-                    «prefix()»ToggleFlag(objectType, fieldName, itemId);
+                    prefix()ToggleFlag(objectType, fieldName, itemId);
                 }).removeClassName('z-hide');
-            «ELSE»
+            ELSE
                 if ($('#toggle' + idSuffix).size() < 1) {
                     return;
                 }
                 $('#toggle' + idSuffix).click( function() {
-                    «prefix()»ToggleFlag(objectType, fieldName, itemId);
+                    prefix()ToggleFlag(objectType, fieldName, itemId);
                 }).removeClass('hidden');
-            «ENDIF»
+            ENDIF
         }
 
     '''
@@ -407,26 +407,26 @@ class DisplayFunctions {
         /**
          * Toggle a certain flag for a given item.
          */
-        function «prefix()»ToggleFlag(objectType, fieldName, itemId)
+        function prefix()ToggleFlag(objectType, fieldName, itemId)
         {
-            fieldName = «prefix()»CapitaliseFirstLetter(fieldName);
+            fieldName = prefix()CapitaliseFirstLetter(fieldName);
             var params = 'ot=' + objectType + '&field=' + fieldName + '&id=' + itemId;
 
-            «IF targets('1.3.5')»
+            IF targets('1.3.5')
                 new Zikula.Ajax.Request(
-                    Zikula.Config.baseURL + 'ajax.php?module=«appName»&func=toggleFlag',
+                    Zikula.Config.baseURL + 'ajax.php?module=appName&func=toggleFlag',
                     {
                         method: 'post',
                         parameters: params,
                         onComplete: function(req) {
                             var idSuffix = fieldName + '_' + itemId;
                             if (!req.isSuccess()) {
-                                Zikula.UI.Alert(req.getMessage(), Zikula.__('Error', 'module_«appName.formatForDB»_js'));
+                                Zikula.UI.Alert(req.getMessage(), Zikula.__('Error', 'module_appName.formatForDB_js'));
                                 return;
                             }
                             var data = req.getData();
                             /*if (data.message) {
-                                Zikula.UI.Alert(data.message, Zikula.__('Success', 'module_«appName.formatForDB»_js'));
+                                Zikula.UI.Alert(data.message, Zikula.__('Success', 'module_appName.formatForDB_js'));
                             }*/
 
                             idSuffix = idSuffix.toLowerCase();
@@ -441,10 +441,10 @@ class DisplayFunctions {
                         }
                     }
                 );
-            «ELSE»
+            ELSE
                 $.ajax({
                     type: 'POST',
-                    url: Routing.generate('«appName.formatForDB»_ajax_toggleFlag'),
+                    url: Routing.generate('appName.formatForDB_ajax_toggleFlag'),
                     data: params
                 }).done(function(res) {
                     // get data returned by the ajax response
@@ -454,7 +454,7 @@ class DisplayFunctions {
                     data = res.data;
 
                     /*if (data.message) {
-                        «prefix()»SimpleAlert($('#toggle' + idSuffix), Zikula.__('Success', 'module_«appName.formatForDB»_js'), data.message, 'toggle' + idSuffix + 'DoneAlert', 'success');
+                        prefix()SimpleAlert($('#toggle' + idSuffix), Zikula.__('Success', 'module_appName.formatForDB_js'), data.message, 'toggle' + idSuffix + 'DoneAlert', 'success');
                     }*/
 
                     idSuffix = idSuffix.toLowerCase();
@@ -466,12 +466,12 @@ class DisplayFunctions {
                         $('#yes' + idSuffix).addClass('hidden');
                         $('#no' + idSuffix).removeClass('hidden');
                     }
-                })«/*.fail(function(jqXHR, textStatus) {
+                })/*.fail(function(jqXHR, textStatus) {
                     // nothing to do yet
                     var idSuffix = fieldName + '_' + itemId;
-                    «prefix()»SimpleAlert($('#toggle' + idSuffix), Zikula.__('Error', 'module_«appName.formatForDB»_js'), Zikula.__('Could not persist your change.', 'module_«appName.formatForDB»_js'), 'toggle' + idSuffix + 'FailedAlert', 'danger');
-                })*/»;
-            «ENDIF»
+                    prefix()SimpleAlert($('#toggle' + idSuffix), Zikula.__('Error', 'module_appName.formatForDB_js'), Zikula.__('Could not persist your change.', 'module_appName.formatForDB_js'), 'toggle' + idSuffix + 'FailedAlert', 'danger');
+                })*/;
+            ENDIF
         }
 
     '''
@@ -480,7 +480,7 @@ class DisplayFunctions {
         /**
          * Simulates a simple alert using bootstrap.
          */
-        function «prefix()»SimpleAlert(beforeElem, title, content, alertId, cssClass)
+        function prefix()SimpleAlert(beforeElem, title, content, alertId, cssClass)
         {
             var alertBox;
 

@@ -32,93 +32,93 @@ class ControllerAction {
     }
 
     def generate(Action it, Boolean isBase) '''
-        «IF isBase»
-            «actionDoc(null, isBase)»
-            public function «methodName»«IF app.targets('1.3.5')»()«ELSE»Action(«methodArgs»)«ENDIF»
+        IF isBase
+            actionDoc(null, isBase)
+            public function methodNameIF app.targets('1.3.5')()ELSEAction(methodArgs)ENDIF
             {
-                «actionsImpl.actionImpl(it)»
+                actionsImpl.actionImpl(it)
             }
-            «/* this line is on purpose */»
-        «ENDIF»
+            /* this line is on purpose */
+        ENDIF
     '''
 
     def generate(Entity it, Action action, Boolean isBase) '''
-        «action.actionDoc(it, isBase)»
-        public function «action.methodName»«IF app.targets('1.3.5')»()«ELSE»Action(«methodArgs(it, action)»)«ENDIF»
+        action.actionDoc(it, isBase)
+        public function action.methodNameIF app.targets('1.3.5')()ELSEAction(methodArgs(it, action))ENDIF
         {
-            «IF isBase»
-                $legacyControllerType = $«IF app.targets('1.3.5')»this->«ENDIF»request->query->filter('lct', 'user', FILTER_SANITIZE_STRING);
+            IF isBase
+                $legacyControllerType = $IF app.targets('1.3.5')this->ENDIFrequest->query->filter('lct', 'user', FILTER_SANITIZE_STRING);
                 System::queryStringSetVar('type', $legacyControllerType);
-                $«IF app.targets('1.3.5')»this->«ENDIF»request->query->set('type', $legacyControllerType);
+                $IF app.targets('1.3.5')this->ENDIFrequest->query->set('type', $legacyControllerType);
 
-                «IF softDeleteable && !app.targets('1.3.5')»
+                IF softDeleteable && !app.targets('1.3.5')
                     if ($legacyControllerType == 'admin') {
                         //$this->entityManager->getFilters()->disable('softdeleteable');
                     } else {
                         $this->entityManager->getFilters()->enable('softdeleteable');
                     }
 
-                «ENDIF»
-                «actionsImpl.actionImpl(it, action)»
-            «ELSE»
-                return parent::«action.methodName»Action(«methodArgsCall(it, action)»);
-            «ENDIF»
+                ENDIF
+                actionsImpl.actionImpl(it, action)
+            ELSE
+                return parent::action.methodNameAction(methodArgsCall(it, action));
+            ENDIF
         }
-        «/* this line is on purpose */»
+        /* this line is on purpose */
     '''
 
     def private actionDoc(Action it, Entity entity, Boolean isBase) '''
         /**
-         * «actionDocMethodDescription»
-        «actionDocMethodDocumentation»
-        «IF !app.targets('1.3.5') && entity !== null»
-            «IF !isBase»
-                «actionRoute(entity)»
-            «ELSE»
-                «IF it instanceof DisplayAction || it instanceof DeleteAction»
-                    «paramConverter(entity)»
-                «ENDIF»
-                «IF it instanceof MainAction»
-                    «' '»* @Cache(expires="+7 days", public=true)
-                «ELSEIF it instanceof ViewAction»
-                    «' '»* @Cache(expires="+2 hours", public=false)
-                «ELSEIF !(it instanceof CustomAction)»
-                    «IF entity.standardFields»
-                        «' '»* @Cache(lastModified="«entity.name.formatForCode».getUpdatedDate()", ETag="'«entity.name.formatForCodeCapital»' ~ «entity.getPrimaryKeyFields.map[entity.name.formatForCode + '.get' + name.formatForCode + '()'].join(' ~ ')» ~ «entity.name.formatForCode».getUpdatedDate().format('U')")
-                    «ELSE»
-                        «IF it instanceof EditAction»
-                            «' '»* @Cache(expires="+30 minutes", public=false)
-                        «ELSE»
-                            «' '»* @Cache(expires="+12 hours", public=false)
-                        «ENDIF»
-                    «ENDIF»
-                «ENDIF»
-            «ENDIF»
-        «ENDIF»
+         * actionDocMethodDescription
+        actionDocMethodDocumentation
+        IF !app.targets('1.3.5') && entity !== null
+            IF !isBase
+                actionRoute(entity)
+            ELSE
+                IF it instanceof DisplayAction || it instanceof DeleteAction
+                    paramConverter(entity)
+                ENDIF
+                IF it instanceof MainAction
+                    ' '* @Cache(expires="+7 days", public=true)
+                ELSEIF it instanceof ViewAction
+                    ' '* @Cache(expires="+2 hours", public=false)
+                ELSEIF !(it instanceof CustomAction)
+                    IF entity.standardFields
+                        ' '* @Cache(lastModified="entity.name.formatForCode.getUpdatedDate()", ETag="'entity.name.formatForCodeCapital' ~ entity.getPrimaryKeyFields.map[entity.name.formatForCode + '.get' + name.formatForCode + '()'].join(' ~ ') ~ entity.name.formatForCode.getUpdatedDate().format('U')")
+                    ELSE
+                        IF it instanceof EditAction
+                            ' '* @Cache(expires="+30 minutes", public=false)
+                        ELSE
+                            ' '* @Cache(expires="+12 hours", public=false)
+                        ENDIF
+                    ENDIF
+                ENDIF
+            ENDIF
+        ENDIF
          *
-         «IF !app.targets('1.3.5')»
+         IF !app.targets('1.3.5')
          * @param Request  $request      Current request instance
-         «ENDIF»
-        «IF entity !== null»
-            «actionDocMethodParams(entity, it)»
-        «ELSE»
-            «actionDocMethodParams»
-        «ENDIF»
+         ENDIF
+        IF entity !== null
+            actionDocMethodParams(entity, it)
+        ELSE
+            actionDocMethodParams
+        ENDIF
          *
          * @return mixed Output.
-         «IF !app.targets('1.3.5')»
+         IF !app.targets('1.3.5')
          *
          * @throws AccessDeniedException Thrown if the user doesn't have required permissions.
-         «IF it instanceof DisplayAction»
+         IF it instanceof DisplayAction
          * @throws NotFoundHttpException Thrown by param converter if item to be displayed isn't found.
-         «ELSEIF it instanceof EditAction»
+         ELSEIF it instanceof EditAction
          * @throws NotFoundHttpException Thrown by form handler if item to be edited isn't found.
          * @throws RuntimeException      Thrown if another critical error occurs (e.g. workflow actions not available).
-         «ELSEIF it instanceof DeleteAction»
+         ELSEIF it instanceof DeleteAction
          * @throws NotFoundHttpException Thrown by param converter if item to be deleted isn't found.
          * @throws RuntimeException      Thrown if another critical error occurs (e.g. workflow actions not available).
-         «ENDIF»
-         «ENDIF»
+         ENDIF
+         ENDIF
          */
     '''
 
@@ -147,7 +147,7 @@ class ControllerAction {
             ' * @param string  $ot           Treated object type.\n'
         } else if (!(it instanceof MainAction || it instanceof CustomAction)) {
             ' * @param string  $ot           Treated object type.\n'
-            + '''«actionDocAdditionalParams(null)»'''
+            + '''actionDocAdditionalParams(null)'''
             + ' * @param string  $tpl          Name of alternative template (to be used instead of the default template).\n'
             + (if (controller.container.application.targets('1.3.5')) ' * @param boolean $raw          Optional way to display a template instead of fetching it (required for standalone output).\n' else '')
         }
@@ -155,7 +155,7 @@ class ControllerAction {
 
     def private actionDocMethodParams(Entity it, Action action) {
         if (!(action instanceof MainAction || action instanceof CustomAction)) {
-            '''«actionDocAdditionalParams(action, it)»'''
+            '''actionDocAdditionalParams(action, it)'''
             + ' * @param string  $tpl          Name of alternative template (to be used instead of the default template).\n'
             + (if (action.controller.container.application.targets('1.3.5')) ' * @param boolean $raw          Optional way to display a template instead of fetching it (required for standalone output).\n' else '')
         }
@@ -179,9 +179,9 @@ class ControllerAction {
         }
     }
 
-    def private dispatch methodName(Action it) '''«name.formatForCode.toFirstLower»'''
+    def private dispatch methodName(Action it) '''name.formatForCode.toFirstLower'''
 
-    def private dispatch methodName(MainAction it) '''«IF app.targets('1.3.5')»main«ELSE»index«ENDIF»'''
+    def private dispatch methodName(MainAction it) '''IF app.targets('1.3.5')mainELSEindexENDIF'''
 
     def private methodArgs(Action action) '''Request $request''' 
 
@@ -192,31 +192,31 @@ class ControllerAction {
     '''
 
     def private dispatch actionRoute(MainAction it, Entity entity) '''
-         «' '»*
-         «' '»* @Route("/%«app.appName.formatForDB».routing.«entity.name.formatForCode».plural%",
-         «' '»*        name = "«app.appName.formatForDB»_«entity.name.formatForCode»_index",
-         «' '»*        methods = {"GET"}
-         «' '»* )
+         ' '*
+         ' '* @Route("/%app.appName.formatForDB.routing.entity.name.formatForCode.plural%",
+         ' '*        name = "app.appName.formatForDB_entity.name.formatForCode_index",
+         ' '*        methods = {"GET"}
+         ' '* )
     '''
 
     def private dispatch actionRoute(ViewAction it, Entity entity) '''
-         «' '»*
-         «' '»* @Route("/%«app.appName.formatForDB».routing.«entity.name.formatForCode».plural%/%«app.appName.formatForDB».routing.view.suffix%/{sort}/{sortdir}/{pos}/{num}.{_format}",
-         «' '»*        name = "«app.appName.formatForDB»_«entity.name.formatForCode»_view",
-         «' '»*        requirements = {"sortdir" = "asc|desc|ASC|DESC", "pos" = "\d+", "num" = "\d+", "_format" = "%«app.appName.formatForDB».routing.formats.view%"},
-         «' '»*        defaults = {"sort" = "", "sortdir" = "asc", "pos" = 1, "num" = 0, "_format" = "html"},
-         «' '»*        methods = {"GET"}
-         «' '»* )
+         ' '*
+         ' '* @Route("/%app.appName.formatForDB.routing.entity.name.formatForCode.plural%/%app.appName.formatForDB.routing.view.suffix%/{sort}/{sortdir}/{pos}/{num}.{_format}",
+         ' '*        name = "app.appName.formatForDB_entity.name.formatForCode_view",
+         ' '*        requirements = {"sortdir" = "asc|desc|ASC|DESC", "pos" = "\d+", "num" = "\d+", "_format" = "%app.appName.formatForDB.routing.formats.view%"},
+         ' '*        defaults = {"sort" = "", "sortdir" = "asc", "pos" = 1, "num" = 0, "_format" = "html"},
+         ' '*        methods = {"GET"}
+         ' '* )
     '''
 
     def private actionRouteForSingleEntity(Entity it, Action action) '''
-         «' '»*
-         «' '»* @Route("/%«app.appName.formatForDB».routing.«name.formatForCode».singular%/«IF !(action instanceof DisplayAction)»«action.name.formatForCode»/«ENDIF»«actionRouteParamsForSingleEntity(action)».{_format}",
-         «' '»*        name = "«app.appName.formatForDB»_«name.formatForCode»_«action.name.formatForCode»",
-         «' '»*        requirements = {«actionRouteRequirementsForSingleEntity(action)», "_format" = "«IF action instanceof DisplayAction»%«app.appName.formatForDB».routing.formats.display%«ELSE»html«ENDIF»"},
-         «' '»*        defaults = {«IF action instanceof EditAction»«actionRouteDefaultsForSingleEntity(action)», «ENDIF»"_format" = "html"},
-         «' '»*        methods = {"GET"«IF action instanceof EditAction || action instanceof DeleteAction», "POST"«ENDIF»}
-         «' '»* )
+         ' '*
+         ' '* @Route("/%app.appName.formatForDB.routing.name.formatForCode.singular%/IF !(action instanceof DisplayAction)action.name.formatForCode/ENDIFactionRouteParamsForSingleEntity(action).{_format}",
+         ' '*        name = "app.appName.formatForDB_name.formatForCode_action.name.formatForCode",
+         ' '*        requirements = {actionRouteRequirementsForSingleEntity(action), "_format" = "IF action instanceof DisplayAction%app.appName.formatForDB.routing.formats.display%ELSEhtmlENDIF"},
+         ' '*        defaults = {IF action instanceof EditActionactionRouteDefaultsForSingleEntity(action), ENDIF"_format" = "html"},
+         ' '*        methods = {"GET"IF action instanceof EditAction || action instanceof DeleteAction, "POST"ENDIF}
+         ' '* )
     '''
 
     def private actionRouteParamsForSingleEntity(Entity it, Action action) {
@@ -241,7 +241,7 @@ class ControllerAction {
                 return output
             }
         }
-        output = output + getPrimaryKeyFields.map['''"«name.formatForCode»" = "\d+"'''].join(', ')
+        output = output + getPrimaryKeyFields.map['''"name.formatForCode" = "\d+"'''].join(', ')
 
         output
     }
@@ -254,7 +254,7 @@ class ControllerAction {
                 return output
             }
         }
-        output = output + getPrimaryKeyFields.map['''"«name.formatForCode»" = "0"'''].join(', ')
+        output = output + getPrimaryKeyFields.map['''"name.formatForCode" = "0"'''].join(', ')
 
         output
     }
@@ -262,38 +262,38 @@ class ControllerAction {
     def private dispatch methodArgs(Entity it, ViewAction action) '''Request $request, $sort, $sortdir, $pos, $num''' 
     def private dispatch methodArgsCall(Entity it, ViewAction action) '''$request, $sort, $sortdir, $pos, $num''' 
 
-    def private dispatch methodArgs(Entity it, DisplayAction action) '''Request $request, «name.formatForCodeCapital»Entity $«name.formatForCode»''' 
-    def private dispatch methodArgsCall(Entity it, DisplayAction action) '''$request, $«name.formatForCode»''' 
+    def private dispatch methodArgs(Entity it, DisplayAction action) '''Request $request, name.formatForCodeCapitalEntity $name.formatForCode''' 
+    def private dispatch methodArgsCall(Entity it, DisplayAction action) '''$request, $name.formatForCode''' 
 
     def private dispatch actionRoute(DisplayAction it, Entity entity) '''
-        «actionRouteForSingleEntity(entity, it)»
+        actionRouteForSingleEntity(entity, it)
     '''
 
-    def private dispatch methodArgs(Entity it, EditAction action) '''Request $request«/* TODO migrate to Symfony forms #416 */»''' 
-    def private dispatch methodArgsCall(Entity it, EditAction action) '''$request«/* TODO migrate to Symfony forms #416 */»''' 
+    def private dispatch methodArgs(Entity it, EditAction action) '''Request $request/* TODO migrate to Symfony forms #416 */''' 
+    def private dispatch methodArgsCall(Entity it, EditAction action) '''$request/* TODO migrate to Symfony forms #416 */''' 
 
     def private dispatch actionRoute(EditAction it, Entity entity) '''
-        «actionRouteForSingleEntity(entity, it)»
+        actionRouteForSingleEntity(entity, it)
     '''
 
-    def private dispatch methodArgs(Entity it, DeleteAction action) '''Request $request, «name.formatForCodeCapital»Entity $«name.formatForCode»''' 
-    def private dispatch methodArgsCall(Entity it, DeleteAction action) '''$request, $«name.formatForCode»''' 
+    def private dispatch methodArgs(Entity it, DeleteAction action) '''Request $request, name.formatForCodeCapitalEntity $name.formatForCode''' 
+    def private dispatch methodArgsCall(Entity it, DeleteAction action) '''$request, $name.formatForCode''' 
 
     def private dispatch actionRoute(DeleteAction it, Entity entity) '''
-        «actionRouteForSingleEntity(entity, it)»
+        actionRouteForSingleEntity(entity, it)
     '''
 
     def private dispatch actionRoute(CustomAction it, Entity entity) '''
-         «' '»*
-         «' '»* @Route("/%«app.appName.formatForDB».routing.«entity.name.formatForCode».plural%/«name.formatForCode»",
-         «' '»*        name = "«app.appName.formatForDB»_«entity.name.formatForCode»_«name.formatForCode»",
-         «' '»*        methods = {"GET", "POST"}
-         «' '»* )
+         ' '*
+         ' '* @Route("/%app.appName.formatForDB.routing.entity.name.formatForCode.plural%/name.formatForCode",
+         ' '*        name = "app.appName.formatForDB_entity.name.formatForCode_name.formatForCode",
+         ' '*        methods = {"GET", "POST"}
+         ' '* )
     '''
 
     // currently called for DisplayAction and DeleteAction
     def private paramConverter(Entity it) '''
-         «' '»* @ParamConverter("«name.formatForCode»", class="«app.appName»:«name.formatForCodeCapital»Entity", options={«paramConverterOptions»})
+         ' '* @ParamConverter("name.formatForCode", class="app.appName:name.formatForCodeCapitalEntity", options={paramConverterOptions})
     '''
 
     def private paramConverterOptions(Entity it) {

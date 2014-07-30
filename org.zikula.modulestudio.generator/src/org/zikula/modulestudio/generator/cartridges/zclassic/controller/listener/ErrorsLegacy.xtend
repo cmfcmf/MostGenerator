@@ -19,11 +19,11 @@ class ErrorsLegacy {
          */
         public static function setupErrorReporting(Zikula_Event $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::setupErrorReporting($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
 
         /**
@@ -36,11 +36,11 @@ class ErrorsLegacy {
          */
         public static function systemError(Zikula_Event $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::systemError($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
     '''
 }

@@ -31,29 +31,29 @@ class ContentTypeList {
     }
 
     def private contentTypeBaseClass(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\ContentType\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\ContentType\Base;
 
-            «IF hasCategorisableEntities»
+            IF hasCategorisableEntities
                 use CategoryUtil;
-            «ENDIF»
+            ENDIF
             use ModUtil;
             use SecurityUtil;
             use ServiceUtil;
             use Zikula_View;
             use ZLanguage;
 
-        «ENDIF»
+        ENDIF
         /**
          * Generic item list content plugin base class.
          */
-        «IF targets('1.3.5')»
-        class «appName»_ContentType_Base_ItemList extends Content_AbstractContentType
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_ContentType_Base_ItemList extends Content_AbstractContentType
+        ELSE
         class ItemList extends \Content_AbstractContentType
-        «ENDIF»
+        ENDIF
         {
-            «contentTypeBaseImpl»
+            contentTypeBaseImpl
         }
     '''
 
@@ -99,7 +99,7 @@ class ContentTypeList {
          * @var string
          */
         protected $filter;
-        «IF hasCategorisableEntities»
+        IF hasCategorisableEntities
 
             /**
              * List of object types allowing categorisation.
@@ -128,7 +128,7 @@ class ContentTypeList {
              * @var array
              */
             protected $catIds;
-        «ENDIF»
+        ENDIF
 
         /**
          * Returns the module providing this content type.
@@ -137,7 +137,7 @@ class ContentTypeList {
          */
         public function getModule()
         {
-            return '«appName»';
+            return 'appName';
         }
 
         /**
@@ -157,9 +157,9 @@ class ContentTypeList {
          */
         public function getTitle()
         {
-            $dom = ZLanguage::getModuleDomain('«appName»');
+            $dom = ZLanguage::getModuleDomain('appName');
 
-            return __('«appName» list view', $dom);
+            return __('appName list view', $dom);
         }
 
         /**
@@ -169,9 +169,9 @@ class ContentTypeList {
          */
         public function getDescription()
         {
-            $dom = ZLanguage::getModuleDomain('«appName»');
+            $dom = ZLanguage::getModuleDomain('appName');
 
-            return __('Display list of «appName» objects.', $dom);
+            return __('Display list of appName objects.', $dom);
         }
 
         /**
@@ -182,11 +182,11 @@ class ContentTypeList {
         public function loadData(&$data)
         {
             $serviceManager = ServiceUtil::getManager();
-            «IF targets('1.3.5')»
-                $controllerHelper = new «appName»_Util_Controller($serviceManager);
-            «ELSE»
-                $controllerHelper = $serviceManager->get('«appName.formatForDB».controller_helper');
-            «ENDIF»
+            IF targets('1.3.5')
+                $controllerHelper = new appName_Util_Controller($serviceManager);
+            ELSE
+                $controllerHelper = $serviceManager->get('appName.formatForDB.controller_helper');
+            ENDIF
 
             $utilArgs = array('name' => 'list');
             if (!isset($data['objectType']) || !in_array($data['objectType'], $controllerHelper->getObjectTypes('contentType', $utilArgs))) {
@@ -216,20 +216,20 @@ class ContentTypeList {
             $this->template = $data['template'];
             $this->customTemplate = $data['customTemplate'];
             $this->filter = $data['filter'];
-            «IF hasCategorisableEntities»
-                $this->categorisableObjectTypes = array(«FOR entity : getCategorisableEntities SEPARATOR ', '»'«entity.name.formatForCode»'«ENDFOR»);
+            IF hasCategorisableEntities
+                $this->categorisableObjectTypes = array(FOR entity : getCategorisableEntities SEPARATOR ', ''entity.name.formatForCode'ENDFOR);
 
                 // fetch category properties
                 $this->catRegistries = array();
                 $this->catProperties = array();
                 if (in_array($this->objectType, $this->categorisableObjectTypes)) {
-                    $idFields = ModUtil::apiFunc('«appName»', 'selection', 'getIdFields', array('ot' => $this->objectType));
-                    $this->catRegistries = ModUtil::apiFunc('«appName»', 'category', 'getAllPropertiesWithMainCat', array('ot' => $this->objectType, 'arraykey' => $idFields[0]));
-                    $this->catProperties = ModUtil::apiFunc('«appName»', 'category', 'getAllProperties', array('ot' => $this->objectType));
+                    $idFields = ModUtil::apiFunc('appName', 'selection', 'getIdFields', array('ot' => $this->objectType));
+                    $this->catRegistries = ModUtil::apiFunc('appName', 'category', 'getAllPropertiesWithMainCat', array('ot' => $this->objectType, 'arraykey' => $idFields[0]));
+                    $this->catProperties = ModUtil::apiFunc('appName', 'category', 'getAllProperties', array('ot' => $this->objectType));
                 }
 
                 if (!isset($data['catIds'])) {
-                    $primaryRegistry = ModUtil::apiFunc('«appName»', 'category', 'getPrimaryProperty', array('ot' => $this->objectType));
+                    $primaryRegistry = ModUtil::apiFunc('appName', 'category', 'getPrimaryProperty', array('ot' => $this->objectType));
                     $data['catIds'] = array($primaryRegistry => array());
                     // backwards compatibility
                     if (isset($data['catId'])) {
@@ -261,7 +261,7 @@ class ContentTypeList {
                 }
 
                 $this->catIds = $data['catIds'];
-            «ENDIF»
+            ENDIF
         }
 
         /**
@@ -271,26 +271,26 @@ class ContentTypeList {
          */
         public function display()
         {
-            $dom = ZLanguage::getModuleDomain('«appName»');
-            ModUtil::initOOModule('«appName»');
+            $dom = ZLanguage::getModuleDomain('appName');
+            ModUtil::initOOModule('appName');
 
-            «IF targets('1.3.5')»
-                $entityClass = '«appName»_Entity_' . ucfirst($this->objectType);
-            «ENDIF»
+            IF targets('1.3.5')
+                $entityClass = 'appName_Entity_' . ucfirst($this->objectType);
+            ENDIF
             $serviceManager = ServiceUtil::getManager();
-            «IF targets('1.3.5')»
-                $entityManager = $serviceManager->get«IF targets('1.3.5')»Service«ENDIF»('doctrine.entitymanager');
+            IF targets('1.3.5')
+                $entityManager = $serviceManager->getIF targets('1.3.5')ServiceENDIF('doctrine.entitymanager');
                 $repository = $entityManager->getRepository($entityClass);
-            «ELSE»
-                $repository = $serviceManager->get('«appName.formatForDB».' . $this->objectType . '_factory')->getRepository();
-            «ENDIF»
+            ELSE
+                $repository = $serviceManager->get('appName.formatForDB.' . $this->objectType . '_factory')->getRepository();
+            ENDIF
 
             // ensure that the view does not look for templates in the Content module (#218)
-            $this->view->toplevelmodule = '«appName»';
+            $this->view->toplevelmodule = 'appName';
 
             $this->view->setCaching(Zikula_View::CACHE_ENABLED);
             // set cache id
-            $component = '«appName»:' . ucfirst($this->objectType) . ':';
+            $component = 'appName:' . ucfirst($this->objectType) . ':';
             $instance = '::';
             $accessLevel = ACCESS_READ;
             if (SecurityUtil::checkPermission($component, $instance, ACCESS_COMMENT)) {
@@ -312,15 +312,15 @@ class ContentTypeList {
             $where = $this->filter;
             $orderBy = $this->getSortParam($repository);
             $qb = $repository->genericBaseQuery($where, $orderBy);
-            «IF hasCategorisableEntities»
+            IF hasCategorisableEntities
 
                 // apply category filters
                 if (in_array($this->objectType, $this->categorisableObjectTypes)) {
                     if (is_array($this->catIds) && count($this->catIds) > 0) {
-                        $qb = ModUtil::apiFunc('«appName»', 'category', 'buildFilterClauses', array('qb' => $qb, 'ot' => $this->objectType, 'catids' => $this->catIds));
+                        $qb = ModUtil::apiFunc('appName', 'category', 'buildFilterClauses', array('qb' => $qb, 'ot' => $this->objectType, 'catids' => $this->catIds));
                     }
                 }
-            «ENDIF»
+            ENDIF
 
             // get objects from database
             $currentPage = 1;
@@ -341,12 +341,12 @@ class ContentTypeList {
                        ->assign('objectType', $this->objectType)
                        ->assign('items', $entities)
                        ->assign($repository->getAdditionalTemplateParameters('contentType'));
-            «IF hasCategorisableEntities»
+            IF hasCategorisableEntities
 
                 // assign category data
                 $this->view->assign('registries', $this->catRegistries);
                 $this->view->assign('properties', $this->catProperties);
-            «ENDIF»
+            ENDIF
 
             $output = $this->view->fetch($template);
 
@@ -368,12 +368,12 @@ class ContentTypeList {
             $templateForObjectType = str_replace('itemlist_', 'itemlist_' . $this->objectType . '_', $templateFile);
 
             $template = '';
-            if ($this->view->template_exists('«IF targets('1.3.5')»contenttype«ELSE»ContentType«ENDIF»/' . $templateForObjectType)) {
-                $template = '«IF targets('1.3.5')»contenttype«ELSE»ContentType«ENDIF»/' . $templateForObjectType;
-            } elseif ($this->view->template_exists('«IF targets('1.3.5')»contenttype«ELSE»ContentType«ENDIF»/' . $templateFile)) {
-                $template = '«IF targets('1.3.5')»contenttype«ELSE»ContentType«ENDIF»/' . $templateFile;
+            if ($this->view->template_exists('IF targets('1.3.5')contenttypeELSEContentTypeENDIF/' . $templateForObjectType)) {
+                $template = 'IF targets('1.3.5')contenttypeELSEContentTypeENDIF/' . $templateForObjectType;
+            } elseif ($this->view->template_exists('IF targets('1.3.5')contenttypeELSEContentTypeENDIF/' . $templateFile)) {
+                $template = 'IF targets('1.3.5')contenttypeELSEContentTypeENDIF/' . $templateFile;
             } else {
-                $template = '«IF targets('1.3.5')»contenttype«ELSE»ContentType«ENDIF»/itemlist_display.tpl';
+                $template = 'IF targets('1.3.5')contenttypeELSEContentTypeENDIF/itemlist_display.tpl';
             }
 
             return $template;
@@ -394,7 +394,7 @@ class ContentTypeList {
 
             $sortParam = '';
             if ($this->sorting == 'newest') {
-                $idFields = ModUtil::apiFunc('«appName»', 'selection', 'getIdFields', array('ot' => $this->objectType));
+                $idFields = ModUtil::apiFunc('appName', 'selection', 'getIdFields', array('ot' => $this->objectType));
                 if (count($idFields) == 1) {
                     $sortParam = $idFields[0] . ' DESC';
                 } else {
@@ -427,7 +427,7 @@ class ContentTypeList {
          */
         public function getDefaultData()
         {
-            return array('objectType' => '«getLeadingEntity.name.formatForCode»',
+            return array('objectType' => 'getLeadingEntity.name.formatForCode',
                          'sorting' => 'default',
                          'amount' => 1,
                          'template' => 'itemlist_display.tpl',
@@ -441,22 +441,22 @@ class ContentTypeList {
         public function startEditing()
         {
             // ensure that the view does not look for templates in the Content module (#218)
-            $this->view->toplevelmodule = '«appName»';
+            $this->view->toplevelmodule = 'appName';
 
             // ensure our custom plugins are loaded
-            «IF targets('1.3.5')»
-            array_push($this->view->plugins_dir, '«rootFolder»/«appName»/templates/plugins');
-            «ELSE»
-            array_push($this->view->plugins_dir, '«rootFolder»/«getViewPath»»/plugins');
-            «ENDIF»
-            «IF hasCategorisableEntities»
+            IF targets('1.3.5')
+            array_push($this->view->plugins_dir, 'rootFolder/appName/templates/plugins');
+            ELSE
+            array_push($this->view->plugins_dir, 'rootFolder/getViewPath/plugins');
+            ENDIF
+            IF hasCategorisableEntities
 
                 // assign category data
                 $this->view->assign('registries', $this->catRegistries);
                 $this->view->assign('properties', $this->catProperties);
 
                 // assign categories lists for simulating category selectors
-                $dom = ZLanguage::getModuleDomain('«appName»');
+                $dom = ZLanguage::getModuleDomain('appName');
                 $locale = ZLanguage::getLanguageCode();
                 $categories = array();
                 foreach ($this->catRegistries as $registryId => $registryCid) {
@@ -481,25 +481,25 @@ class ContentTypeList {
                 }
 
                 $this->view->assign('categories', $categories);
-            «ENDIF»
+            ENDIF
         }
     '''
 
     def private contentTypeImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\ContentType;
+        IF !targets('1.3.5')
+            namespace appNamespace\ContentType;
 
-            use «appNamespace»\ContentType\Base\ItemList as BaseItemList;
+            use appNamespace\ContentType\Base\ItemList as BaseItemList;
 
-        «ENDIF»
+        ENDIF
         /**
          * Generic item list content plugin implementation class.
          */
-        «IF targets('1.3.5')»
-        class «appName»_ContentType_ItemList extends «appName»_ContentType_Base_ItemList
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_ContentType_ItemList extends appName_ContentType_Base_ItemList
+        ELSE
         class ItemList extends BaseItemList
-        «ENDIF»
+        ENDIF
         {
             // feel free to extend the content type here
         }

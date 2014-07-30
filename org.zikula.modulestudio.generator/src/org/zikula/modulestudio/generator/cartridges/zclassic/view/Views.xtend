@@ -163,94 +163,94 @@ class Views {
     }
 
     def private headerImpl(Application it, Controller controller) '''
-        {* purpose of this template: header for «controller.formattedName» area *}
-        «IF targets('1.3.5')»
+        {* purpose of this template: header for controller.formattedName area *}
+        IF targets('1.3.5')
             {pageaddvar name='javascript' value='prototype'}
             {pageaddvar name='javascript' value='validation'}
             {pageaddvar name='javascript' value='zikula'}
             {pageaddvar name='javascript' value='livepipe'}
             {pageaddvar name='javascript' value='zikula.ui'}
-            «IF hasUploads»
+            IF hasUploads
                 {pageaddvar name='javascript' value='zikula.imageviewer'}
-            «ENDIF»
-        «ELSE»
+            ENDIF
+        ELSE
             {pageaddvar name='stylesheet' value='web/bootstrap/css/bootstrap.min.css'}
             {pageaddvar name='stylesheet' value='web/bootstrap/css/bootstrap-theme.min.css'}
             {pageaddvar name='javascript' value='jquery'}
             {pageaddvar name='javascript' value='web/bootstrap/js/bootstrap.min.js'}
             {pageaddvar name='javascript' value='zikula'}{* still required for Gettext *}
-            «IF hasUploads»
+            IF hasUploads
                 {pageaddvar name='javascript' value='web/bootstrap-media-lightbox/bootstrap-media-lightbox.min.js'}
                 {pageaddvar name='stylesheet' value='web/bootstrap-media-lightbox/bootstrap-media-lightbox.css'}
-            «ENDIF»
-            «IF controller.hasActions('view') || controller.hasActions('display') || controller.hasActions('edit')»
+            ENDIF
+            IF controller.hasActions('view') || controller.hasActions('display') || controller.hasActions('edit')
                 {pageaddvar name='stylesheet' value='web/bootstrap-jqueryui/bootstrap-jqueryui.min.css'}
                 {pageaddvar name='javascript' value='web/bootstrap-jqueryui/bootstrap-jqueryui.min.js'}
-            «ENDIF»
-        «ENDIF»
-        {pageaddvar name='javascript' value='«rootFolder»/«appName»/«IF targets('1.3.5')»javascript/«ELSE»«getAppJsPath»«ENDIF»«appName».js'}
+            ENDIF
+        ENDIF
+        {pageaddvar name='javascript' value='rootFolder/appName/IF targets('1.3.5')javascript/ELSEgetAppJsPathENDIFappName.js'}
 
         {* initialise additional gettext domain for translations within javascript *}
-        {pageaddvar name='jsgettext' value='module_«appName.formatForDB»_js:«appName»'}
+        {pageaddvar name='jsgettext' value='module_appName.formatForDB_js:appName'}
 
         {if !isset($smarty.get.theme) || $smarty.get.theme ne 'Printer'}
-            «IF controller instanceof AdminController»
+            IF controller instanceof AdminController
                 {adminheader}
-            «ELSE»
-                «IF targets('1.3.5')»
+            ELSE
+                IF targets('1.3.5')
                     <div class="z-frontendbox">
-                        <h2>{gt text='«name.formatForDisplayCapital»' comment='This is the title of the header template'}</h2>
-                        {modulelinks modname='«appName»' type='«controller.formattedName»'}
+                        <h2>{gt text='name.formatForDisplayCapital' comment='This is the title of the header template'}</h2>
+                        {modulelinks modname='appName' type='controller.formattedName'}
                     </div>
-                «ELSE»
-                    <h2 class="userheader">{gt text='«name.formatForDisplayCapital»' comment='This is the title of the header template'}</h2>
-                    {modulelinks modname='«appName»' type='«controller.formattedName»'}
-                «ENDIF»
-            «ENDIF»
-            «IF generateModerationPanel && needsApproval && controller instanceof UserController»
+                ELSE
+                    <h2 class="userheader">{gt text='name.formatForDisplayCapital' comment='This is the title of the header template'}</h2>
+                    {modulelinks modname='appName' type='controller.formattedName'}
+                ENDIF
+            ENDIF
+            IF generateModerationPanel && needsApproval && controller instanceof UserController
                 {nocache}
-                    {«appName.formatForDB»ModerationObjects assign='moderationObjects'}
+                    {appName.formatForDBModerationObjects assign='moderationObjects'}
                     {if count($moderationObjects) gt 0}
                         {foreach item='modItem' from=$moderationObjects}
-                            <p class="«IF targets('1.3.5')»z-informationmsg z«ELSE»alert alert-info alert-dismissable text«ENDIF»-center">
-                                «IF targets('1.3.5')»
-                                    <a href="{modurl modname='«appName»' type='admin' func='view' ot=$modItem.objectType workflowState=$modItem.state}" class="z-bold">{$modItem.message}</a>
-                                «ELSE»
+                            <p class="IF targets('1.3.5')z-informationmsg zELSEalert alert-info alert-dismissable textENDIF-center">
+                                IF targets('1.3.5')
+                                    <a href="{modurl modname='appName' type='admin' func='view' ot=$modItem.objectType workflowState=$modItem.state}" class="z-bold">{$modItem.message}</a>
+                                ELSE
                                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                                    <a href="{route name="«appName.formatForDB»_`$modItem.objectType`_view" lct='admin' workflowState=$modItem.state}" class="bold alert-link">{$modItem.message}</a>
-                                «ENDIF»
+                                    <a href="{route name="appName.formatForDB_`$modItem.objectType`_view" lct='admin' workflowState=$modItem.state}" class="bold alert-link">{$modItem.message}</a>
+                                ENDIF
                             </p>
                         {/foreach}
                     {/if}
                 {/nocache}
-            «ENDIF»
+            ENDIF
         {/if}
-        «IF controller instanceof AdminController»
-        «ELSE»
+        IF controller instanceof AdminController
+        ELSE
             {insert name='getstatusmsg'}
-        «ENDIF»
+        ENDIF
     '''
 
     def private footerImpl(Application it, Controller controller) '''
-        {* purpose of this template: footer for «controller.formattedName» area *}
+        {* purpose of this template: footer for controller.formattedName area *}
         {if !isset($smarty.get.theme) || $smarty.get.theme ne 'Printer'}
-            «IF generatePoweredByBacklinksIntoFooterTemplates»
-                «new FileHelper().msWeblink(it)»
-            «ENDIF»
-            «IF controller instanceof AdminController»
+            IF generatePoweredByBacklinksIntoFooterTemplates
+                new FileHelper().msWeblink(it)
+            ENDIF
+            IF controller instanceof AdminController
                 {adminfooter}
-            «ENDIF»
-        «IF hasEditActions»
+            ENDIF
+        IF hasEditActions
         {elseif isset($smarty.get.func) && $smarty.get.func eq 'edit'}
             {pageaddvar name='stylesheet' value='style/core.css'}
-            {pageaddvar name='stylesheet' value='«rootFolder»/«appName»/«IF targets('1.3.5')»style/«ELSE»«getAppCssPath»«ENDIF»style.css'}
-            «IF targets('1.3.5')»
+            {pageaddvar name='stylesheet' value='rootFolder/appName/IF targets('1.3.5')style/ELSEgetAppCssPathENDIFstyle.css'}
+            IF targets('1.3.5')
                 {pageaddvar name='stylesheet' value='system/Theme/style/form/style.css'}
                 {pageaddvar name='stylesheet' value='themes/Andreas08/style/fluid960gs/reset.css'}
-            «ELSE»
+            ELSE
                 {pageaddvar name='stylesheet' value='system/Zikula/Module/ThemeModule/Resources/public/css/form/style.css'}
                 {pageaddvar name='stylesheet' value='themes/Zikula/Theme/Andreas08Theme/Resources/public/css/fluid960gs/reset.css'}
-            «ENDIF»
+            ENDIF
             {capture assign='pageStyles'}
             <style type="text/css">
                 body {
@@ -259,7 +259,7 @@ class Views {
             </style>
             {/capture}
             {pageaddvar name='header' value=$pageStyles}
-        «ENDIF»
+        ENDIF
         {/if}
     '''
 

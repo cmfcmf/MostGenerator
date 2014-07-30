@@ -34,26 +34,26 @@ class UrlRoutingLegacy {
     }
 
     def private routerFacadeBaseImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Base;
 
             use ModUtil;
             use System;
             use Zikula\Routing\UrlRoute;
             use Zikula\Routing\UrlRouter;
 
-        «ENDIF»
+        ENDIF
         /**
          * Url router facade base class
          */
-        «IF targets('1.3.5')»
-        class «appName»_Base_RouterFacade
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Base_RouterFacade
+        ELSE
         class RouterFacade
-        «ENDIF»
+        ENDIF
         {
             /**
-             * @var «IF targets('1.3.5')»Zikula_Routing_«ENDIF»UrlRouter The router which is used internally
+             * @var IF targets('1.3.5')Zikula_Routing_ENDIFUrlRouter The router which is used internally
              */
             protected $router;
 
@@ -68,77 +68,77 @@ class UrlRoutingLegacy {
             function __construct()
             {
                 $displayDefaultEnding = System::getVar('shorturlsext', 'html');
-                «/*Modifier: + (1..n), * (0..n), ? (0..1), {x,y} (x..y)*/»
+                /*Modifier: + (1..n), * (0..n), ? (0..1), {x,y} (x..y)*/
                 $this->requirements = array(
                     'func'          => '\w+',
                     'ot'            => '\w+',
                     'slug'          => '[^/.]+', // slugs ([^/.]+ = all chars except / and .)
-                    'displayending' => '(?:' . $displayDefaultEnding . '«IF getListOfDisplayFormats.size > 0»|«FOR format : getListOfDisplayFormats SEPARATOR '|'»«format»«ENDFOR»«ENDIF»)',
-                    'viewending'    => '(?:«FOR format : getListOfViewFormats SEPARATOR '|'»\.«format»«ENDFOR»)?',
+                    'displayending' => '(?:' . $displayDefaultEnding . 'IF getListOfDisplayFormats.size > 0|FOR format : getListOfDisplayFormats SEPARATOR '|'formatENDFORENDIF)',
+                    'viewending'    => '(?:FOR format : getListOfViewFormats SEPARATOR '|'\.formatENDFOR)?',
                     'id'            => '\d+'
                 );
 
                 // initialise and reference router instance
-                $this->router = new «IF targets('1.3.5')»Zikula_Routing_«ENDIF»UrlRouter();
+                $this->router = new IF targets('1.3.5')Zikula_Routing_ENDIFUrlRouter();
 
                 // add generic routes
                 return $this->initUrlRoutes();
             }
 
-            «initUrlRoutes»
+            initUrlRoutes
 
-            «getGroupingFolderFromObjectType»
+            getGroupingFolderFromObjectType
 
-            «getObjectTypeFromGroupingFolder»
+            getObjectTypeFromGroupingFolder
 
-            «getFormattedSlug»
+            getFormattedSlug
 
-            «IF targets('1.3.5')»
-                «fh.getterAndSetterMethods(it, 'router', 'Zikula_Routing_UrlRouter', false, true, 'null', '')»
-            «ELSE»
-                «fh.getterAndSetterMethods(it, 'router', '\\Zikula\\Routing\\UrlRouter', false, true, 'null', '')»
-            «ENDIF»
+            IF targets('1.3.5')
+                fh.getterAndSetterMethods(it, 'router', 'Zikula_Routing_UrlRouter', false, true, 'null', '')
+            ELSE
+                fh.getterAndSetterMethods(it, 'router', '\\Zikula\\Routing\\UrlRouter', false, true, 'null', '')
+            ENDIF
         }
     '''
 
     def private initUrlRoutes(Application it) '''
-        «val userController = getMainUserController»
+        val userController = getMainUserController
         /**
          * Initialise the url routes for this application.
          *
-         * @return «IF targets('1.3.5')»Zikula_Routing_UrlRouter«ENDIF»UrlRouter The router instance treating all initialised routes
+         * @return IF targets('1.3.5')Zikula_Routing_UrlRouterENDIFUrlRouter The router instance treating all initialised routes
          */
         protected function initUrlRoutes()
         {
             $fieldRequirements = $this->requirements;
-            $isDefaultModule = (System::getVar('shorturlsdefaultmodule', '') == '«appName»');
+            $isDefaultModule = (System::getVar('shorturlsdefaultmodule', '') == 'appName');
 
             $defaults = array();
             $modulePrefix = '';
             if (!$isDefaultModule) {
-                $defaults['module'] = '«appName»';
+                $defaults['module'] = 'appName';
                 $modulePrefix = ':module/';
             }
 
-            «IF userController.hasActions('view')»
+            IF userController.hasActions('view')
                 $defaults['func'] = 'view';
                 $viewFolder = 'view';
                 // normal views (e.g. orders/ or customers.xml)
-                $this->router->set('va', new «IF targets('1.3.5')»Zikula_Routing_«ENDIF»UrlRoute($modulePrefix . $viewFolder . '/:ot:viewending', $defaults, $fieldRequirements));
+                $this->router->set('va', new IF targets('1.3.5')Zikula_Routing_ENDIFUrlRoute($modulePrefix . $viewFolder . '/:ot:viewending', $defaults, $fieldRequirements));
 
                 // TODO filter views (e.g. /orders/customer/mr-smith.csv)
                 // $this->initRouteForEachSlugType('vn', $modulePrefix . $viewFolder . '/:ot/:filterot/', ':viewending', $defaults, $fieldRequirements);
-            «ENDIF»
+            ENDIF
 
-            «IF userController.hasActions('display')»
+            IF userController.hasActions('display')
                 $defaults['func'] = 'display';
                 // normal display pages including the group folder corresponding to the object type
                 $this->initRouteForEachSlugType('dn', $modulePrefix . ':ot/', ':displayending', $defaults, $fieldRequirements);
 
                 // additional rules for the leading object type (where ot is omitted)
-                $defaults['ot'] = '«getLeadingEntity.name.formatForCode»';
+                $defaults['ot'] = 'getLeadingEntity.name.formatForCode';
                 $this->initRouteForEachSlugType('dl', $modulePrefix . '', ':displayending', $defaults, $fieldRequirements);
-            «ENDIF»
+            ENDIF
 
             return $this->router;
         }
@@ -155,13 +155,13 @@ class UrlRoutingLegacy {
         protected function initRouteForEachSlugType($prefix, $patternStart, $patternEnd, $defaults, $fieldRequirements)
         {
             // entities with unique slug (slug only)
-            $this->router->set($prefix . 'a', new «IF targets('1.3.5')»Zikula_Routing_«ENDIF»UrlRoute($patternStart . ':slug.' . $patternEnd,     $defaults, $fieldRequirements));
+            $this->router->set($prefix . 'a', new IF targets('1.3.5')Zikula_Routing_ENDIFUrlRoute($patternStart . ':slug.' . $patternEnd,     $defaults, $fieldRequirements));
 
             // entities with non-unique slug (slug and id)
-            $this->router->set($prefix . 'b', new «IF targets('1.3.5')»Zikula_Routing_«ENDIF»UrlRoute($patternStart . ':slug.:id.' . $patternEnd, $defaults, $fieldRequirements));
+            $this->router->set($prefix . 'b', new IF targets('1.3.5')Zikula_Routing_ENDIFUrlRoute($patternStart . ':slug.:id.' . $patternEnd, $defaults, $fieldRequirements));
 
             // entities without slug (id)
-            $this->router->set($prefix . 'c', new «IF targets('1.3.5')»Zikula_Routing_«ENDIF»UrlRoute($patternStart . 'id.:id.' . $patternEnd,    $defaults, $fieldRequirements));
+            $this->router->set($prefix . 'c', new IF targets('1.3.5')Zikula_Routing_ENDIFUrlRoute($patternStart . 'id.:id.' . $patternEnd,    $defaults, $fieldRequirements));
         }
     '''
 
@@ -181,12 +181,12 @@ class UrlRoutingLegacy {
 
             if ($func == 'view') {
                 switch ($objectType) {
-                    «FOR entity : getAllEntities»«entity.getGroupingFolderFromObjectType(true)»«ENDFOR»
+                    FOR entity : getAllEntitiesentity.getGroupingFolderFromObjectType(true)ENDFOR
                     default: return '';
                 }
             } else if ($func == 'display') {
                 switch ($objectType) {
-                    «FOR entity : getAllEntities»«entity.getGroupingFolderFromObjectType(false)»«ENDFOR»
+                    FOR entity : getAllEntitiesentity.getGroupingFolderFromObjectType(false)ENDFOR
                     default: return '';
                 }
             }
@@ -211,12 +211,12 @@ class UrlRoutingLegacy {
 
             if ($func == 'view') {
                 switch ($groupFolder) {
-                    «FOR entity : getAllEntities»«entity.getObjectTypeFromGroupingFolder(true)»«ENDFOR»
+                    FOR entity : getAllEntitiesentity.getObjectTypeFromGroupingFolder(true)ENDFOR
                     default: return '';
                 }
             } else if ($func == 'display') {
                 switch ($groupFolder) {
-                    «FOR entity : getAllEntities»«entity.getObjectTypeFromGroupingFolder(false)»«ENDFOR»
+                    FOR entity : getAllEntitiesentity.getObjectTypeFromGroupingFolder(false)ENDFOR
                     default: return '';
                 }
             }
@@ -226,14 +226,14 @@ class UrlRoutingLegacy {
     '''
 
     def private getGroupingFolderFromObjectType(Entity it, Boolean plural) '''
-        case '«name.formatForCode»':
-                    $groupFolder = '«getEntityNameSingularPlural(plural).formatForDB»';
+        case 'name.formatForCode':
+                    $groupFolder = 'getEntityNameSingularPlural(plural).formatForDB';
                     break;
     '''
 
     def private getObjectTypeFromGroupingFolder(Entity it, Boolean plural) '''
-        case '«getEntityNameSingularPlural(plural).formatForDB»':
-                    $objectType = '«name.formatForCode»';
+        case 'getEntityNameSingularPlural(plural).formatForDB':
+                    $objectType = 'name.formatForCode';
                     break;
     '''
 
@@ -253,7 +253,7 @@ class UrlRoutingLegacy {
             $slug = '';
 
             switch ($objectType) {
-                «FOR entity : getAllEntities»«entity.getSlugForItem»«ENDFOR»
+                FOR entity : getAllEntitiesentity.getSlugForItemENDFOR
             }
 
             return $slug;
@@ -261,14 +261,14 @@ class UrlRoutingLegacy {
     '''
 
     def private getSlugForItem(Entity it) '''
-        case '«name.formatForCode»':
-            «IF hasSluggableFields»
-                    $item = ModUtil::apiFunc('«container.application.appName»', 'selection', 'getEntity', array('ot' => $objectType, 'id' => $itemid, 'slimMode' => true));
-                    «IF slugUnique»
+        case 'name.formatForCode':
+            IF hasSluggableFields
+                    $item = ModUtil::apiFunc('container.application.appName', 'selection', 'getEntity', array('ot' => $objectType, 'id' => $itemid, 'slimMode' => true));
+                    IF slugUnique
                         $slug = $item['slug'];
-                    «ELSE»
+                    ELSE
                         // make non-unique slug unique by adding the identifier
-                        $idFields = ModUtil::apiFunc('«container.application.appName»', 'selection', 'getIdFields', array('ot' => $objectType));
+                        $idFields = ModUtil::apiFunc('container.application.appName', 'selection', 'getIdFields', array('ot' => $objectType));
 
                         // concatenate identifiers (for composite keys)
                         $itemId = '';
@@ -276,28 +276,28 @@ class UrlRoutingLegacy {
                             $itemId .= ((!empty($itemId)) ? '_' : '') . $item[$idField];
                         }
                         $slug = $item['slug'] . '.' . $itemId;
-                    «ENDIF»
-            «ELSE»
+                    ENDIF
+            ELSE
                     $slug = $itemid;
-            «ENDIF»
+            ENDIF
                     break;
     '''
 
     def private routerFacadeImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»;
+        IF !targets('1.3.5')
+            namespace appNamespace;
 
-            use «appNamespace»\Base\RouterFacade as BaseRouterFacade;
+            use appNamespace\Base\RouterFacade as BaseRouterFacade;
 
-        «ENDIF»
+        ENDIF
         /**
          * Url router facade implementation class.
          */
-        «IF targets('1.3.5')»
-        class «appName»_RouterFacade extends «appName»_Base_RouterFacade
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_RouterFacade extends appName_Base_RouterFacade
+        ELSE
         class RouterFacade extends BaseRouterFacade
-        «ENDIF»
+        ENDIF
         {
             // here you can customise the data which is provided to the url router.
         }

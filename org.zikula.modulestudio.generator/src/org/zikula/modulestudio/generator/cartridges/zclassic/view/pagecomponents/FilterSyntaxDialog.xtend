@@ -23,9 +23,9 @@ class FilterSyntaxDialog {
         <div class="modal fade" id="filterSyntaxModal" tabindex="-1" role="dialog" aria-labelledby="filterSyntaxModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    «dialogHeader»
-                    «dialogBody»
-                    «dialogFooter»
+                    dialogHeader
+                    dialogBody
+                    dialogFooter
                 </div>
             </div>
         </div>
@@ -108,7 +108,7 @@ class FilterSyntaxDialog {
                 <li>{gt text='You can use relative time information according to the GNU Date Input Formats syntax.'}
                     <ul>
                         <li><code>date:eq:today</code> {gt text='All items with date of today.'}</li>
-                        <li><code>date:ge:­24 hours</code> {gt text='All items with date up from 24 hours ago.'}</li>
+                        <li><code>date:ge:24 hours</code> {gt text='All items with date up from 24 hours ago.'}</li>
                         <li><code>date:eq:last year</code> {gt text='All items with date in the last year.'}</li>
                     </ul>
                 </li>

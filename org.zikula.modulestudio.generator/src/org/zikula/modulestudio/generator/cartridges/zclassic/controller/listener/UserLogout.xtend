@@ -9,22 +9,22 @@ class UserLogout {
     CommonExample commonExample = new CommonExample()
 
     def generate(Application it, Boolean isBase) '''
-        «IF !targets('1.3.5')»
+        IF !targets('1.3.5')
             /**
              * Makes our handlers known to the event system.
              */
             public static function getSubscribedEvents()
             {
-                «IF isBase»
+                IF isBase
                     return array(
                         'module.users.ui.logout.succeeded' => array('succeeded', 5)
                     );
-                «ELSE»
+                ELSE
                     return parent::getSubscribedEvents();
-                «ENDIF»
+                ENDIF
             }
 
-        «ENDIF»
+        ENDIF
         /**
          * Listener for the `module.users.ui.logout.succeeded` event.
          *
@@ -34,15 +34,15 @@ class UserLogout {
          * Args contain array of `array('authentication_method' => $authenticationMethod,
          *                              'uid'                   => $uid));`
          *
-         * @param «IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event The event instance.
+         * @param IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event The event instance.
          */
-        public «IF targets('1.3.5')»static «ENDIF»function succeeded(«IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event)
+        public IF targets('1.3.5')static ENDIFfunction succeeded(IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::succeeded($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
     '''
 }

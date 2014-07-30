@@ -34,22 +34,22 @@ class Index {
     }
 
     def private indexView(Entity it, String pageName) '''
-        {* purpose of this template: «nameMultiple.formatForDisplay» «pageName» view *}
+        {* purpose of this template: nameMultiple.formatForDisplay pageName view *}
         {assign var='lct' value='user'}
         {if isset($smarty.get.lct) && $smarty.get.lct eq 'admin'}
             {assign var='lct' value='admin'}
         {/if}
-        «IF container.application.targets('1.3.5')»
+        IF container.application.targets('1.3.5')
             {include file="`$lct`/header.tpl"}
-        «ELSE»
+        ELSE
             {assign var='lctUc' value=$lct|ucfirst}
             {include file="`$lctUc`/header.tpl"}
-        «ENDIF»
-        <p>{gt text='Welcome to the «name.formatForDisplay» section of the «app.name.formatForDisplayCapital» application.'}</p>
-        «IF container.application.targets('1.3.5')»
+        ENDIF
+        <p>{gt text='Welcome to the name.formatForDisplay section of the app.name.formatForDisplayCapital application.'}</p>
+        IF container.application.targets('1.3.5')
             {include file="`$lct`/footer.tpl"}
-        «ELSE»
+        ELSE
             {include file="`$lctUc`/footer.tpl"}
-        «ENDIF»
+        ENDIF
     '''
 }

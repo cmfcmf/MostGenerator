@@ -9,38 +9,38 @@ class View {
     CommonExample commonExample = new CommonExample()
 
     def generate(Application it, Boolean isBase) '''
-        «IF !targets('1.3.5')»
+        IF !targets('1.3.5')
             /**
              * Makes our handlers known to the event system.
              */
             public static function getSubscribedEvents()
             {
-                «IF isBase»
+                IF isBase
                     return array(
                         'view.init'      => array('init', 5),
                         'view.postfetch' => array('postFetch', 5)
                     );
-                «ELSE»
+                ELSE
                     return parent::getSubscribedEvents();
-                «ENDIF»
+                ENDIF
             }
 
-        «ENDIF»
+        ENDIF
         /**
          * Listener for the `view.init` event.
          *
          * Occurs just before `Zikula_View#__construct()` finishes.
          * The subject is the Zikula_View instance.
          *
-         * @param «IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event The event instance.
+         * @param IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event The event instance.
          */
-        public «IF targets('1.3.5')»static «ENDIF»function init(«IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event)
+        public IF targets('1.3.5')static ENDIFfunction init(IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::init($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
 
         /**
@@ -51,15 +51,15 @@ class View {
          * args are `array('template' => $template)`,
          * $data was the result of the fetch to be filtered.
          *
-         * @param «IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event The event instance.
+         * @param IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event The event instance.
          */
-        public «IF targets('1.3.5')»static «ENDIF»function postFetch(«IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event)
+        public IF targets('1.3.5')static ENDIFfunction postFetch(IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::postFetch($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
     '''
 }

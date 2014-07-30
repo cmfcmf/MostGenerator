@@ -40,76 +40,76 @@ class MailzView {
     }
 
     def private textTemplate(Entity it, Application app) '''
-        {* Purpose of this template: Display «nameMultiple.formatForDisplay» in text mailings *}
-        {foreach item='«name.formatForCode»' from=$items}
-        «mailzEntryText(app.appName)»
+        {* Purpose of this template: Display nameMultiple.formatForDisplay in text mailings *}
+        {foreach item='name.formatForCode' from=$items}
+        mailzEntryText(app.appName)
         -----
         {foreachelse}
-        {gt text='No «nameMultiple.formatForDisplay» found.'}
+        {gt text='No nameMultiple.formatForDisplay found.'}
         {/foreach}
     '''
 
     def private htmlTemplate(Entity it, Application app) '''
-        {* Purpose of this template: Display «nameMultiple.formatForDisplay» in html mailings *}
+        {* Purpose of this template: Display nameMultiple.formatForDisplay in html mailings *}
         {*
         <ul>
-        {foreach item='«name.formatForCode»' from=$items}
+        {foreach item='name.formatForCode' from=$items}
             <li>
-                «mailzEntryHtml(app)»
+                mailzEntryHtml(app)
             </li>
         {foreachelse}
-            <li>{gt text='No «nameMultiple.formatForDisplay» found.'}</li>
+            <li>{gt text='No nameMultiple.formatForDisplay found.'}</li>
         {/foreach}
         </ul>
         *}
 
-        {include file='«IF app.targets('1.3.5')»contenttype«ELSE»ContentType«ENDIF»/itemlist_«name.formatForCode»_display_description.tpl'}
+        {include file='IF app.targets('1.3.5')contenttypeELSEContentTypeENDIF/itemlist_name.formatForCode_display_description.tpl'}
     '''
 
     def private mailzEntryText(Entity it, String appName) '''
-        {$«name.formatForCode»->getTitleFromDisplayPattern()}
-        «mailzEntryHtmlLinkUrlDisplay(container.application)»
+        {$name.formatForCode->getTitleFromDisplayPattern()}
+        mailzEntryHtmlLinkUrlDisplay(container.application)
     '''
 
     def private mailzEntryHtml(Entity it, Application app) '''
-        «IF app.hasUserController && app.getMainUserController.hasActions('display')»
-            <a href="«mailzEntryHtmlLinkUrlDisplay(app)»">«mailzEntryHtmlLinkText(app)»</a>
-        «ELSE»
-            <a href="«mailzEntryHtmlLinkUrlMain(app)»">«mailzEntryHtmlLinkText(app)»</a>
-        «ENDIF»
+        IF app.hasUserController && app.getMainUserController.hasActions('display')
+            <a href="mailzEntryHtmlLinkUrlDisplay(app)">mailzEntryHtmlLinkText(app)</a>
+        ELSE
+            <a href="mailzEntryHtmlLinkUrlMain(app)">mailzEntryHtmlLinkText(app)</a>
+        ENDIF
     '''
 
     def private mailzEntryHtmlLinkUrlDisplay(Entity it, Application app) '''
-        «IF container.application.targets('1.3.5')»
-            {modurl modname='«app.appName»' type='user' func='display' ot='«name.formatForCode»' «routeParamsLegacy('$objectType', true, true)» fqurl=true}
-        «ELSE»
-            {route name='«app.appName.formatForDB»_«name.formatForCode»_display' «routeParams('$objectType', true)» absolute=true}
-        «ENDIF»'''
+        IF container.application.targets('1.3.5')
+            {modurl modname='app.appName' type='user' func='display' ot='name.formatForCode' routeParamsLegacy('$objectType', true, true) fqurl=true}
+        ELSE
+            {route name='app.appName.formatForDB_name.formatForCode_display' routeParams('$objectType', true) absolute=true}
+        ENDIF'''
 
     def private mailzEntryHtmlLinkUrlMain(Entity it, Application app) '''
-        «IF app.hasUserController»
-            «IF app.targets('1.3.5')»
-                «IF app.getMainUserController.hasActions('view')»
-                    {modurl modname='«app.appName»' type='user' func='view' fqurl=true}
-                «ELSEIF app.getMainUserController.hasActions('index')»
-                    {modurl modname='«app.appName»' type='user' func='main' fqurl=true}
-                «ELSE»
-                    {modurl modname='«app.appName»' type='user' func='main' fqurl=true}
-                «ENDIF»
-            «ELSE»
-                «IF app.getMainUserController.hasActions('view')»
-                    {route name='«app.appName.formatForDB»_«name.formatForCode»_view' absolute=true}
-                «ELSEIF app.getMainUserController.hasActions('index')»
-                    {route name='«app.appName.formatForDB»_«name.formatForCode»_index' absolute=true}
-                «ELSE»
-                    {route name='«app.appName.formatForDB»_«name.formatForCode»_index' absolute=true}
-                «ENDIF»
-            «ENDIF»
-        «ELSE»
+        IF app.hasUserController
+            IF app.targets('1.3.5')
+                IF app.getMainUserController.hasActions('view')
+                    {modurl modname='app.appName' type='user' func='view' fqurl=true}
+                ELSEIF app.getMainUserController.hasActions('index')
+                    {modurl modname='app.appName' type='user' func='main' fqurl=true}
+                ELSE
+                    {modurl modname='app.appName' type='user' func='main' fqurl=true}
+                ENDIF
+            ELSE
+                IF app.getMainUserController.hasActions('view')
+                    {route name='app.appName.formatForDB_name.formatForCode_view' absolute=true}
+                ELSEIF app.getMainUserController.hasActions('index')
+                    {route name='app.appName.formatForDB_name.formatForCode_index' absolute=true}
+                ELSE
+                    {route name='app.appName.formatForDB_name.formatForCode_index' absolute=true}
+                ENDIF
+            ENDIF
+        ELSE
             {homepage}
-        «ENDIF»'''
+        ENDIF'''
 
     def private mailzEntryHtmlLinkText(Entity it, Application app) '''
-        {$«name.formatForCode»->getTitleFromDisplayPattern()}
+        {$name.formatForCode->getTitleFromDisplayPattern()}
     '''
 }

@@ -28,11 +28,11 @@ class BlockModerationView {
         {if count($moderationObjects) gt 0}
             <ul>
             {foreach item='modItem' from=$moderationObjects}
-                «IF targets('1.3.5')»
-                    <li><a href="{modurl modname='«appName»' type='admin' func='view' ot=$modItem.objectType workflowState=$modItem.state}" class="z-bold">{$modItem.message}</a></li>
-                «ELSE»
-                    <li><a href="{route name="«appName.formatForDB»_`$modItem.objectType`_view" lct='admin' workflowState=$modItem.state}" class="bold">{$modItem.message}</a></li>
-                «ENDIF»
+                IF targets('1.3.5')
+                    <li><a href="{modurl modname='appName' type='admin' func='view' ot=$modItem.objectType workflowState=$modItem.state}" class="z-bold">{$modItem.message}</a></li>
+                ELSE
+                    <li><a href="{route name="appName.formatForDB_`$modItem.objectType`_view" lct='admin' workflowState=$modItem.state}" class="bold">{$modItem.message}</a></li>
+                ENDIF
             {/foreach}
             </ul>
         {/if}

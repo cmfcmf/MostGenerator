@@ -33,21 +33,21 @@ class ModelUtil {
     }
 
     def private modelFunctionsBaseImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Util\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Util\Base;
 
             use ModUtil;
             use Zikula_AbstractBase;
 
-        «ENDIF»
+        ENDIF
         /**
          * Utility base class for model helper methods.
          */
-        class «IF targets('1.3.5')»«appName»_Util_Base_Model«ELSE»ModelUtil«ENDIF» extends Zikula_AbstractBase
+        class IF targets('1.3.5')appName_Util_Base_ModelELSEModelUtilENDIF extends Zikula_AbstractBase
         {
-            «canBeCreated»
+            canBeCreated
 
-            «hasExistingInstances»
+            hasExistingInstances
         }
     '''
 
@@ -70,11 +70,11 @@ class ModelUtil {
          */
         public function canBeCreated($objectType)
         {
-            «IF targets('1.3.5')»
-                $controllerHelper = new «appName»_Util_Controller($this->serviceManager);
-            «ELSE»
-                $controllerHelper = $this->serviceManager->get('«appName.formatForDB».controller_helper');
-            «ENDIF»
+            IF targets('1.3.5')
+                $controllerHelper = new appName_Util_Controller($this->serviceManager);
+            ELSE
+                $controllerHelper = $this->serviceManager->get('appName.formatForDB.controller_helper');
+            ENDIF
             if (!in_array($objectType, $controllerHelper->getObjectTypes('util', array('util' => 'model', 'action' => 'canBeCreated')))) {
                 throw new \Exception('Error! Invalid object type received.');
             }
@@ -82,11 +82,11 @@ class ModelUtil {
             $result = false;
 
             switch ($objectType) {
-                «FOR entity : getAllEntities.filter[tree == EntityTreeType.NONE]»
-                    case '«entity.name.formatForCode»':
-                        «entity.canBeCreatedImpl»
+                FOR entity : getAllEntities.filter[tree == EntityTreeType.NONE]
+                    case 'entity.name.formatForCode':
+                        entity.canBeCreatedImpl
                         break;
-                «ENDFOR»
+                ENDFOR
             }
 
             return $result;
@@ -94,23 +94,23 @@ class ModelUtil {
     '''
 
     def private canBeCreatedImpl(Entity it) '''
-        «var incomingAndMandatoryRelations = getBidirectionalIncomingAndMandatoryJoinRelations»
-        «IF incomingAndMandatoryRelations.empty»«/* has no incoming bidirectional non-nullable relationships */»
+        var incomingAndMandatoryRelations = getBidirectionalIncomingAndMandatoryJoinRelations
+        IF incomingAndMandatoryRelations.empty/* has no incoming bidirectional non-nullable relationships */
             $result = true;
-        «ELSE»«/* we can leave out those relations which have PASSIVE_EDIT as edit type and use auto completion on the target side
-                * (then a new source object can be created while creating the target object). */»
-            «{incomingAndMandatoryRelations = incomingAndMandatoryRelations
+        ELSE/* we can leave out those relations which have PASSIVE_EDIT as edit type and use auto completion on the target side
+                * (then a new source object can be created while creating the target object). */
+            {incomingAndMandatoryRelations = incomingAndMandatoryRelations
                 .filter[!usesAutoCompletion(true)]
-                .filter[editType != RelationEditType.ACTIVE_NONE_PASSIVE_EDIT && editType != RelationEditType.ACTIVE_EDIT_PASSIVE_EDIT]; ''}»
-            «IF incomingAndMandatoryRelations.empty»
+                .filter[editType != RelationEditType.ACTIVE_NONE_PASSIVE_EDIT && editType != RelationEditType.ACTIVE_EDIT_PASSIVE_EDIT]; ''}
+            IF incomingAndMandatoryRelations.empty
                 $result = true;
-            «ELSE»«/* corresponding source objects exist already in the system */»
+            ELSE/* corresponding source objects exist already in the system */
                 $result = true;
-                «FOR entity : getUniqueListOfSourceEntityTypes(incomingAndMandatoryRelations)»
-                    $result &= $this->hasExistingInstances('«entity.name.formatForCode»');
-                «ENDFOR»
-            «ENDIF»
-        «ENDIF»
+                FOR entity : getUniqueListOfSourceEntityTypes(incomingAndMandatoryRelations)
+                    $result &= $this->hasExistingInstances('entity.name.formatForCode');
+                ENDFOR
+            ENDIF
+        ENDIF
     '''
 
     def private getUniqueListOfSourceEntityTypes(Entity it, Iterable<JoinRelationship> relations) {
@@ -133,41 +133,41 @@ class ModelUtil {
          */
         protected function hasExistingInstances($objectType)
         {
-            «IF targets('1.3.5')»
-                $controllerHelper = new «appName»_Util_Controller($this->serviceManager);
-            «ELSE»
-                $controllerHelper = $this->serviceManager->get('«appName.formatForDB».controller_helper');
-            «ENDIF»
+            IF targets('1.3.5')
+                $controllerHelper = new appName_Util_Controller($this->serviceManager);
+            ELSE
+                $controllerHelper = $this->serviceManager->get('appName.formatForDB.controller_helper');
+            ENDIF
             if (!in_array($objectType, $controllerHelper->getObjectTypes('util', array('util' => 'model', 'action' => 'hasExistingInstances')))) {
                 throw new \Exception('Error! Invalid object type received.');
             }
 
-            «IF targets('1.3.5')»
-                $entityClass = '«appName»_Entity_' . ucfirst($objectType);
+            IF targets('1.3.5')
+                $entityClass = 'appName_Entity_' . ucfirst($objectType);
                 $repository = $this->entityManager->getRepository($entityClass);
-            «ELSE»
-                $repository = $this->serviceManager->get('«appName.formatForDB».' . $objectType . '_factory')->getRepository();
-            «ENDIF»
+            ELSE
+                $repository = $this->serviceManager->get('appName.formatForDB.' . $objectType . '_factory')->getRepository();
+            ENDIF
 
             return ($repository->selectCount() > 0);
         }
     '''
 
     def private modelFunctionsImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Util;
+        IF !targets('1.3.5')
+            namespace appNamespace\Util;
 
-            use «appNamespace»\Util\Base\ModelUtil as BaseModelUtil;
+            use appNamespace\Util\Base\ModelUtil as BaseModelUtil;
 
-        «ENDIF»
+        ENDIF
         /**
          * Utility implementation class for model helper methods.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Util_Model extends «appName»_Util_Base_Model
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Util_Model extends appName_Util_Base_Model
+        ELSE
         class ModelUtil extends BaseModelUtil
-        «ENDIF»
+        ENDIF
         {
             // feel free to add your own convenience methods here
         }

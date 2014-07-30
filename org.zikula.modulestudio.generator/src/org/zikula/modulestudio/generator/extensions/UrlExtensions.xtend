@@ -34,7 +34,7 @@ class UrlExtensions {
      * @param withSlug Whether to append the slug or not (since in 1.3.x only display pages use it)
      * @return String collected url parameter string.
      */
-    def routeParamsLegacy(Entity it, String objName, Boolean template, Boolean withSlug) '''«routePkParams(objName, template)»«IF withSlug»«appendSlug(objName, template)»«ENDIF»'''
+    def routeParamsLegacy(Entity it, String objName, Boolean template, Boolean withSlug) '''routePkParams(objName, template)IF withSlugappendSlug(objName, template)ENDIF'''
 
     /**
      * Collects parameters for a route relating a given entity,
@@ -46,7 +46,7 @@ class UrlExtensions {
      * @param template Whether to create the syntax for a template (true) or for source code (false)
      * @return String collected url parameter string.
      */
-    def routeParams(Entity it, String objName, Boolean template) '''«IF !(hasSluggableFields && slugUnique)»«routePkParams(objName, template)»«ENDIF»«appendSlug(objName, template)»'''
+    def routeParams(Entity it, String objName, Boolean template) '''IF !(hasSluggableFields && slugUnique)routePkParams(objName, template)ENDIFappendSlug(objName, template)'''
 
     /**
      * Collects parameters for a route relating a given entity,
@@ -60,7 +60,7 @@ class UrlExtensions {
      * @param customVarName Custom name for using another field name as url parameter
      * @return String collected url parameter string.
      */
-    def routeParamsLegacy(Entity it, String objName, Boolean template, Boolean withSlug, String customVarName) '''«routePkParams(objName, template, customVarName)»«IF withSlug»«appendSlug(objName, template)»«ENDIF»'''
+    def routeParamsLegacy(Entity it, String objName, Boolean template, Boolean withSlug, String customVarName) '''routePkParams(objName, template, customVarName)IF withSlugappendSlug(objName, template)ENDIF'''
 
     /**
      * Collects parameters for a route relating a given entity,
@@ -73,7 +73,7 @@ class UrlExtensions {
      * @param customVarName Custom name for using another field name as url parameter
      * @return String collected url parameter string.
      */
-    def routeParams(Entity it, String objName, Boolean template, String customVarName) '''«IF !(hasSluggableFields && slugUnique)»«routePkParams(objName, template, customVarName)»«ENDIF»«appendSlug(objName, template)»'''
+    def routeParams(Entity it, String objName, Boolean template, String customVarName) '''IF !(hasSluggableFields && slugUnique)routePkParams(objName, template, customVarName)ENDIFappendSlug(objName, template)'''
 
     /**
      * Collects primary key parameters for a route relating a given entity,

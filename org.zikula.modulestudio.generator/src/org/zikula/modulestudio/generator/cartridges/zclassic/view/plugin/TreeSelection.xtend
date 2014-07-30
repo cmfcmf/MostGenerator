@@ -21,7 +21,7 @@ class TreeSelection {
 
     def private treeSelectionImpl(Application it) '''
         /**
-         * The «appName.formatForDB»TreeSelection plugin retrieves tree entities based on a given one.
+         * The appName.formatForDBTreeSelection plugin retrieves tree entities based on a given one.
          *
          * Available parameters:
          *   - objectType:   Name of treated object type.
@@ -33,23 +33,23 @@ class TreeSelection {
          * @param  array       $params All attributes passed to this function from the template.
          * @param  Zikula_View $view   Reference to the view object.
          */
-        function smarty_function_«appName.formatForDB»TreeSelection($params, $view)
+        function smarty_function_appName.formatForDBTreeSelection($params, $view)
         {
             if (!isset($params['objectType']) || empty($params['objectType'])) {
-                $view->trigger_error(__f('Error! in %1$s: the %2$s parameter must be specified.', array('«appName.formatForDB»TreeSelection', 'objectType')));
+                $view->trigger_error(__f('Error! in %1$s: the %2$s parameter must be specified.', array('appName.formatForDBTreeSelection', 'objectType')));
 
                 return false;
             }
 
             if (!isset($params['node']) || !is_object($params['node'])) {
-                $view->trigger_error(__f('Error! in %1$s: the %2$s parameter must be specified.', array('«appName.formatForDB»TreeSelection', 'node')));
+                $view->trigger_error(__f('Error! in %1$s: the %2$s parameter must be specified.', array('appName.formatForDBTreeSelection', 'node')));
 
                 return false;
             }
 
             $allowedTargets = array('allParents', 'directParent', 'allChildren', 'directChildren', 'predecessors', 'successors', 'preandsuccessors');
             if (!isset($params['target']) || empty($params['target']) || !in_array($params['target'], $allowedTargets)) {
-                $view->trigger_error(__f('Error! in %1$s: the %2$s parameter must be specified.', array('«appName.formatForDB»TreeSelection', 'target')));
+                $view->trigger_error(__f('Error! in %1$s: the %2$s parameter must be specified.', array('appName.formatForDBTreeSelection', 'target')));
 
                 return false;
             }
@@ -57,21 +57,21 @@ class TreeSelection {
             $skipRootNode = (isset($params['skipRootNode']) ? (bool) $params['skipRootNode'] : true);
 
             if (!isset($params['assign']) || empty($params['assign'])) {
-                $view->trigger_error(__f('Error! in %1$s: the %2$s parameter must be specified.', array('«appName.formatForDB»TreeSelection', 'assign')));
+                $view->trigger_error(__f('Error! in %1$s: the %2$s parameter must be specified.', array('appName.formatForDBTreeSelection', 'assign')));
 
                 return false;
             }
 
-            «IF targets('1.3.5')»
-                $entityClass = '«appName»_Entity_' . ucfirst($params['objectType']);
-            «ENDIF»
+            IF targets('1.3.5')
+                $entityClass = 'appName_Entity_' . ucfirst($params['objectType']);
+            ENDIF
             $serviceManager = ServiceUtil::getManager();
-            «IF targets('1.3.5')»
-                $entityManager = $serviceManager->get«IF targets('1.3.5')»Service«ENDIF»('doctrine.entitymanager');
+            IF targets('1.3.5')
+                $entityManager = $serviceManager->getIF targets('1.3.5')ServiceENDIF('doctrine.entitymanager');
                 $repository = $entityManager->getRepository($entityClass);
-            «ELSE»
-                $repository = $serviceManager->get('«appName.formatForDB».' . $params['objectType'] . '_factory')->getRepository();
-            «ENDIF»
+            ELSE
+                $repository = $serviceManager->get('appName.formatForDB.' . $params['objectType'] . '_factory')->getRepository();
+            ENDIF
             $titleFieldName = $repository->getTitleFieldName();
 
             $node = $params['node'];

@@ -39,29 +39,29 @@ class StandardFields {
         {* purpose of this template: reusable display of standard fields *}
         {if (isset($obj.createdUserId) && $obj.createdUserId) || (isset($obj.updatedUserId) && $obj.updatedUserId)}
             {if isset($panel) && $panel eq true}
-                «IF targets('1.3.5')»
-                    <h3 class="standardfields z-panel-header z-panel-indicator «IF targets('1.3.5')»z«ELSE»cursor«ENDIF»-pointer">{gt text='Creation and update'}</h3>
+                IF targets('1.3.5')
+                    <h3 class="standardfields z-panel-header z-panel-indicator IF targets('1.3.5')zELSEcursorENDIF-pointer">{gt text='Creation and update'}</h3>
                     <div class="standardfields z-panel-content" style="display: none">
-                «ELSE»
+                ELSE
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseStandardFields">{gt text='Creation and update'}</a></h3>
                         </div>
                         <div id="collapseStandardFields" class="panel-collapse collapse in">
                             <div class="panel-body">
-                «ENDIF»
+                ENDIF
             {else}
                 <h3 class="standardfields">{gt text='Creation and update'}</h3>
             {/if}
-            «viewBody»
+            viewBody
             {if isset($panel) && $panel eq true}
-                «IF targets('1.3.5')»
+                IF targets('1.3.5')
                     </div>
-                «ELSE»
+                ELSE
                             </div>
                         </div>
                     </div>
-                «ENDIF»
+                ENDIF
             {/if}
         {/if}
     '''
@@ -105,30 +105,30 @@ class StandardFields {
         {* purpose of this template: reusable editing of standard fields *}
         {if (isset($obj.createdUserId) && $obj.createdUserId) || (isset($obj.updatedUserId) && $obj.updatedUserId)}
             {if isset($panel) && $panel eq true}
-                «IF targets('1.3.5')»
-                    <h3 class="standardfields z-panel-header z-panel-indicator «IF targets('1.3.5')»z«ELSE»cursor«ENDIF»-pointer">{gt text='Creation and update'}</h3>
+                IF targets('1.3.5')
+                    <h3 class="standardfields z-panel-header z-panel-indicator IF targets('1.3.5')zELSEcursorENDIF-pointer">{gt text='Creation and update'}</h3>
                     <fieldset class="standardfields z-panel-content" style="display: none">
-                «ELSE»
+                ELSE
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseStandardFields">{gt text='Creation and update'}</a></h3>
                         </div>
                         <div id="collapseStandardFields" class="panel-collapse collapse in">
                             <div class="panel-body">
-                «ENDIF»
+                ENDIF
             {else}
                 <fieldset class="standardfields">
             {/if}
                 <legend>{gt text='Creation and update'}</legend>
-                «editBody»
+                editBody
             {if isset($panel) && $panel eq true}
-                «IF targets('1.3.5')»
+                IF targets('1.3.5')
                     </fieldset>
-                «ELSE»
+                ELSE
                             </div>
                         </div>
                     </div>
-                «ENDIF»
+                ENDIF
             {else}
                 </fieldset>
             {/if}

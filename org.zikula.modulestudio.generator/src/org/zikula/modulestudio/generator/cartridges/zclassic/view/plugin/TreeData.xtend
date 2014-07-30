@@ -25,7 +25,7 @@ class TreeData {
 
     def private treeDataImpl(Application it) '''
         /**
-         * The «appName.formatForDB»TreeData plugin delivers the html output for a JS tree
+         * The appName.formatForDBTreeData plugin delivers the html output for a JS tree
          * based on given tree entities.
          *
          * Available parameters:
@@ -33,9 +33,9 @@ class TreeData {
          *   - tree:       Object collection with tree items.
          *   - controller: Optional name of controller, defaults to 'user'.
          *   - root:       Optional id of root node, defaults to 1.
-        «IF targets('1.3.5')»
-            «' '»*   - sortable:   Whether tree nodes should be sortable or not, defaults to true.
-        «ENDIF»
+        IF targets('1.3.5')
+            ' '*   - sortable:   Whether tree nodes should be sortable or not, defaults to true.
+        ENDIF
          *   - assign:     If set, the results are assigned to the corresponding variable instead of printed out.
          *
          * @param  array       $params  All attributes passed to this function from the template.
@@ -43,16 +43,16 @@ class TreeData {
          *
          * @return string The output of the plugin.
          */
-        function smarty_function_«appName.formatForDB»TreeData($params, $view)
+        function smarty_function_appName.formatForDBTreeData($params, $view)
         {
             if (!isset($params['objectType']) || empty($params['objectType'])) {
-                $view->trigger_error(__f('Error! in %1$s: the %2$s parameter must be specified.', array('«appName.formatForDB»TreeJS', 'objectType')));
+                $view->trigger_error(__f('Error! in %1$s: the %2$s parameter must be specified.', array('appName.formatForDBTreeJS', 'objectType')));
 
                 return false;
             }
 
             if (!isset($params['tree']) || empty($params['tree'])) {
-                $view->trigger_error(__f('Error! in %1$s: the %2$s parameter must be specified.', array('«appName.formatForDB»TreeJS', 'tree')));
+                $view->trigger_error(__f('Error! in %1$s: the %2$s parameter must be specified.', array('appName.formatForDBTreeJS', 'tree')));
 
                 return false;
             }
@@ -60,11 +60,11 @@ class TreeData {
             if (!isset($params['controller']) || empty($params['controller'])) {
                 $params['controller'] = 'user';
             }
-            «IF !targets('1.3.5')»
+            IF !targets('1.3.5')
 
                 $params['lct'] = $params['controller'];
                 $params['controller'] = $params['objectType'];
-            «ENDIF»
+            ENDIF
 
             if (!isset($params['root']) || empty($params['root'])) {
                 $params['root'] = 1;
@@ -73,27 +73,27 @@ class TreeData {
             // check whether an edit action is available
             $controllerHasEditAction = false;
             switch ($params['controller']) {
-                «controllerEditActionFlags»
+                controllerEditActionFlags
             }
 
-            «IF targets('1.3.5')»
-                $entityClass = '«appName»_Entity_' . ucfirst($params['objectType']);
-            «ENDIF»
+            IF targets('1.3.5')
+                $entityClass = 'appName_Entity_' . ucfirst($params['objectType']);
+            ENDIF
             $serviceManager = ServiceUtil::getManager();
-            «IF targets('1.3.5')»
-                $entityManager = $serviceManager->get«IF targets('1.3.5')»Service«ENDIF»('doctrine.entitymanager');
+            IF targets('1.3.5')
+                $entityManager = $serviceManager->getIF targets('1.3.5')ServiceENDIF('doctrine.entitymanager');
                 $repository = $entityManager->getRepository($entityClass);
-            «ELSE»
-                $repository = $serviceManager->get('«appName.formatForDB».«name.formatForCode»_factory')->getRepository();
-            «ENDIF»
+            ELSE
+                $repository = $serviceManager->get('appName.formatForDB.name.formatForCode_factory')->getRepository();
+            ENDIF
             $descriptionFieldName = $repository->getDescriptionFieldName();
 
             $result = '';
-            «IF targets('1.3.5')»
+            IF targets('1.3.5')
                 $treeData = array();
 
                 foreach ($params['tree'] as $item) {
-                    $url = $controllerHasEditAction ? ModUtil::url('«appName»', $params['controller'], 'edit', $item->createUrlArgs()) : '';
+                    $url = $controllerHasEditAction ? ModUtil::url('appName', $params['controller'], 'edit', $item->createUrlArgs()) : '';
 
                     $treeData[] = array('id' => $item->createCompositeIdentifier(),
                                         'parent_id' => $item->getParent()->createCompositeIdentifier(),
@@ -122,11 +122,11 @@ class TreeData {
 
                 // get output result
                 $result = $tree->getHTML();
-            «ELSE»
+            ELSE
                 foreach ($params['tree'] as $item) {
                     $result .= processTreeItemWithChildren($item, $rootId, $descriptionFieldName, $controllerHasEditAction);
                 }
-            «ENDIF»
+            ENDIF
 
             if (array_key_exists('assign', $params)) {
                 $view->assign($params['assign'], $result);
@@ -136,7 +136,7 @@ class TreeData {
 
             return $result;
         }
-        «IF !targets('1.3.5')»
+        IF !targets('1.3.5')
 
             function processTreeItemWithChildren($node, $rootId, $descriptionFieldName, $controllerHasEditAction)
             {
@@ -149,7 +149,7 @@ class TreeData {
                 if ($controllerHasEditAction) {
                     $urlArgs = $item->createUrlArgs();
                     $urlArgs['lct'] = $params['lct'];
-                    $url = $serviceManager->get('router')->generate('«appName.formatForDB»_' . $params['objectType'] . '_edit', $urlArgs);
+                    $url = $serviceManager->get('router')->generate('appName.formatForDB_' . $params['objectType'] . '_edit', $urlArgs);
 
                     $liContent = '<a href="' . $url . '" title="' . str_replace('"', '', $title) . '">' . $liContent . '</a>';
 
@@ -179,17 +179,17 @@ class TreeData {
 
                 return $output;
             }
-        «ENDIF»
+        ENDIF
     '''
 
     def private controllerEditActionFlags(Application it) '''
-        «FOR controller : getAllControllers.filter[hasActions('edit')]»
-            case '«controller.formattedName»': $controllerHasEditAction = true; break;
-        «ENDFOR»
-        «IF !targets('1.3.5')»
-            «FOR entity : getAllEntities.filter[hasActions('edit')]»
-                case '«entity.name.formatForCode»': $controllerHasEditAction = true; break;
-            «ENDFOR»
-        «ENDIF»
+        FOR controller : getAllControllers.filter[hasActions('edit')]
+            case 'controller.formattedName': $controllerHasEditAction = true; break;
+        ENDFOR
+        IF !targets('1.3.5')
+            FOR entity : getAllEntities.filter[hasActions('edit')]
+                case 'entity.name.formatForCode': $controllerHasEditAction = true; break;
+            ENDFOR
+        ENDIF
     '''
 }

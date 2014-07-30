@@ -63,21 +63,21 @@ class ValidatorLegacy {
     }
 
     def private validatorCommonBaseImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Base;
 
             use UserUtil;
             use Zikula_AbstractBase;
             use Zikula_EntityAccess;
             use ZLanguage;
 
-        «ENDIF»
+        ENDIF
         /**
          * Validator class for encapsulating common entity validation methods.
          *
          * This is the base validation class with general checks.
          */
-        abstract class «IF targets('1.3.5')»«appName»_Base_Validator«ELSE»AbstractValidator«ENDIF» extends Zikula_AbstractBase
+        abstract class IF targets('1.3.5')appName_Base_ValidatorELSEAbstractValidatorENDIF extends Zikula_AbstractBase
         {
             /**
              * @var Zikula_EntityAccess The entity instance which is treated by this validator.
@@ -471,22 +471,22 @@ class ValidatorLegacy {
     '''
 
     def private validatorCommonImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»;
+        IF !targets('1.3.5')
+            namespace appNamespace;
 
-            use «appNamespace»\Base\AbstractValidator as BaseAbstractValidator;
+            use appNamespace\Base\AbstractValidator as BaseAbstractValidator;
 
-        «ENDIF»
+        ENDIF
         /**
          * Validator class for encapsulating common entity validation methods.
          *
          * This is the concrete validation class with general checks.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Validator extends «appName»_Base_Validator
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Validator extends appName_Base_Validator
+        ELSE
         class AbstractValidator extends BaseAbstractValidator
-        «ENDIF»
+        ENDIF
         {
             // here you can add custom validation methods or override existing checks
         }
@@ -519,62 +519,62 @@ class ValidatorLegacy {
     }
 
     def private validatorBaseImpl(Entity it) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Entity\Validator\Base;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Entity\Validator\Base;
 
-            use «app.appNamespace»\AbstractValidator as BaseAbstractValidator;
+            use app.appNamespace\AbstractValidator as BaseAbstractValidator;
 
             use ServiceUtil;
             use Zikula_EntityAccess;
             use ZLanguage;
 
-        «ENDIF»
+        ENDIF
         /**
          * Validator class for encapsulating entity validation methods.
          *
-         * This is the base validation class for «name.formatForDisplay» entities.
+         * This is the base validation class for name.formatForDisplay entities.
          */
-        «IF app.targets('1.3.5')»
-        class «app.appName»_Entity_Validator_Base_«name.formatForCodeCapital» extends «app.appName»_Validator
-        «ELSE»
-        class «name.formatForCodeCapital»Validator extends BaseAbstractValidator
-        «ENDIF»
+        IF app.targets('1.3.5')
+        class app.appName_Entity_Validator_Base_name.formatForCodeCapital extends app.appName_Validator
+        ELSE
+        class name.formatForCodeCapitalValidator extends BaseAbstractValidator
+        ENDIF
         {
-            «validatorBaseImplBody(false)»
+            validatorBaseImplBody(false)
         }
     '''
 
     def private validatorImpl(Entity it) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Entity\Validator;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Entity\Validator;
 
-            «IF isInheriting»
-                use «app.appNamespace»\Entity\Validator\«parentType.name.formatForCodeCapital»Validator as Base«parentType.name.formatForCodeCapital»Validator;
-            «ELSE»
-                use «app.appNamespace»\Entity\Validator\Base\«name.formatForCodeCapital»Validator as Base«name.formatForCodeCapital»Validator;
-            «ENDIF»
-            «IF isInheriting»
+            IF isInheriting
+                use app.appNamespace\Entity\Validator\parentType.name.formatForCodeCapitalValidator as BaseparentType.name.formatForCodeCapitalValidator;
+            ELSE
+                use app.appNamespace\Entity\Validator\Base\name.formatForCodeCapitalValidator as Basename.formatForCodeCapitalValidator;
+            ENDIF
+            IF isInheriting
 
                 use ServiceUtil;
                 use ZLanguage;
-            «ENDIF»
+            ENDIF
 
-        «ENDIF»
+        ENDIF
         /**
          * Validator class for encapsulating entity validation methods.
          *
-         * This is the concrete validation class for «name.formatForDisplay» entities.
+         * This is the concrete validation class for name.formatForDisplay entities.
          */
-        «IF app.targets('1.3.5')»
-        class «app.appName»_Entity_Validator_«name.formatForCodeCapital» extends «IF isInheriting»«app.appName»_Entity_Validator_«parentType.name.formatForCodeCapital»«ELSE»«app.appName»_Entity_Validator_Base_«name.formatForCodeCapital»«ENDIF»
-        «ELSE»
-        class «name.formatForCodeCapital»Validator extends Base«IF isInheriting»«parentType.name.formatForCodeCapital»«ELSE»«name.formatForCodeCapital»«ENDIF»Validator
-        «ENDIF»
+        IF app.targets('1.3.5')
+        class app.appName_Entity_Validator_name.formatForCodeCapital extends IF isInheritingapp.appName_Entity_Validator_parentType.name.formatForCodeCapitalELSEapp.appName_Entity_Validator_Base_name.formatForCodeCapitalENDIF
+        ELSE
+        class name.formatForCodeCapitalValidator extends BaseIF isInheritingparentType.name.formatForCodeCapitalELSEname.formatForCodeCapitalENDIFValidator
+        ENDIF
         {
             // here you can add custom validation methods or override existing checks
-        «IF isInheriting»
-            «validatorBaseImplBody(true)»
-        «ENDIF»
+        IF isInheriting
+            validatorBaseImplBody(true)
+        ENDIF
         }
     '''
 
@@ -587,35 +587,35 @@ class ValidatorLegacy {
         public function validateAll()
         {
             $errorInfo = array('message' => '', 'code' => 0, 'debugArray' => array());
-            $dom = ZLanguage::getModuleDomain('«app.appName»');
-            «IF isInheriting»
+            $dom = ZLanguage::getModuleDomain('app.appName');
+            IF isInheriting
                 parent::validateAll();
-            «ENDIF» 
-            «FOR df : getDerivedFields»
-                «validationCalls(df)»
-            «ENDFOR»
-            «validationCallDateRange»
-            «FOR udf : getUniqueDerivedFields.filter[!primaryKey]»
-                «validationCallUnique(udf)»
-            «ENDFOR»
-            «validationCallsForMandatoryRelationships»
+            ENDIF 
+            FOR df : getDerivedFields
+                validationCalls(df)
+            ENDFOR
+            validationCallDateRange
+            FOR udf : getUniqueDerivedFields.filter[!primaryKey]
+                validationCallUnique(udf)
+            ENDFOR
+            validationCallsForMandatoryRelationships
 
             return true;
         }
 
-        «checkForUniqueValues»
+        checkForUniqueValues
 
-        «fh.getterAndSetterMethods(app, 'entity', 'Zikula_EntityAccess', false, true, 'null', '')»
+        fh.getterAndSetterMethods(app, 'entity', 'Zikula_EntityAccess', false, true, 'null', '')
     '''
 
     def private checkForUniqueValues(Entity it) '''
         /**
          * Check for unique values.
          *
-         * This method determines if there already exist «nameMultiple.formatForDisplay» with the same «name.formatForDisplay».
+         * This method determines if there already exist nameMultiple.formatForDisplay with the same name.formatForDisplay.
          *
          * @param string $fieldName The name of the property to be checked
-         * @return boolean result of this check, true if the given «name.formatForDisplay» does not already exist
+         * @return boolean result of this check, true if the given name.formatForDisplay does not already exist
          */
         public function isUniqueValue($fieldName)
         {
@@ -623,16 +623,16 @@ class ValidatorLegacy {
                 return false;
             }
 
-            «IF app.targets('1.3.5')»
-                $entityClass = '«app.appName»_Entity_«name.formatForCodeCapital»';
-            «ELSE»
-                $entityClass = '«app.vendor.formatForCodeCapital»«app.name.formatForCodeCapital»Module:«name.formatForCodeCapital»Entity';
-            «ENDIF»
+            IF app.targets('1.3.5')
+                $entityClass = 'app.appName_Entity_name.formatForCodeCapital';
+            ELSE
+                $entityClass = 'app.vendor.formatForCodeCapitalapp.name.formatForCodeCapitalModule:name.formatForCodeCapitalEntity';
+            ENDIF
             $serviceManager = ServiceUtil::getManager();
-            $entityManager = $serviceManager->get«IF app.targets('1.3.5')»Service«ENDIF»('doctrine.entitymanager');
+            $entityManager = $serviceManager->getIF app.targets('1.3.5')ServiceENDIF('doctrine.entitymanager');
             $repository = $entityManager->getRepository($entityClass);
 
-            $excludeid = $this->entity['«getFirstPrimaryKey.name.formatForCode»'];
+            $excludeid = $this->entity['getFirstPrimaryKey.name.formatForCode'];
 
             return $repository->detectUniqueState($fieldName, $this->entity[$fieldName], $excludeid);
         }
@@ -643,54 +643,54 @@ class ValidatorLegacy {
     }
 
     def private validationCallDateRange(Entity it) '''
-        «val startDateField = getStartDateField»
-        «val endDateField = getEndDateField»
-        «IF startDateField !== null && endDateField !== null»
-            if ($this->entity['«startDateField.name.formatForCode»'] > $this->entity['«endDateField.name.formatForCode»']) {
-                $errorInfo['message'] = __f('Error! The start date (%1$s) must be before the end date (%2$s).', array('«startDateField.name.formatForDisplay»', '«endDateField.name.formatForDisplay»'), $dom);
+        val startDateField = getStartDateField
+        val endDateField = getEndDateField
+        IF startDateField !== null && endDateField !== null
+            if ($this->entity['startDateField.name.formatForCode'] > $this->entity['endDateField.name.formatForCode']) {
+                $errorInfo['message'] = __f('Error! The start date (%1$s) must be before the end date (%2$s).', array('startDateField.name.formatForDisplay', 'endDateField.name.formatForDisplay'), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
+        ENDIF
     '''
 
     def private validationCallUnique(DerivedField it) '''
-        if (!$this->isUniqueValue('«name.formatForCode»')) {
-            $errorInfo['message'] = __f('The %1$s %2$s is already assigned. Please choose another %1$s.', array('«name.formatForDisplay»', $this->entity['«name.formatForCode»']), $dom);
+        if (!$this->isUniqueValue('name.formatForCode')) {
+            $errorInfo['message'] = __f('The %1$s %2$s is already assigned. Please choose another %1$s.', array('name.formatForDisplay', $this->entity['name.formatForCode']), $dom);
             return $errorInfo;
         }
     '''
 
     def private dispatch validationCalls(BooleanField it) '''
-        if (!$this->isValidBoolean('«name.formatForCode»')) {
-            $errorInfo['message'] = __f('Error! Field value must be a valid boolean (%s).', array('«name.formatForDisplay»'), $dom);
+        if (!$this->isValidBoolean('name.formatForCode')) {
+            $errorInfo['message'] = __f('Error! Field value must be a valid boolean (%s).', array('name.formatForDisplay'), $dom);
             return $errorInfo;
         }
     '''
 
     def private validationCallsNumeric(DerivedField it) '''
-        if (!$this->isValidNumber('«name.formatForCode»')) {
-            $errorInfo['message'] = __f('Error! Field value must be numeric (%s).', array('«name.formatForDisplay»'), $dom);
+        if (!$this->isValidNumber('name.formatForCode')) {
+            $errorInfo['message'] = __f('Error! Field value must be numeric (%s).', array('name.formatForDisplay'), $dom);
             return $errorInfo;
         }
-        «IF mandatory»
-            if (!$this->isNumberNotEmpty('«name.formatForCode»')) {
-                $errorInfo['message'] = __f('Error! Field value must not be 0 (%s).', array('«name.formatForDisplay»'), $dom);
+        IF mandatory
+            if (!$this->isNumberNotEmpty('name.formatForCode')) {
+                $errorInfo['message'] = __f('Error! Field value must not be 0 (%s).', array('name.formatForDisplay'), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
+        ENDIF
     '''
 
     def private validationCallsInteger(AbstractIntegerField it) '''
-        if (!$this->isValidInteger('«name.formatForCode»')) {
-            $errorInfo['message'] = __f('Error! Field value may only contain digits (%s).', array('«name.formatForDisplay»'), $dom);
+        if (!$this->isValidInteger('name.formatForCode')) {
+            $errorInfo['message'] = __f('Error! Field value may only contain digits (%s).', array('name.formatForDisplay'), $dom);
             return $errorInfo;
         }
-        «IF mandatory && (!primaryKey || entity.hasCompositeKeys || entity.getVersionField == this)»
-            if (!$this->isNumberNotEmpty('«name.formatForCode»')) {
-                $errorInfo['message'] = __f('Error! Field value must not be 0 (%s).', array('«name.formatForDisplay»'), $dom);
+        IF mandatory && (!primaryKey || entity.hasCompositeKeys || entity.getVersionField == this)
+            if (!$this->isNumberNotEmpty('name.formatForCode')) {
+                $errorInfo['message'] = __f('Error! Field value must not be 0 (%s).', array('name.formatForDisplay'), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
+        ENDIF
     '''
     def private dispatch validationCalls(AbstractIntegerField it) {
         if (entity.incoming.filter(JoinRelationship).filter[e|e.targetField == name].empty
@@ -698,339 +698,339 @@ class ValidatorLegacy {
             validationCallsInteger
     }
     def private dispatch validationCalls(IntegerField it) '''
-        «IF entity.incoming.filter(JoinRelationship).filter[e|e.targetField == name].empty
-         && entity.outgoing.filter(JoinRelationship).filter[e|e.sourceField == name].empty»
-            «validationCallsInteger»
-            «IF minValue.toString != '0'»
-                if (!$this->isIntegerNotLowerThan('«name.formatForCode»', «minValue»)) {
-                    $errorInfo['message'] = __f('Error! Field value must not be lower than %2$s (%1$s).', array('«name.formatForDisplay»', «minValue»), $dom);
+        IF entity.incoming.filter(JoinRelationship).filter[e|e.targetField == name].empty
+         && entity.outgoing.filter(JoinRelationship).filter[e|e.sourceField == name].empty
+            validationCallsInteger
+            IF minValue.toString != '0'
+                if (!$this->isIntegerNotLowerThan('name.formatForCode', minValue)) {
+                    $errorInfo['message'] = __f('Error! Field value must not be lower than %2$s (%1$s).', array('name.formatForDisplay', minValue), $dom);
                     return $errorInfo;
                 }
-            «ENDIF»
-            «IF maxValue.toString != '0'»
-                if (!$this->isIntegerNotHigherThan('«name.formatForCode»', «maxValue»)) {
-                    $errorInfo['message'] = __f('Error! Field value must not be higher than %2$s (%1$s).', array('«name.formatForDisplay»', «maxValue»), $dom);
+            ENDIF
+            IF maxValue.toString != '0'
+                if (!$this->isIntegerNotHigherThan('name.formatForCode', maxValue)) {
+                    $errorInfo['message'] = __f('Error! Field value must not be higher than %2$s (%1$s).', array('name.formatForDisplay', maxValue), $dom);
                     return $errorInfo;
                 }
-            «ENDIF»
-            if (!$this->isNumberNotLongerThan('«name.formatForCode»', «length»)) {
-                $errorInfo['message'] = __f('Error! Length of field value must not be higher than %2$s (%1$s).', array('«name.formatForDisplay»', «length»), $dom);
+            ENDIF
+            if (!$this->isNumberNotLongerThan('name.formatForCode', length)) {
+                $errorInfo['message'] = __f('Error! Length of field value must not be higher than %2$s (%1$s).', array('name.formatForDisplay', length), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
+        ENDIF
     '''
     def private dispatch validationCalls(DecimalField it) '''
-        «validationCallsNumeric»
-        if (!$this->isNumberNotLongerThan('«name.formatForCode»', «(length+scale)»)) {
-            $errorInfo['message'] = __f('Error! Length of field value must not be higher than %2$s (%1$s).', array('«name.formatForDisplay»', «(length+scale)»), $dom);
+        validationCallsNumeric
+        if (!$this->isNumberNotLongerThan('name.formatForCode', (length+scale))) {
+            $errorInfo['message'] = __f('Error! Length of field value must not be higher than %2$s (%1$s).', array('name.formatForDisplay', (length+scale)), $dom);
             return $errorInfo;
         }
     '''
     def private dispatch validationCalls(UserField it) '''
-        «validationCallsInteger»
-        if («IF !mandatory»$this->entity['«name.formatForCode»'] > 0 && «ENDIF»!$this->isValidUser('«name.formatForCode»')) {
-            $errorInfo['message'] = __f('Error! Field value must be a valid user id (%s).', array('«name.formatForDisplay»'), $dom);
+        validationCallsInteger
+        if (IF !mandatory$this->entity['name.formatForCode'] > 0 && ENDIF!$this->isValidUser('name.formatForCode')) {
+            $errorInfo['message'] = __f('Error! Field value must be a valid user id (%s).', array('name.formatForDisplay'), $dom);
             return $errorInfo;
         }
     '''
 
     def private validationCallsString(AbstractStringField it) '''
-        «IF mandatory»
-            if (!$this->isStringNotEmpty('«name.formatForCode»')) {
-                $errorInfo['message'] = __f('Error! Field value must not be empty (%s).', array('«name.formatForDisplay»'), $dom);
+        IF mandatory
+            if (!$this->isStringNotEmpty('name.formatForCode')) {
+                $errorInfo['message'] = __f('Error! Field value must not be empty (%s).', array('name.formatForDisplay'), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
-        «IF nospace»
-            if (!$this->isStringNotContaining('«name.formatForCode»', ' ')) {
-                $errorInfo['message'] = __f('Error! Field value must not contain space chars (%s).', array('«name.formatForDisplay»'), $dom);
+        ENDIF
+        IF nospace
+            if (!$this->isStringNotContaining('name.formatForCode', ' ')) {
+                $errorInfo['message'] = __f('Error! Field value must not contain space chars (%s).', array('name.formatForDisplay'), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
-        «IF minLength > 0»
-            if (!$this->isStringNotShorterThan('«name.formatForCode»', «minLength»)) {
-                $errorInfo['message'] = __f('Error! Length of field value must not be smaller than %2$s (%1$s).', array('«name.formatForDisplay»', «minLength»), $dom);
+        ENDIF
+        IF minLength > 0
+            if (!$this->isStringNotShorterThan('name.formatForCode', minLength)) {
+                $errorInfo['message'] = __f('Error! Length of field value must not be smaller than %2$s (%1$s).', array('name.formatForDisplay', minLength), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
-        «IF regexp !== null && regexp != ''»
-            if («IF !regexpOpposite»!«ENDIF»$this->isValidRegExp('«name.formatForCode»', '«regexp»')) {
-                $errorInfo['message'] = __f('Error! Field value must «IF regexpOpposite»not «ENDIF»conform to regular expression [%2$s] (%1$s).', array('«name.formatForDisplay»', '«regexp»'), $dom);
+        ENDIF
+        IF regexp !== null && regexp != ''
+            if (IF !regexpOpposite!ENDIF$this->isValidRegExp('name.formatForCode', 'regexp')) {
+                $errorInfo['message'] = __f('Error! Field value must IF regexpOppositenot ENDIFconform to regular expression [%2$s] (%1$s).', array('name.formatForDisplay', 'regexp'), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
+        ENDIF
     '''
     def private dispatch validationCalls(AbstractStringField it) '''
     '''
     def private dispatch validationCalls(StringField it) '''
-        if (!$this->isStringNotLongerThan('«name.formatForCode»', «length»)) {
-            $errorInfo['message'] = __f('Error! Length of field value must not be higher than %2$s (%1$s).', array('«name.formatForDisplay»', «length»), $dom);
+        if (!$this->isStringNotLongerThan('name.formatForCode', length)) {
+            $errorInfo['message'] = __f('Error! Length of field value must not be higher than %2$s (%1$s).', array('name.formatForDisplay', length), $dom);
             return $errorInfo;
         }
-        «validationCallsString»
-        «IF fixed»
-            if (!$this->isStringWithFixedLength('«name.formatForCode»', «length»)) {
-                $errorInfo['message'] = __f('Error! Length of field value must be %2$s (%1$s).', array('«name.formatForDisplay»', «length»), $dom);
+        validationCallsString
+        IF fixed
+            if (!$this->isStringWithFixedLength('name.formatForCode', length)) {
+                $errorInfo['message'] = __f('Error! Length of field value must be %2$s (%1$s).', array('name.formatForDisplay', length), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
-        «IF language»
-            if («IF !mandatory»$this->entity['«name.formatForCode»'] != '' && «ENDIF»!$this->isValidLanguage('«name.formatForCode»', false)) {
-                $errorInfo['message'] = __f('Error! Field value must be a valid language code (%s).', array('«name.formatForDisplay»'), $dom);
+        ENDIF
+        IF language
+            if (IF !mandatory$this->entity['name.formatForCode'] != '' && ENDIF!$this->isValidLanguage('name.formatForCode', false)) {
+                $errorInfo['message'] = __f('Error! Field value must be a valid language code (%s).', array('name.formatForDisplay'), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
-        «IF country»
-            if («IF !mandatory»$this->entity['«name.formatForCode»'] != '' && «ENDIF»!$this->isValidCountry('«name.formatForCode»')) {
-                $errorInfo['message'] = __f('Error! Field value must be a valid country code (%s).', array('«name.formatForDisplay»'), $dom);
+        ENDIF
+        IF country
+            if (IF !mandatory$this->entity['name.formatForCode'] != '' && ENDIF!$this->isValidCountry('name.formatForCode')) {
+                $errorInfo['message'] = __f('Error! Field value must be a valid country code (%s).', array('name.formatForDisplay'), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
-        «IF htmlcolour»
-            if («IF !mandatory»$this->entity['«name.formatForCode»'] != '' && «ENDIF»!$this->isValidHtmlColour('«name.formatForCode»')) {
-                $errorInfo['message'] = __f('Error! Field value must be a valid html colour code [#123 or #123456] (%s).', array('«name.formatForDisplay»'), $dom);
+        ENDIF
+        IF htmlcolour
+            if (IF !mandatory$this->entity['name.formatForCode'] != '' && ENDIF!$this->isValidHtmlColour('name.formatForCode')) {
+                $errorInfo['message'] = __f('Error! Field value must be a valid html colour code [#123 or #123456] (%s).', array('name.formatForDisplay'), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
+        ENDIF
     '''
     def private dispatch validationCalls(TextField it) '''
-        if (!$this->isStringNotLongerThan('«name.formatForCode»', «length»)) {
-            $errorInfo['message'] = __f('Error! Length of field value must not be higher than %2$s (%1$s).', array('«name.formatForDisplay»', «length»), $dom);
+        if (!$this->isStringNotLongerThan('name.formatForCode', length)) {
+            $errorInfo['message'] = __f('Error! Length of field value must not be higher than %2$s (%1$s).', array('name.formatForDisplay', length), $dom);
             return $errorInfo;
         }
-        «validationCallsString»
+        validationCallsString
     '''
     def private dispatch validationCalls(EmailField it) '''
-        if (!$this->isStringNotLongerThan('«name.formatForCode»', «length»)) {
-            $errorInfo['message'] = __f('Error! Length of field value must not be higher than %2$s (%1$s).', array('«name.formatForDisplay»', «length»), $dom);
+        if (!$this->isStringNotLongerThan('name.formatForCode', length)) {
+            $errorInfo['message'] = __f('Error! Length of field value must not be higher than %2$s (%1$s).', array('name.formatForDisplay', length), $dom);
             return $errorInfo;
         }
-        «validationCallsString»
-        if («IF !mandatory»$this->entity['«name.formatForCode»'] != '' && «ENDIF»!$this->isValidEmail('«name.formatForCode»')) {
-            $errorInfo['message'] = __f('Error! Field value must be a valid email address (%s).', array('«name.formatForDisplay»'), $dom);
+        validationCallsString
+        if (IF !mandatory$this->entity['name.formatForCode'] != '' && ENDIF!$this->isValidEmail('name.formatForCode')) {
+            $errorInfo['message'] = __f('Error! Field value must be a valid email address (%s).', array('name.formatForDisplay'), $dom);
             return $errorInfo;
         }
     '''
     def private dispatch validationCalls(UrlField it) '''
-        if (!$this->isStringNotLongerThan('«name.formatForCode»', «length»)) {
-            $errorInfo['message'] = __f('Error! Length of field value must not be higher than %2$s (%1$s).', array('«name.formatForDisplay»', «length»), $dom);
+        if (!$this->isStringNotLongerThan('name.formatForCode', length)) {
+            $errorInfo['message'] = __f('Error! Length of field value must not be higher than %2$s (%1$s).', array('name.formatForDisplay', length), $dom);
             return $errorInfo;
         }
-        «validationCallsString»
-        if («IF !mandatory»$this->entity['«name.formatForCode»'] != '' && «ENDIF»!$this->isValidUrl('«name.formatForCode»')) {
-            $errorInfo['message'] = __f('Error! Field value must be a valid url (%s).', array('«name.formatForDisplay»'), $dom);
+        validationCallsString
+        if (IF !mandatory$this->entity['name.formatForCode'] != '' && ENDIF!$this->isValidUrl('name.formatForCode')) {
+            $errorInfo['message'] = __f('Error! Field value must be a valid url (%s).', array('name.formatForDisplay'), $dom);
             return $errorInfo;
         }
     '''
     def private dispatch validationCalls(UploadField it) '''
-        if (!$this->isStringNotLongerThan('«name.formatForCode»', «length»)) {
-            $errorInfo['message'] = __f('Error! Length of field value must not be higher than %2$s (%1$s).', array('«name.formatForDisplay»', «length»), $dom);
+        if (!$this->isStringNotLongerThan('name.formatForCode', length)) {
+            $errorInfo['message'] = __f('Error! Length of field value must not be higher than %2$s (%1$s).', array('name.formatForDisplay', length), $dom);
             return $errorInfo;
         }
-        «validationCallsString»
+        validationCallsString
     '''
     def private dispatch validationCalls(ListField it) '''
-        «IF mandatory»
-            if (!$this->isStringNotEmpty('«name.formatForCode»')) {
-                $errorInfo['message'] = __f('Error! Field value must not be empty (%s).', array('«name.formatForDisplay»'), $dom);
+        IF mandatory
+            if (!$this->isStringNotEmpty('name.formatForCode')) {
+                $errorInfo['message'] = __f('Error! Field value must not be empty (%s).', array('name.formatForDisplay'), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
-        «IF multiple && (min > 0 || max > 0)»
+        ENDIF
+        IF multiple && (min > 0 || max > 0)
             $serviceManager = ServiceUtil::getManager();
-            «IF app.targets('1.3.5')»
-                $helper = new «app.appName»_Util_ListEntries($serviceManager);
-            «ELSE»
-                $helper = $serviceManager->get('«app.appName.formatForDB».listentries_helper');
-            «ENDIF»
-            $listValues = $helper->extractMultiList($this->entity['«name.formatForCode»']);
+            IF app.targets('1.3.5')
+                $helper = new app.appName_Util_ListEntries($serviceManager);
+            ELSE
+                $helper = $serviceManager->get('app.appName.formatForDB.listentries_helper');
+            ENDIF
+            $listValues = $helper->extractMultiList($this->entity['name.formatForCode']);
             $amountOfValues = count($listValues);
-            «IF min == max»
-                if ($amountOfValues != «min») {
-                    $errorInfo['message'] = __f('Error! You must select exactly %s choices.', array('«min»'), $dom);
+            IF min == max
+                if ($amountOfValues != min) {
+                    $errorInfo['message'] = __f('Error! You must select exactly %s choices.', array('min'), $dom);
                     return $errorInfo;
                 }
-            «ELSE»
-                «IF min > 0»
-                    if ($amountOfValues < «min») {
-                        $errorInfo['message'] = __f('Error! You must select at least %s choices.', array('«min»'), $dom);
+            ELSE
+                IF min > 0
+                    if ($amountOfValues < min) {
+                        $errorInfo['message'] = __f('Error! You must select at least %s choices.', array('min'), $dom);
                         return $errorInfo;
                     }
-                «ENDIF»
-                «IF max > 0»
-                    if ($amountOfValues > «max») {
-                        $errorInfo['message'] = __f('Error! You must select at most %s choices.', array('«max»'), $dom);
+                ENDIF
+                IF max > 0
+                    if ($amountOfValues > max) {
+                        $errorInfo['message'] = __f('Error! You must select at most %s choices.', array('max'), $dom);
                         return $errorInfo;
                     }
-                «ENDIF»
-            «ENDIF»
-        «ENDIF»
+                ENDIF
+            ENDIF
+        ENDIF
     '''
     def private dispatch validationCalls(ArrayField it) '''
-        «IF min > 0 && max > 0»
-            $amountOfItems = count($this->entity['«name.formatForCode»']);
-            «IF min == max»
-                if ($amountOfItems != «min») {
-                    $errorInfo['message'] = __f('Error! This collection should contain exactly %s elements.', array('«min»'), $dom);
+        IF min > 0 && max > 0
+            $amountOfItems = count($this->entity['name.formatForCode']);
+            IF min == max
+                if ($amountOfItems != min) {
+                    $errorInfo['message'] = __f('Error! This collection should contain exactly %s elements.', array('min'), $dom);
                     return $errorInfo;
                 }
-            «ELSE»
-                if ($amountOfItems < «min») {
-                    $errorInfo['message'] = __f('Error! This collection should contain %s elements or more.', array('«min»'), $dom);
+            ELSE
+                if ($amountOfItems < min) {
+                    $errorInfo['message'] = __f('Error! This collection should contain %s elements or more.', array('min'), $dom);
                     return $errorInfo;
                 }
-                if ($amountOfItems > «max») {
-                    $errorInfo['message'] = __f('Error! This collection should contain %s elements or less.', array('«max»'), $dom);
+                if ($amountOfItems > max) {
+                    $errorInfo['message'] = __f('Error! This collection should contain %s elements or less.', array('max'), $dom);
                     return $errorInfo;
                 }
-            «ENDIF»
-        «ENDIF»
+            ENDIF
+        ENDIF
     '''
     def private dispatch validationCalls(ObjectField it) '''
     '''
     def private validationCallsDateTime(AbstractDateField it) '''
-        «IF mandatory»
-            if (!$this->isValidDateTime('«name.formatForCode»')) {
-                $errorInfo['message'] = __f('Error! Field value must be a valid datetime (%s).', array('«name.formatForDisplay»'), $dom);
+        IF mandatory
+            if (!$this->isValidDateTime('name.formatForCode')) {
+                $errorInfo['message'] = __f('Error! Field value must be a valid datetime (%s).', array('name.formatForDisplay'), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
+        ENDIF
     '''
     def private dispatch validationCalls(AbstractDateField it) {
         validationCallsDateTime
     }
     def private dispatch validationCalls(DatetimeField it) '''
-        «validationCallsDateTime»
-        «IF past»
-            if (!$this->isDateTimeInPast('«name.formatForCode»', «mandatory.displayBool»)) {
-                $errorInfo['message'] = __f('Error! Field value must be a date in the past (%s).', array('«name.formatForDisplay»'), $dom);
+        validationCallsDateTime
+        IF past
+            if (!$this->isDateTimeInPast('name.formatForCode', mandatory.displayBool)) {
+                $errorInfo['message'] = __f('Error! Field value must be a date in the past (%s).', array('name.formatForDisplay'), $dom);
                 return $errorInfo;
             }
-        «ELSEIF future»
-            if (!$this->isDateTimeInFuture('«name.formatForCode»', «mandatory.displayBool»)) {
-                $errorInfo['message'] = __f('Error! Field value must be a date in the future (%s).', array('«name.formatForDisplay»'), $dom);
+        ELSEIF future
+            if (!$this->isDateTimeInFuture('name.formatForCode', mandatory.displayBool)) {
+                $errorInfo['message'] = __f('Error! Field value must be a date in the future (%s).', array('name.formatForDisplay'), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
+        ENDIF
     '''
     def private dispatch validationCalls(DateField it) '''
-        «validationCallsDateTime»
-        «IF past»
-            if (!$this->isDateInPast('«name.formatForCode»', «mandatory.displayBool»)) {
-                $errorInfo['message'] = __f('Error! Field value must be a date in the past (%s).', array('«name.formatForDisplay»'), $dom);
+        validationCallsDateTime
+        IF past
+            if (!$this->isDateInPast('name.formatForCode', mandatory.displayBool)) {
+                $errorInfo['message'] = __f('Error! Field value must be a date in the past (%s).', array('name.formatForDisplay'), $dom);
                 return $errorInfo;
             }
-        «ELSEIF future»
-            if (!$this->isDateInFuture('«name.formatForCode»', «mandatory.displayBool»)) {
-                $errorInfo['message'] = __f('Error! Field value must be a date in the future (%s).', array('«name.formatForDisplay»'), $dom);
+        ELSEIF future
+            if (!$this->isDateInFuture('name.formatForCode', mandatory.displayBool)) {
+                $errorInfo['message'] = __f('Error! Field value must be a date in the future (%s).', array('name.formatForDisplay'), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
+        ENDIF
     '''
     def private dispatch validationCalls(TimeField it) '''
-        «validationCallsDateTime»
-        «IF past»
-            if (!$this->isTimeInPast('«name.formatForCode»', «mandatory.displayBool»)) {
-                $errorInfo['message'] = __f('Error! Field value must be a time in the past (%s).', array('«name.formatForDisplay»'), $dom);
+        validationCallsDateTime
+        IF past
+            if (!$this->isTimeInPast('name.formatForCode', mandatory.displayBool)) {
+                $errorInfo['message'] = __f('Error! Field value must be a time in the past (%s).', array('name.formatForDisplay'), $dom);
                 return $errorInfo;
             }
-        «ELSEIF future»
-            if (!$this->isTimeInFuture('«name.formatForCode»', «mandatory.displayBool»)) {
-                $errorInfo['message'] = __f('Error! Field value must be a time in the future (%s).', array('«name.formatForDisplay»'), $dom);
+        ELSEIF future
+            if (!$this->isTimeInFuture('name.formatForCode', mandatory.displayBool)) {
+                $errorInfo['message'] = __f('Error! Field value must be a time in the future (%s).', array('name.formatForDisplay'), $dom);
                 return $errorInfo;
             }
-        «ENDIF»
+        ENDIF
     '''
     def private dispatch validationCalls(FloatField it) '''
-        «validationCallsNumeric»
-        if (!$this->isNumberNotLongerThan('«name.formatForCode»', «length»)) {
-            $errorInfo['message'] = __f('Error! Length of field value must not be higher than %2$s (%1$s).', array('«name.formatForDisplay»', «length»), $dom);
+        validationCallsNumeric
+        if (!$this->isNumberNotLongerThan('name.formatForCode', length)) {
+            $errorInfo['message'] = __f('Error! Length of field value must not be higher than %2$s (%1$s).', array('name.formatForDisplay', length), $dom);
             return $errorInfo;
         }
     '''
 
     def private validationCallsForMandatoryRelationships(Entity it) '''
-        «var incomingAndMandatoryRelations = getBidirectionalIncomingAndMandatoryJoinRelations»
-        «IF !incomingAndMandatoryRelations.empty»
+        var incomingAndMandatoryRelations = getBidirectionalIncomingAndMandatoryJoinRelations
+        IF !incomingAndMandatoryRelations.empty
             // verify that all incoming bidirectional non-nullable relationships are not null
-            «FOR relation : incomingAndMandatoryRelations»
-                «val aliasName = relation.getRelationAliasName(false).toFirstLower»
-                if ($this->entity['«aliasName»'] === null) {
-                    «IF !relation.isManySide(false)»
-                        $errorInfo['message'] = __('Error! Choosing a «aliasName.formatForDisplay» is required.', $dom);
-                    «ELSE»
-                        $errorInfo['message'] = __('Error! Choosing at least one of the «aliasName.formatForDisplay» is required.', $dom);
-                    «ENDIF»
+            FOR relation : incomingAndMandatoryRelations
+                val aliasName = relation.getRelationAliasName(false).toFirstLower
+                if ($this->entity['aliasName'] === null) {
+                    IF !relation.isManySide(false)
+                        $errorInfo['message'] = __('Error! Choosing a aliasName.formatForDisplay is required.', $dom);
+                    ELSE
+                        $errorInfo['message'] = __('Error! Choosing at least one of the aliasName.formatForDisplay is required.', $dom);
+                    ENDIF
                     return $errorInfo;
                 }
-            «ENDFOR»
-        «ENDIF»
-        «FOR rel : getBidirectionalIncomingJoinRelations»
-            «IF rel instanceof ManyToManyRelationship»
-                «IF rel.minSource > 0 && rel.maxSource > 0»
-                    «val aliasName = rel.getRelationAliasName(false).toFirstLower»
-                    $amountOfItems = count($this->entity['«aliasName.formatForCode»']);
-                    «IF rel.minSource == rel.maxSource»
-                        if ($amountOfItems != «rel.minSource») {
-                            $errorInfo['message'] = __f('Error! This collection should contain exactly %s «aliasName.formatForDisplay».', array('«rel.minSource»'), $dom);
+            ENDFOR
+        ENDIF
+        FOR rel : getBidirectionalIncomingJoinRelations
+            IF rel instanceof ManyToManyRelationship
+                IF rel.minSource > 0 && rel.maxSource > 0
+                    val aliasName = rel.getRelationAliasName(false).toFirstLower
+                    $amountOfItems = count($this->entity['aliasName.formatForCode']);
+                    IF rel.minSource == rel.maxSource
+                        if ($amountOfItems != rel.minSource) {
+                            $errorInfo['message'] = __f('Error! This collection should contain exactly %s aliasName.formatForDisplay.', array('rel.minSource'), $dom);
                             return $errorInfo;
                         }
-                    «ELSE»
-                        if ($amountOfItems < «rel.minSource») {
-                            $errorInfo['message'] = __f('Error! This collection should contain %s «aliasName.formatForDisplay» or more.', array('«rel.minSource»'), $dom);
+                    ELSE
+                        if ($amountOfItems < rel.minSource) {
+                            $errorInfo['message'] = __f('Error! This collection should contain %s aliasName.formatForDisplay or more.', array('rel.minSource'), $dom);
                             return $errorInfo;
                         }
-                        if ($amountOfItems > «rel.maxSource») {
-                            $errorInfo['message'] = __f('Error! This collection should contain %s «aliasName.formatForDisplay» or less.', array('«rel.maxSource»'), $dom);
+                        if ($amountOfItems > rel.maxSource) {
+                            $errorInfo['message'] = __f('Error! This collection should contain %s aliasName.formatForDisplay or less.', array('rel.maxSource'), $dom);
                             return $errorInfo;
                         }
-                    «ENDIF»
-                «ENDIF»
-            «ENDIF»
-        «ENDFOR»
-        «FOR rel : outgoing»
-            «IF rel instanceof OneToManyRelationship»
-                «IF rel.minTarget > 0 && rel.maxTarget > 0»
-                    «val aliasName = rel.getRelationAliasName(true).toFirstLower»
-                    $amountOfItems = count($this->entity['«aliasName.formatForCode»']);
-                    «IF rel.minTarget == rel.maxTarget»
-                        if ($amountOfItems != «rel.minTarget») {
-                            $errorInfo['message'] = __f('Error! This collection should contain exactly %s «aliasName.formatForDisplay».', array('«rel.minTarget»'), $dom);
+                    ENDIF
+                ENDIF
+            ENDIF
+        ENDFOR
+        FOR rel : outgoing
+            IF rel instanceof OneToManyRelationship
+                IF rel.minTarget > 0 && rel.maxTarget > 0
+                    val aliasName = rel.getRelationAliasName(true).toFirstLower
+                    $amountOfItems = count($this->entity['aliasName.formatForCode']);
+                    IF rel.minTarget == rel.maxTarget
+                        if ($amountOfItems != rel.minTarget) {
+                            $errorInfo['message'] = __f('Error! This collection should contain exactly %s aliasName.formatForDisplay.', array('rel.minTarget'), $dom);
                             return $errorInfo;
                         }
-                    «ELSE»
-                        if ($amountOfItems < «rel.minTarget») {
-                            $errorInfo['message'] = __f('Error! This collection should contain %s «aliasName.formatForDisplay» or more.', array('«rel.minTarget»'), $dom);
+                    ELSE
+                        if ($amountOfItems < rel.minTarget) {
+                            $errorInfo['message'] = __f('Error! This collection should contain %s aliasName.formatForDisplay or more.', array('rel.minTarget'), $dom);
                             return $errorInfo;
                         }
-                        if ($amountOfItems > «rel.maxTarget») {
-                            $errorInfo['message'] = __f('Error! This collection should contain %s «aliasName.formatForDisplay» or less.', array('«rel.maxTarget»'), $dom);
+                        if ($amountOfItems > rel.maxTarget) {
+                            $errorInfo['message'] = __f('Error! This collection should contain %s aliasName.formatForDisplay or less.', array('rel.maxTarget'), $dom);
                             return $errorInfo;
                         }
-                    «ENDIF»
-                «ENDIF»
-            «ENDIF»
-            «IF rel instanceof ManyToManyRelationship»
-                «IF rel.minTarget > 0 && rel.maxTarget > 0»
-                    «val aliasName = rel.getRelationAliasName(true).toFirstLower»
-                    $amountOfItems = count($this->entity['«aliasName.formatForCode»']);
-                    «IF rel.minTarget == rel.maxTarget»
-                        if ($amountOfItems != «rel.minTarget») {
-                            $errorInfo['message'] = __f('Error! This collection should contain exactly %s «aliasName.formatForDisplay».', array('«rel.minTarget»'), $dom);
+                    ENDIF
+                ENDIF
+            ENDIF
+            IF rel instanceof ManyToManyRelationship
+                IF rel.minTarget > 0 && rel.maxTarget > 0
+                    val aliasName = rel.getRelationAliasName(true).toFirstLower
+                    $amountOfItems = count($this->entity['aliasName.formatForCode']);
+                    IF rel.minTarget == rel.maxTarget
+                        if ($amountOfItems != rel.minTarget) {
+                            $errorInfo['message'] = __f('Error! This collection should contain exactly %s aliasName.formatForDisplay.', array('rel.minTarget'), $dom);
                             return $errorInfo;
                         }
-                    «ELSE»
-                        if ($amountOfItems < «rel.minTarget») {
-                            $errorInfo['message'] = __f('Error! This collection should contain %s «aliasName.formatForDisplay» or more.', array('«rel.minTarget»'), $dom);
+                    ELSE
+                        if ($amountOfItems < rel.minTarget) {
+                            $errorInfo['message'] = __f('Error! This collection should contain %s aliasName.formatForDisplay or more.', array('rel.minTarget'), $dom);
                             return $errorInfo;
                         }
-                        if ($amountOfItems > «rel.maxTarget») {
-                            $errorInfo['message'] = __f('Error! This collection should contain %s «aliasName.formatForDisplay» or less.', array('«rel.maxTarget»'), $dom);
+                        if ($amountOfItems > rel.maxTarget) {
+                            $errorInfo['message'] = __f('Error! This collection should contain %s aliasName.formatForDisplay or less.', array('rel.maxTarget'), $dom);
                             return $errorInfo;
                         }
-                    «ENDIF»
-                «ENDIF»
-            «ENDIF»
-        «ENDFOR»
+                    ENDIF
+                ENDIF
+            ENDIF
+        ENDFOR
     '''
 }

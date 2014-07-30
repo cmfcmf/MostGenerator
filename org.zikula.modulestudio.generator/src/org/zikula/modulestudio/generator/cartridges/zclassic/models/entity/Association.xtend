@@ -42,51 +42,51 @@ class Association {
     }
 
     def private unidirectional(JoinRelationship it, Boolean useTarget, String sourceName, String targetName, String entityClass) '''
-        «IF useTarget»
-            «outgoing(sourceName, targetName, entityClass)»
-        «ENDIF»
+        IF useTarget
+            outgoing(sourceName, targetName, entityClass)
+        ENDIF
     '''
 
     def private bidirectional(JoinRelationship it, Boolean useTarget, String sourceName, String targetName, String entityClass) '''
-        «IF !useTarget»
-            «incoming(sourceName, targetName, entityClass)»
-        «ELSE»
-            «outgoing(sourceName, targetName, entityClass)»
-        «ENDIF»
+        IF !useTarget
+            incoming(sourceName, targetName, entityClass)
+        ELSE
+            outgoing(sourceName, targetName, entityClass)
+        ENDIF
     '''
 
 
     def private dispatch incoming(JoinRelationship it, String sourceName, String targetName, String entityClass) '''
         /**
-         * Bidirectional - «incomingMappingDescription(it, sourceName, targetName)».
+         * Bidirectional - incomingMappingDescription(it, sourceName, targetName).
          *
-        «incomingMappingDetails»
-         * @ORM\«incomingMappingType»(targetEntity="«IF !container.application.targets('1.3.5')»\«ENDIF»«entityClass»", inversedBy="«targetName»"«additionalOptions(true)»)
-        «joinDetails(false)»
-        «IF !container.application.targets('1.3.5')»
-            «IF !nullable»
-                «val aliasName = getRelationAliasName(false).toFirstLower»
-                «IF !isManySide(false)»
-                    «' '»* @Assert\NotNull(message="Choosing a «aliasName.formatForDisplay» is required.")
-                «ELSE»
-                    «' '»* @Assert\NotNull(message="Choosing at least one of the «aliasName.formatForDisplay» is required.")
-                «ENDIF»
-            «ENDIF»
-            «IF !isManySide(false)»
-                «' '»* @Assert\Type(type="\«entityClass»")
-            «ENDIF»
-            «' '»* @Assert\Valid()
-        «ENDIF»
-         * @var «IF !container.application.targets('1.3.5')»\«ENDIF»«entityClass»«IF isManySide(false)»[]«ENDIF» $«sourceName».
+        incomingMappingDetails
+         * @ORM\incomingMappingType(targetEntity="IF !container.application.targets('1.3.5')\ENDIFentityClass", inversedBy="targetName"additionalOptions(true))
+        joinDetails(false)
+        IF !container.application.targets('1.3.5')
+            IF !nullable
+                val aliasName = getRelationAliasName(false).toFirstLower
+                IF !isManySide(false)
+                    ' '* @Assert\NotNull(message="Choosing a aliasName.formatForDisplay is required.")
+                ELSE
+                    ' '* @Assert\NotNull(message="Choosing at least one of the aliasName.formatForDisplay is required.")
+                ENDIF
+            ENDIF
+            IF !isManySide(false)
+                ' '* @Assert\Type(type="\entityClass")
+            ENDIF
+            ' '* @Assert\Valid()
+        ENDIF
+         * @var IF !container.application.targets('1.3.5')\ENDIFentityClassIF isManySide(false)[]ENDIF $sourceName.
          */
-        protected $«sourceName»;
-        «/* this last line is on purpose */»
+        protected $sourceName;
+        /* this last line is on purpose */
     '''
 
     def private dispatch incomingMappingDescription(JoinRelationship it, String sourceName, String targetName) {
         switch it {
-            OneToOneRelationship: '''One «targetName» [«target.name.formatForDisplay»] is linked by one «sourceName» [«source.name.formatForDisplay»] (INVERSE SIDE)'''
-            OneToManyRelationship: '''Many «targetName» [«target.nameMultiple.formatForDisplay»] are linked by one «sourceName» [«source.name.formatForDisplay»] (OWNING SIDE)'''
+            OneToOneRelationship: '''One targetName [target.name.formatForDisplay] is linked by one sourceName [source.name.formatForDisplay] (INVERSE SIDE)'''
+            OneToManyRelationship: '''Many targetName [target.nameMultiple.formatForDisplay] are linked by one sourceName [source.name.formatForDisplay] (OWNING SIDE)'''
             default: ''
         }
     }
@@ -106,89 +106,89 @@ class Association {
 
     def private dispatch incoming(ManyToOneRelationship it, String sourceName, String targetName, String entityClass) '''
         /**
-         * Bidirectional - «incomingMappingDescription(it, sourceName, targetName)».
+         * Bidirectional - incomingMappingDescription(it, sourceName, targetName).
          *
-         «IF primaryKey»
+         IF primaryKey
              * @ORM\Id
-         «ENDIF»
-         * @ORM\OneToOne(targetEntity="«IF !container.application.targets('1.3.5')»\«ENDIF»«entityClass»")
-        «joinDetails(false)»
-        «IF !container.application.targets('1.3.5')»
-            «IF !nullable»
-                «val aliasName = getRelationAliasName(false).toFirstLower»
-                «' '»* @Assert\NotNull(message="Choosing a «aliasName.formatForDisplay» is required.")
-            «ENDIF»
-            «' '»* @Assert\Type(type="\«entityClass»")
-            «' '»* @Assert\Valid()
-        «ENDIF»
-         * @var «IF !container.application.targets('1.3.5')»\«ENDIF»«entityClass» $«sourceName».
+         ENDIF
+         * @ORM\OneToOne(targetEntity="IF !container.application.targets('1.3.5')\ENDIFentityClass")
+        joinDetails(false)
+        IF !container.application.targets('1.3.5')
+            IF !nullable
+                val aliasName = getRelationAliasName(false).toFirstLower
+                ' '* @Assert\NotNull(message="Choosing a aliasName.formatForDisplay is required.")
+            ENDIF
+            ' '* @Assert\Type(type="\entityClass")
+            ' '* @Assert\Valid()
+        ENDIF
+         * @var IF !container.application.targets('1.3.5')\ENDIFentityClass $sourceName.
          */
-        protected $«sourceName»;
-        «/* this last line is on purpose */»
+        protected $sourceName;
+        /* this last line is on purpose */
     '''
 
-    def private dispatch incomingMappingDescription(ManyToOneRelationship it, String sourceName, String targetName) '''One «targetName» [«target.name.formatForDisplay»] is linked by many «sourceName» [«source.nameMultiple.formatForDisplay»] (INVERSE SIDE)'''
+    def private dispatch incomingMappingDescription(ManyToOneRelationship it, String sourceName, String targetName) '''One targetName [target.name.formatForDisplay] is linked by many sourceName [source.nameMultiple.formatForDisplay] (INVERSE SIDE)'''
 
     def private dispatch incoming(ManyToManyRelationship it, String sourceName, String targetName, String entityClass) '''
-        «IF bidirectional»
+        IF bidirectional
             /**
-             * Bidirectional - «incomingMappingDescription(sourceName, targetName)».
+             * Bidirectional - incomingMappingDescription(sourceName, targetName).
              *
-             * @ORM\ManyToMany(targetEntity="«IF !container.application.targets('1.3.5')»\«ENDIF»«entityClass»", mappedBy="«targetName»"«additionalOptions(true)»)
-             «IF orderByReverse !== null && orderByReverse != ''»
-              * @ORM\OrderBy({"«orderByReverse»" = "ASC"})
-             «ENDIF»
-            «IF !container.application.targets('1.3.5')»
-                «IF !nullable»
-                    «val aliasName = getRelationAliasName(false).toFirstLower»
-                    «' '»* @Assert\NotNull(message="Choosing at least one of the «aliasName.formatForDisplay» is required.")
-                «ENDIF»
-                «IF minSource > 0 && maxSource > 0»
-                    «' '»* @Assert\Count(min="«minSource»", max="«maxSource»")
-                «ENDIF»
-                «' '»* @Assert\Valid()
-            «ENDIF»
-             * @var «IF !container.application.targets('1.3.5')»\«ENDIF»«entityClass»[] $«sourceName».
+             * @ORM\ManyToMany(targetEntity="IF !container.application.targets('1.3.5')\ENDIFentityClass", mappedBy="targetName"additionalOptions(true))
+             IF orderByReverse !== null && orderByReverse != ''
+              * @ORM\OrderBy({"orderByReverse" = "ASC"})
+             ENDIF
+            IF !container.application.targets('1.3.5')
+                IF !nullable
+                    val aliasName = getRelationAliasName(false).toFirstLower
+                    ' '* @Assert\NotNull(message="Choosing at least one of the aliasName.formatForDisplay is required.")
+                ENDIF
+                IF minSource > 0 && maxSource > 0
+                    ' '* @Assert\Count(min="minSource", max="maxSource")
+                ENDIF
+                ' '* @Assert\Valid()
+            ENDIF
+             * @var IF !container.application.targets('1.3.5')\ENDIFentityClass[] $sourceName.
              */
-            protected $«sourceName» = null;
-        «ENDIF»
+            protected $sourceName = null;
+        ENDIF
     '''
 
-    def private dispatch incomingMappingDescription(ManyToManyRelationship it, String sourceName, String targetName) '''Many «targetName» [«target.nameMultiple.formatForDisplay»] are linked by many «sourceName» [«source.nameMultiple.formatForDisplay»] (INVERSE SIDE)'''
+    def private dispatch incomingMappingDescription(ManyToManyRelationship it, String sourceName, String targetName) '''Many targetName [target.nameMultiple.formatForDisplay] are linked by many sourceName [source.nameMultiple.formatForDisplay] (INVERSE SIDE)'''
 
     /**
      * This default rule is used for OneToOne and ManyToOne.
      */
     def private dispatch outgoing(JoinRelationship it, String sourceName, String targetName, String entityClass) '''
         /**
-         * «IF bidirectional»Bi«ELSE»Uni«ENDIF»directional - «outgoingMappingDescription(sourceName, targetName)».
+         * IF bidirectionalBiELSEUniENDIFdirectional - outgoingMappingDescription(sourceName, targetName).
          *
-         * @ORM\«outgoingMappingType»(targetEntity="«IF !container.application.targets('1.3.5')»\«ENDIF»«entityClass»"«IF bidirectional», mappedBy="«sourceName»"«ENDIF»«cascadeOptions(false)»«fetchTypeTag»«outgoingMappingAdditions»)
-        «joinDetails(true)»
-        «IF !container.application.targets('1.3.5')»
-            «IF !nullable»
-                «val aliasName = getRelationAliasName(true).toFirstLower»
-                «IF !isManySide(true)»
-                    «' '»* @Assert\NotNull(message="Choosing a «aliasName.formatForDisplay» is required.")
-                «ELSE»
-                    «' '»* @Assert\NotNull(message="Choosing at least one of the «aliasName.formatForDisplay» is required.")
-                «ENDIF»
-            «ENDIF»
-            «IF !isManySide(true)»
-                «' '»* @Assert\Type(type="\«entityClass»")
-            «ENDIF»
-            «' '»* @Assert\Valid()
-        «ENDIF»
-         * @var «IF !container.application.targets('1.3.5')»\«ENDIF»«entityClass» $«targetName».
+         * @ORM\outgoingMappingType(targetEntity="IF !container.application.targets('1.3.5')\ENDIFentityClass"IF bidirectional, mappedBy="sourceName"ENDIFcascadeOptions(false)fetchTypeTagoutgoingMappingAdditions)
+        joinDetails(true)
+        IF !container.application.targets('1.3.5')
+            IF !nullable
+                val aliasName = getRelationAliasName(true).toFirstLower
+                IF !isManySide(true)
+                    ' '* @Assert\NotNull(message="Choosing a aliasName.formatForDisplay is required.")
+                ELSE
+                    ' '* @Assert\NotNull(message="Choosing at least one of the aliasName.formatForDisplay is required.")
+                ENDIF
+            ENDIF
+            IF !isManySide(true)
+                ' '* @Assert\Type(type="\entityClass")
+            ENDIF
+            ' '* @Assert\Valid()
+        ENDIF
+         * @var IF !container.application.targets('1.3.5')\ENDIFentityClass $targetName.
          */
-        protected $«targetName»;
-        «/* this last line is on purpose */»
+        protected $targetName;
+        /* this last line is on purpose */
     '''
 
     def private dispatch outgoingMappingDescription(JoinRelationship it, String sourceName, String targetName) {
         switch it {
-            OneToOneRelationship: '''One «sourceName» [«source.name.formatForDisplay»] has one «targetName» [«target.name.formatForDisplay»] (INVERSE SIDE)'''
-            ManyToOneRelationship: '''Many «sourceName» [«source.nameMultiple.formatForDisplay»] have one «targetName» [«target.name.formatForDisplay»] (OWNING SIDE)'''
+            OneToOneRelationship: '''One sourceName [source.name.formatForDisplay] has one targetName [target.name.formatForDisplay] (INVERSE SIDE)'''
+            ManyToOneRelationship: '''Many sourceName [source.nameMultiple.formatForDisplay] have one targetName [target.name.formatForDisplay] (OWNING SIDE)'''
             default: ''
         }
     }
@@ -201,66 +201,66 @@ class Association {
     }
 
     def private dispatch outgoingMappingAdditions(JoinRelationship it) ''''''
-    def private dispatch outgoingMappingAdditions(OneToOneRelationship it) '''«IF orphanRemoval», orphanRemoval=true«ENDIF»'''
-    def private dispatch outgoingMappingAdditions(OneToManyRelationship it) '''«IF orphanRemoval», orphanRemoval=true«ENDIF»«IF indexBy !== null && indexBy != ''», indexBy="«indexBy»"«ENDIF»)'''
-    def private dispatch outgoingMappingAdditions(ManyToManyRelationship it) '''«IF orphanRemoval», orphanRemoval=true«ENDIF»«IF indexBy !== null && indexBy != ''», indexBy="«indexBy»"«ENDIF»'''
+    def private dispatch outgoingMappingAdditions(OneToOneRelationship it) '''IF orphanRemoval, orphanRemoval=trueENDIF'''
+    def private dispatch outgoingMappingAdditions(OneToManyRelationship it) '''IF orphanRemoval, orphanRemoval=trueENDIFIF indexBy !== null && indexBy != '', indexBy="indexBy"ENDIF)'''
+    def private dispatch outgoingMappingAdditions(ManyToManyRelationship it) '''IF orphanRemoval, orphanRemoval=trueENDIFIF indexBy !== null && indexBy != '', indexBy="indexBy"ENDIF'''
 
     def private dispatch outgoing(OneToManyRelationship it, String sourceName, String targetName, String entityClass) '''
         /**
-         * «IF bidirectional»Bi«ELSE»Uni«ENDIF»directional - «outgoingMappingDescription(sourceName, targetName)».
+         * IF bidirectionalBiELSEUniENDIFdirectional - outgoingMappingDescription(sourceName, targetName).
          *
-         «IF !bidirectional»
-          * @ORM\ManyToMany(targetEntity="«IF !container.application.targets('1.3.5')»\«ENDIF»«entityClass»"«additionalOptions(false)»)
-         «ELSE»
-          * @ORM\OneToMany(targetEntity="«IF !container.application.targets('1.3.5')»\«ENDIF»«entityClass»", mappedBy="«sourceName»"«additionalOptions(false)»«outgoingMappingAdditions»
-         «ENDIF»
-        «joinDetails(true)»
-         «IF orderBy !== null && orderBy != ''»
-          * @ORM\OrderBy({"«orderBy»" = "ASC"})
-         «ENDIF»
-        «IF !container.application.targets('1.3.5')»
-            «IF !nullable»
-                «val aliasName = getRelationAliasName(true).toFirstLower»
-                «' '»* @Assert\NotNull(message="Choosing at least one of the «aliasName.formatForDisplay» is required.")
-            «ENDIF»
-            «IF minTarget > 0 && maxTarget > 0»
-                «' '»* @Assert\Count(min="«minTarget»", max="«maxTarget»")
-            «ENDIF»
-            «' '»* @Assert\Valid()
-        «ENDIF»
-         * @var «IF !container.application.targets('1.3.5')»\«ENDIF»«entityClass»[] $«targetName».
+         IF !bidirectional
+          * @ORM\ManyToMany(targetEntity="IF !container.application.targets('1.3.5')\ENDIFentityClass"additionalOptions(false))
+         ELSE
+          * @ORM\OneToMany(targetEntity="IF !container.application.targets('1.3.5')\ENDIFentityClass", mappedBy="sourceName"additionalOptions(false)outgoingMappingAdditions
+         ENDIF
+        joinDetails(true)
+         IF orderBy !== null && orderBy != ''
+          * @ORM\OrderBy({"orderBy" = "ASC"})
+         ENDIF
+        IF !container.application.targets('1.3.5')
+            IF !nullable
+                val aliasName = getRelationAliasName(true).toFirstLower
+                ' '* @Assert\NotNull(message="Choosing at least one of the aliasName.formatForDisplay is required.")
+            ENDIF
+            IF minTarget > 0 && maxTarget > 0
+                ' '* @Assert\Count(min="minTarget", max="maxTarget")
+            ENDIF
+            ' '* @Assert\Valid()
+        ENDIF
+         * @var IF !container.application.targets('1.3.5')\ENDIFentityClass[] $targetName.
          */
-        protected $«targetName» = null;
-        «/* this last line is on purpose */»
+        protected $targetName = null;
+        /* this last line is on purpose */
     '''
 
-    def private dispatch outgoingMappingDescription(OneToManyRelationship it, String sourceName, String targetName) '''One «sourceName» [«source.name.formatForDisplay»] has many «targetName» [«target.nameMultiple.formatForDisplay»] (INVERSE SIDE)'''
+    def private dispatch outgoingMappingDescription(OneToManyRelationship it, String sourceName, String targetName) '''One sourceName [source.name.formatForDisplay] has many targetName [target.nameMultiple.formatForDisplay] (INVERSE SIDE)'''
 
     def private dispatch outgoing(ManyToManyRelationship it, String sourceName, String targetName, String entityClass) '''
         /**
-         * «IF bidirectional»Bi«ELSE»Uni«ENDIF»directional - «outgoingMappingDescription(sourceName, targetName)».
+         * IF bidirectionalBiELSEUniENDIFdirectional - outgoingMappingDescription(sourceName, targetName).
          *
-         * @ORM\ManyToMany(targetEntity="«IF !container.application.targets('1.3.5')»\«ENDIF»«entityClass»"«IF bidirectional», inversedBy="«sourceName»"«ENDIF»«additionalOptions(false)»«outgoingMappingAdditions»)
-        «joinDetails(true)»
-         «IF orderBy !== null && orderBy != ''»
-          * @ORM\OrderBy({"«orderBy»" = "ASC"})
-         «ENDIF»
-        «IF !container.application.targets('1.3.5')»
-            «IF !nullable»
-                «val aliasName = getRelationAliasName(true).toFirstLower»
-                «' '»* @Assert\NotNull(message="Choosing at least one of the «aliasName.formatForDisplay» is required.")
-            «ENDIF»
-            «IF minTarget > 0 && maxTarget > 0»
-                «' '»* @Assert\Count(min="«minTarget»", max="«maxTarget»")
-            «ENDIF»
-            «' '»* @Assert\Valid()
-        «ENDIF»
-         * @var «IF !container.application.targets('1.3.5')»\«ENDIF»«entityClass»[] $«targetName».
+         * @ORM\ManyToMany(targetEntity="IF !container.application.targets('1.3.5')\ENDIFentityClass"IF bidirectional, inversedBy="sourceName"ENDIFadditionalOptions(false)outgoingMappingAdditions)
+        joinDetails(true)
+         IF orderBy !== null && orderBy != ''
+          * @ORM\OrderBy({"orderBy" = "ASC"})
+         ENDIF
+        IF !container.application.targets('1.3.5')
+            IF !nullable
+                val aliasName = getRelationAliasName(true).toFirstLower
+                ' '* @Assert\NotNull(message="Choosing at least one of the aliasName.formatForDisplay is required.")
+            ENDIF
+            IF minTarget > 0 && maxTarget > 0
+                ' '* @Assert\Count(min="minTarget", max="maxTarget")
+            ENDIF
+            ' '* @Assert\Valid()
+        ENDIF
+         * @var IF !container.application.targets('1.3.5')\ENDIFentityClass[] $targetName.
          */
-        protected $«targetName» = null;
+        protected $targetName = null;
     '''
 
-    def private dispatch outgoingMappingDescription(ManyToManyRelationship it, String sourceName, String targetName) '''Many «sourceName» [«source.nameMultiple.formatForDisplay»] have many «targetName» [«target.nameMultiple.formatForDisplay»] (OWNING SIDE)'''
+    def private dispatch outgoingMappingDescription(ManyToManyRelationship it, String sourceName, String targetName) '''Many sourceName [source.nameMultiple.formatForDisplay] have many targetName [target.nameMultiple.formatForDisplay] (OWNING SIDE)'''
 
 
     def private joinDetails(JoinRelationship it, Boolean useTarget) {
@@ -270,31 +270,31 @@ class Association {
         val joinColumnsForeign = { if (useTarget) getTargetFields else getSourceFields }
         val foreignTableName = fullJoinTableName(useTarget, joinedEntityForeign)
         if (joinColumnsForeign.containsDefaultIdField(joinedEntityForeign) && joinColumnsLocal.containsDefaultIdField(joinedEntityLocal)
-           && !unique && nullable && onDelete == '') ''' * @ORM\JoinTable(name="«foreignTableName»")'''
-        else ''' * @ORM\JoinTable(name="«foreignTableName»",
-«joinTableDetails(useTarget)»
+           && !unique && nullable && onDelete == '') ''' * @ORM\JoinTable(name="foreignTableName")'''
+        else ''' * @ORM\JoinTable(name="foreignTableName",
+joinTableDetails(useTarget)
  * )'''
     }
 
     def private joinTableDetails(JoinRelationship it, Boolean useTarget) '''
-        «val joinedEntityLocal = { if (useTarget) source else target }»
-        «val joinedEntityForeign = { if (useTarget) target else source }»
-        «val joinColumnsLocal = { if (useTarget) getSourceFields else getTargetFields }»
-        «val joinColumnsForeign = { if (useTarget) getTargetFields else getSourceFields }»
-        «IF (joinColumnsForeign.size > 1)»«joinColumnsMultiple(useTarget, joinedEntityLocal, joinColumnsLocal)»
-        «ELSE»«joinColumnsSingle(useTarget, joinedEntityLocal, joinColumnsLocal)»
-        «ENDIF»
-        «IF (joinColumnsForeign.size > 1)» *      inverseJoinColumns={«FOR joinColumnForeign : joinColumnsForeign SEPARATOR ', '»«joinColumn(joinColumnForeign, joinedEntityForeign.getFirstPrimaryKey.name.formatForDB, useTarget)»«ENDFOR»}
-        «ELSE» *      inverseJoinColumns={«joinColumn(joinColumnsForeign.head, joinedEntityForeign.getFirstPrimaryKey.name.formatForDB, useTarget)»}
-        «ENDIF»
+        val joinedEntityLocal = { if (useTarget) source else target }
+        val joinedEntityForeign = { if (useTarget) target else source }
+        val joinColumnsLocal = { if (useTarget) getSourceFields else getTargetFields }
+        val joinColumnsForeign = { if (useTarget) getTargetFields else getSourceFields }
+        IF (joinColumnsForeign.size > 1)joinColumnsMultiple(useTarget, joinedEntityLocal, joinColumnsLocal)
+        ELSEjoinColumnsSingle(useTarget, joinedEntityLocal, joinColumnsLocal)
+        ENDIF
+        IF (joinColumnsForeign.size > 1) *      inverseJoinColumns={FOR joinColumnForeign : joinColumnsForeign SEPARATOR ', 'joinColumn(joinColumnForeign, joinedEntityForeign.getFirstPrimaryKey.name.formatForDB, useTarget)ENDFOR}
+        ELSE *      inverseJoinColumns={joinColumn(joinColumnsForeign.head, joinedEntityForeign.getFirstPrimaryKey.name.formatForDB, useTarget)}
+        ENDIF
     '''
 
-    def private joinColumnsMultiple(JoinRelationship it, Boolean useTarget, Entity joinedEntityLocal, String[] joinColumnsLocal) ''' *      joinColumns={«FOR joinColumnLocal : joinColumnsLocal SEPARATOR ', '»«joinColumn(joinColumnLocal, joinedEntityLocal.getFirstPrimaryKey.name.formatForDB, !useTarget)»«ENDFOR»},'''
+    def private joinColumnsMultiple(JoinRelationship it, Boolean useTarget, Entity joinedEntityLocal, String[] joinColumnsLocal) ''' *      joinColumns={FOR joinColumnLocal : joinColumnsLocal SEPARATOR ', 'joinColumn(joinColumnLocal, joinedEntityLocal.getFirstPrimaryKey.name.formatForDB, !useTarget)ENDFOR},'''
 
-    def private joinColumnsSingle(JoinRelationship it, Boolean useTarget, Entity joinedEntityLocal, String[] joinColumnsLocal) ''' *      joinColumns={«joinColumn(joinColumnsLocal.head, joinedEntityLocal.getFirstPrimaryKey.name.formatForDB, !useTarget)»},'''
+    def private joinColumnsSingle(JoinRelationship it, Boolean useTarget, Entity joinedEntityLocal, String[] joinColumnsLocal) ''' *      joinColumns={joinColumn(joinColumnsLocal.head, joinedEntityLocal.getFirstPrimaryKey.name.formatForDB, !useTarget)},'''
 
     def private joinColumn(JoinRelationship it, String columnName, String referencedColumnName, Boolean useTarget) '''
-        @ORM\JoinColumn(name="«joinColumnName(columnName, useTarget)»", referencedColumnName="«referencedColumnName»" «IF unique», unique=true«ENDIF»«IF !nullable», nullable=false«ENDIF»«IF onDelete != ''», onDelete="«onDelete»"«ENDIF»)'''
+        @ORM\JoinColumn(name="joinColumnName(columnName, useTarget)", referencedColumnName="referencedColumnName" IF unique, unique=trueENDIFIF !nullable, nullable=falseENDIFIF onDelete != '', onDelete="onDelete"ENDIF)'''
 
     def private joinColumnName(JoinRelationship it, String columnName, Boolean useTarget) {
         switch it {
@@ -304,14 +304,14 @@ class Association {
         //(if (useTarget) target else source).name.formatForDB + '_' + columnName //$NON-NLS-1$
     }
 
-    def private additionalOptions(JoinRelationship it, Boolean useReverse) '''«cascadeOptions(useReverse)»«fetchTypeTag»'''
+    def private additionalOptions(JoinRelationship it, Boolean useReverse) '''cascadeOptions(useReverse)fetchTypeTag'''
     def private cascadeOptions(JoinRelationship it, Boolean useReverse) {
         val cascadeProperty = { if (useReverse) cascadeReverse else cascade }
         if (cascadeProperty == CascadeType::NONE) ''
-        else ''', cascade={«cascadeOptionsImpl(useReverse)»}'''
+        else ''', cascade={cascadeOptionsImpl(useReverse)}'''
     }
 
-    def private fetchTypeTag(JoinRelationship it) { if (fetchType != RelationFetchType::LAZY) ''', fetch="«fetchType.literal»"''' }
+    def private fetchTypeTag(JoinRelationship it) { if (fetchType != RelationFetchType::LAZY) ''', fetch="fetchType.literal"''' }
 
     def private cascadeOptionsImpl(JoinRelationship it, Boolean useReverse) {
         val cascadeProperty = { if (useReverse) cascadeReverse else cascade }
@@ -334,94 +334,94 @@ class Association {
 
 
     def initCollections(Entity it) '''
-        «FOR relation : getOutgoingCollections»«relation.initCollection(true)»«ENDFOR»
-        «FOR relation : getIncomingCollections»«relation.initCollection(false)»«ENDFOR»
-        «IF attributable»
+        FOR relation : getOutgoingCollectionsrelation.initCollection(true)ENDFOR
+        FOR relation : getIncomingCollectionsrelation.initCollection(false)ENDFOR
+        IF attributable
             $this->attributes = new ArrayCollection();
-        «ENDIF»
-        «IF categorisable»
+        ENDIF
+        IF categorisable
             $this->categories = new ArrayCollection();
-        «ENDIF»
+        ENDIF
     '''
 
     def private initCollection(JoinRelationship it, Boolean outgoing) '''
-        «IF isManySide(outgoing)»
-            $this->«getRelationAliasName(outgoing)» = new ArrayCollection();
-        «ENDIF»
+        IF isManySide(outgoing)
+            $this->getRelationAliasName(outgoing) = new ArrayCollection();
+        ENDIF
     '''
 
 
     def relationAccessor(JoinRelationship it, Boolean useTarget) '''
-        «val relationAliasName = getRelationAliasName(useTarget)»
-        «relationAccessorImpl(useTarget, relationAliasName)»
+        val relationAliasName = getRelationAliasName(useTarget)
+        relationAccessorImpl(useTarget, relationAliasName)
     '''
 
     def private relationAccessorImpl(JoinRelationship it, Boolean useTarget, String aliasName) '''
-        «val entityClass = { (if (useTarget) target else source).entityClassName('', false) }»
-        «val nameSingle = { (if (useTarget) target else source).name }»
-        «val isMany = isManySide(useTarget)»
-        «val entityClassPrefix = (if (!container.application.targets('1.3.5')) '\\' else '')»
-        «IF isMany»
-            «fh.getterAndSetterMethods(it, aliasName, entityClassPrefix + entityClass, true, false, '', relationSetterCustomImpl(useTarget, aliasName))»
-            «relationAccessorAdditions(useTarget, aliasName, nameSingle)»
-        «ELSE»
-            «fh.getterAndSetterMethods(it, aliasName, entityClassPrefix + entityClass, false, true, 'null', relationSetterCustomImpl(useTarget, aliasName))»
-        «ENDIF»
-        «IF isMany»
-            «addMethod(useTarget, isMany, aliasName, nameSingle, entityClass)»
-            «removeMethod(useTarget, isMany, aliasName, nameSingle, entityClass)»
-        «ENDIF»
+        val entityClass = { (if (useTarget) target else source).entityClassName('', false) }
+        val nameSingle = { (if (useTarget) target else source).name }
+        val isMany = isManySide(useTarget)
+        val entityClassPrefix = (if (!container.application.targets('1.3.5')) '\\' else '')
+        IF isMany
+            fh.getterAndSetterMethods(it, aliasName, entityClassPrefix + entityClass, true, false, '', relationSetterCustomImpl(useTarget, aliasName))
+            relationAccessorAdditions(useTarget, aliasName, nameSingle)
+        ELSE
+            fh.getterAndSetterMethods(it, aliasName, entityClassPrefix + entityClass, false, true, 'null', relationSetterCustomImpl(useTarget, aliasName))
+        ENDIF
+        IF isMany
+            addMethod(useTarget, isMany, aliasName, nameSingle, entityClass)
+            removeMethod(useTarget, isMany, aliasName, nameSingle, entityClass)
+        ENDIF
     '''
 
     def private relationSetterCustomImpl(JoinRelationship it, Boolean useTarget, String aliasName) '''
-        «val otherIsMany = isManySide(useTarget)»
-        «IF otherIsMany»
-            «val nameSingle = { (if (useTarget) target else source).name + 'Single' }»
-            foreach ($«aliasName» as $«nameSingle») {
-                $this->add«aliasName.toFirstUpper»($«nameSingle»);
+        val otherIsMany = isManySide(useTarget)
+        IF otherIsMany
+            val nameSingle = { (if (useTarget) target else source).name + 'Single' }
+            foreach ($aliasName as $nameSingle) {
+                $this->addaliasName.toFirstUpper($nameSingle);
             }
-        «ELSE»
-            $this->«aliasName.formatForCode» = $«aliasName»;
-            «val generateInverseCalls = bidirectional && ((!isManyToMany && useTarget) || (isManyToMany && !useTarget))»
-            «IF generateInverseCalls»
-                «val ownAliasName = getRelationAliasName(!useTarget).toFirstUpper»
-                $«aliasName»->set«ownAliasName»($this);
-            «ENDIF»
-        «ENDIF»
+        ELSE
+            $this->aliasName.formatForCode = $aliasName;
+            val generateInverseCalls = bidirectional && ((!isManyToMany && useTarget) || (isManyToMany && !useTarget))
+            IF generateInverseCalls
+                val ownAliasName = getRelationAliasName(!useTarget).toFirstUpper
+                $aliasName->setownAliasName($this);
+            ENDIF
+        ENDIF
     '''
 
     def private dispatch relationAccessorAdditions(JoinRelationship it, Boolean useTarget, String aliasName, String singleName) '''
     '''
 
     def private dispatch relationAccessorAdditions(OneToManyRelationship it, Boolean useTarget, String aliasName, String singleName) '''
-        «IF !useTarget && indexBy !== null && indexBy != ''»
+        IF !useTarget && indexBy !== null && indexBy != ''
             /**
-             * Returns an instance of «source.entityClassName('', false)» from the list of «getRelationAliasName(useTarget)» by its given «indexBy.formatForDisplay» index.
+             * Returns an instance of source.entityClassName('', false) from the list of getRelationAliasName(useTarget) by its given indexBy.formatForDisplay index.
              *
-             * @param «source.entityClassName('', false)» $«indexBy.formatForCode».
+             * @param source.entityClassName('', false) $indexBy.formatForCode.
              */
-            public function get«singleName.formatForCodeCapital»($«indexBy.formatForCode»)
+            public function getsingleName.formatForCodeCapital($indexBy.formatForCode)
             {
-                if (!isset($this->«aliasName.formatForCode»[$«indexBy.formatForCode»])) {
-                    throw new \InvalidArgumentException("«indexBy.formatForDisplayCapital» is not available on this list of «aliasName.formatForDisplay».");
+                if (!isset($this->aliasName.formatForCode[$indexBy.formatForCode])) {
+                    throw new \InvalidArgumentException("indexBy.formatForDisplayCapital is not available on this list of aliasName.formatForDisplay.");
                 }
 
-                return $this->«aliasName.formatForCode»[$«indexBy.formatForCode»];
+                return $this->aliasName.formatForCode[$indexBy.formatForCode];
             }
-            «/* this last line is on purpose */»
-        «ENDIF»
+            /* this last line is on purpose */
+        ENDIF
     '''
 
     def private addMethod(JoinRelationship it, Boolean useTarget, Boolean selfIsMany, String name, String nameSingle, String type) '''
         /**
-         * Adds an instance of «IF !container.application.targets('1.3.5')»\«ENDIF»«type» to the list of «name.formatForDisplay».
+         * Adds an instance of IF !container.application.targets('1.3.5')\ENDIFtype to the list of name.formatForDisplay.
          *
-         * @param «addParameters(useTarget, nameSingle, type)» The instance to be added to the collection.
+         * @param addParameters(useTarget, nameSingle, type) The instance to be added to the collection.
          *
          * @return void
          */
-        «addMethodImpl(useTarget, selfIsMany, name, nameSingle, type)»
-        «/* this last line is on purpose */»
+        addMethodImpl(useTarget, selfIsMany, name, nameSingle, type)
+        /* this last line is on purpose */
     '''
 
     def private isManyToMany(JoinRelationship it) {
@@ -432,109 +432,109 @@ class Association {
     }
 
     def private dispatch addParameters(JoinRelationship it, Boolean useTarget, String name, String type) '''
-        «IF !container.application.targets('1.3.5')»\«ENDIF»«type» $«name»'''
+        IF !container.application.targets('1.3.5')\ENDIFtype $name'''
     def private dispatch addParameters(OneToManyRelationship it, Boolean useTarget, String name, String type) '''
-        «IF !useTarget && !source.getAggregateFields.empty»
-            «val targetField = source.getAggregateFields.head.getAggregateTargetField»
-            «IF !container.application.targets('1.3.5')»\«ENDIF»«targetField.fieldTypeAsString» $«targetField.name.formatForCode»
-        «ELSE»«IF !container.application.targets('1.3.5')»\«ENDIF»«type» $«name»«ENDIF»'''
+        IF !useTarget && !source.getAggregateFields.empty
+            val targetField = source.getAggregateFields.head.getAggregateTargetField
+            IF !container.application.targets('1.3.5')\ENDIFtargetField.fieldTypeAsString $targetField.name.formatForCode
+        ELSEIF !container.application.targets('1.3.5')\ENDIFtype $nameENDIF'''
 
     def private addMethodSignature(JoinRelationship it, Boolean useTarget, String name, String nameSingle, String type) '''
-        public function add«name.toFirstUpper»(«addParameters(useTarget, nameSingle, type)»)'''
+        public function addname.toFirstUpper(addParameters(useTarget, nameSingle, type))'''
 
     def private addMethodImplDefault(JoinRelationship it, Boolean selfIsMany, Boolean useTarget, String name, String nameSingle, String type) '''
-        «addMethodSignature(useTarget, name, nameSingle, type)»
+        addMethodSignature(useTarget, name, nameSingle, type)
         {
-            $this->«name»«IF selfIsMany»->add(«ELSE» = «ENDIF»$«nameSingle»«IF selfIsMany»)«ENDIF»;
-            «addInverseCalls(useTarget, nameSingle)»
+            $this->nameIF selfIsMany->add(ELSE = ENDIF$nameSingleIF selfIsMany)ENDIF;
+            addInverseCalls(useTarget, nameSingle)
         }
     '''
     def private dispatch addMethodImpl(JoinRelationship it, Boolean selfIsMany, Boolean useTarget, String name, String nameSingle, String type) '''
-        «addMethodImplDefault(useTarget, selfIsMany, name, nameSingle, type)»
+        addMethodImplDefault(useTarget, selfIsMany, name, nameSingle, type)
     '''
     def private dispatch addMethodImpl(OneToManyRelationship it, Boolean selfIsMany, Boolean useTarget, String name, String nameSingle, String type) '''
-        «IF !useTarget && indexBy !== null && indexBy != ''»
-            «addMethodSignature(useTarget, name, nameSingle, type)»
+        IF !useTarget && indexBy !== null && indexBy != ''
+            addMethodSignature(useTarget, name, nameSingle, type)
             {
-                $this->«name»[$«nameSingle»->get«indexBy.formatForCodeCapital»()] = $«nameSingle»;
-                «addInverseCalls(useTarget, nameSingle)»
+                $this->name[$nameSingle->getindexBy.formatForCodeCapital()] = $nameSingle;
+                addInverseCalls(useTarget, nameSingle)
             }
-        «ELSEIF !useTarget && !source.getAggregateFields.empty»
-            «addMethodSignature(useTarget, name, nameSingle, type)»
+        ELSEIF !useTarget && !source.getAggregateFields.empty
+            addMethodSignature(useTarget, name, nameSingle, type)
             {
-                «val sourceField = source.getAggregateFields.head»
-                «val targetField = sourceField.getAggregateTargetField»
-                $«getRelationAliasName(true)» = new «target.entityClassName('', false)»($this, $«targetField.name.formatForCode»);
-                $this->«name»«IF selfIsMany»[]«ENDIF» = $«nameSingle»;
-                $this->«sourceField.name.formatForCode» += $«targetField.name.formatForCode»;
+                val sourceField = source.getAggregateFields.head
+                val targetField = sourceField.getAggregateTargetField
+                $getRelationAliasName(true) = new target.entityClassName('', false)($this, $targetField.name.formatForCode);
+                $this->nameIF selfIsMany[]ENDIF = $nameSingle;
+                $this->sourceField.name.formatForCode += $targetField.name.formatForCode;
 
-                return $«getRelationAliasName(true)»;
+                return $getRelationAliasName(true);
             }
 
             /**
              * Additional add function for internal use.
              *
-             * @param «targetField.fieldTypeAsString» $«targetField.name.formatForCode» Given instance to be used for aggregation.
+             * @param targetField.fieldTypeAsString $targetField.name.formatForCode Given instance to be used for aggregation.
              */
-            protected function add«targetField.name.formatForCodeCapital»Without«getRelationAliasName(true).formatForCodeCapital»($«targetField.name.formatForCode»)
+            protected function addtargetField.name.formatForCodeCapitalWithoutgetRelationAliasName(true).formatForCodeCapital($targetField.name.formatForCode)
             {
-                $this->«sourceField.name.formatForCode» += $«targetField.name.formatForCode»;
+                $this->sourceField.name.formatForCode += $targetField.name.formatForCode;
             }
-        «ELSE»
-            «addMethodImplDefault(useTarget, selfIsMany, name, nameSingle, type)»
-        «ENDIF»
+        ELSE
+            addMethodImplDefault(useTarget, selfIsMany, name, nameSingle, type)
+        ENDIF
     '''
     def private dispatch addMethodImpl(ManyToManyRelationship it, Boolean selfIsMany, Boolean useTarget, String name, String nameSingle, String type) '''
-        «IF !useTarget && indexBy !== null && indexBy != ''»
-            «addMethodSignature(useTarget, name, nameSingle, type)»
+        IF !useTarget && indexBy !== null && indexBy != ''
+            addMethodSignature(useTarget, name, nameSingle, type)
             {
-                $this->«name»[$«nameSingle»->get«indexBy.formatForCodeCapital»()] = $«nameSingle»;
-                «addInverseCalls(useTarget, nameSingle)»
+                $this->name[$nameSingle->getindexBy.formatForCodeCapital()] = $nameSingle;
+                addInverseCalls(useTarget, nameSingle)
             }
-        «ELSE»
-            «addMethodImplDefault(useTarget, selfIsMany, name, nameSingle, type)»
-        «ENDIF»
+        ELSE
+            addMethodImplDefault(useTarget, selfIsMany, name, nameSingle, type)
+        ENDIF
     '''
 
     def private addInverseCalls(JoinRelationship it, Boolean useTarget, String nameSingle) '''
-        «val generateInverseCalls = bidirectional && ((!isManyToMany && useTarget) || (isManyToMany && !useTarget))»
-        «IF generateInverseCalls»
-            «val ownAliasName = getRelationAliasName(!useTarget).toFirstUpper»
-            «val otherIsMany = isManySide(!useTarget)»
-            «IF otherIsMany»
-                $«nameSingle»->add«ownAliasName»($this);
-            «ELSE»
-                $«nameSingle»->set«ownAliasName»($this);
-            «ENDIF»
-        «ENDIF»
+        val generateInverseCalls = bidirectional && ((!isManyToMany && useTarget) || (isManyToMany && !useTarget))
+        IF generateInverseCalls
+            val ownAliasName = getRelationAliasName(!useTarget).toFirstUpper
+            val otherIsMany = isManySide(!useTarget)
+            IF otherIsMany
+                $nameSingle->addownAliasName($this);
+            ELSE
+                $nameSingle->setownAliasName($this);
+            ENDIF
+        ENDIF
     '''
 
     def private removeMethod(JoinRelationship it, Boolean useTarget, Boolean selfIsMany, String name, String nameSingle, String type) '''
         /**
-         * Removes an instance of «IF !container.application.targets('1.3.5')»\«ENDIF»«type» from the list of «name.formatForDisplay».
+         * Removes an instance of IF !container.application.targets('1.3.5')\ENDIFtype from the list of name.formatForDisplay.
          *
-         * @param «IF !container.application.targets('1.3.5')»\«ENDIF»«type» $«nameSingle» The instance to be removed from the collection.
+         * @param IF !container.application.targets('1.3.5')\ENDIFtype $nameSingle The instance to be removed from the collection.
          *
          * @return void
          */
-        public function remove«name.toFirstUpper»(«IF !container.application.targets('1.3.5')»\«ENDIF»«type» $«nameSingle»)
+        public function removename.toFirstUpper(IF !container.application.targets('1.3.5')\ENDIFtype $nameSingle)
         {
-            «IF selfIsMany»
-                $this->«name»->removeElement($«nameSingle»);
-            «ELSE»
-                $this->«name» = null;
-            «ENDIF»
-            «val generateInverseCalls = bidirectional && ((!isManyToMany && useTarget) || (isManyToMany && !useTarget))»
-            «IF generateInverseCalls»
-                «val ownAliasName = getRelationAliasName(!useTarget).toFirstUpper»
-                «val otherIsMany = isManySide(!useTarget)»
-                «IF otherIsMany»
-                    $«nameSingle»->remove«ownAliasName»($this);
-                «ELSE»
-                    $«nameSingle»->set«ownAliasName»(null);
-                «ENDIF»
-            «ENDIF»
+            IF selfIsMany
+                $this->name->removeElement($nameSingle);
+            ELSE
+                $this->name = null;
+            ENDIF
+            val generateInverseCalls = bidirectional && ((!isManyToMany && useTarget) || (isManyToMany && !useTarget))
+            IF generateInverseCalls
+                val ownAliasName = getRelationAliasName(!useTarget).toFirstUpper
+                val otherIsMany = isManySide(!useTarget)
+                IF otherIsMany
+                    $nameSingle->removeownAliasName($this);
+                ELSE
+                    $nameSingle->setownAliasName(null);
+                ENDIF
+            ENDIF
         }
-        «/* this last line is on purpose */»
+        /* this last line is on purpose */
     '''
 }

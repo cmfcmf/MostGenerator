@@ -31,78 +31,78 @@ class ControllerUtil {
     }
 
     def private controllerFunctionsBaseImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Util\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Util\Base;
 
-            «IF hasUploads»
+            IF hasUploads
                 use Symfony\Component\Filesystem\Filesystem;
                 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
-            «ENDIF»
+            ENDIF
             use DataUtil;
-            «IF hasUploads»
+            IF hasUploads
                 use FileUtil;
-            «ENDIF»
-            «IF hasGeographical»
+            ENDIF
+            IF hasGeographical
                 use UserUtil;
-            «ENDIF»
+            ENDIF
             use Zikula_AbstractBase;
             use Zikula_Request_Http;
-            «IF hasGeographical»
+            IF hasGeographical
                 use ZLanguage;
-            «ENDIF»
+            ENDIF
 
-        «ENDIF»
+        ENDIF
         /**
          * Utility base class for controller helper methods.
          */
-        class «IF targets('1.3.5')»«appName»_Util_Base_Controller«ELSE»ControllerUtil«ENDIF» extends Zikula_AbstractBase
+        class IF targets('1.3.5')appName_Util_Base_ControllerELSEControllerUtilENDIF extends Zikula_AbstractBase
         {
-            «getObjectTypes»
+            getObjectTypes
 
-            «getDefaultObjectType»
+            getDefaultObjectType
 
-            «hasCompositeKeys»
+            hasCompositeKeys
 
-            «retrieveIdentifier»
+            retrieveIdentifier
 
-            «isValidIdentifier»
+            isValidIdentifier
 
-            «formatPermalink»
-            «IF hasUploads»
+            formatPermalink
+            IF hasUploads
 
-                «getFileBaseFolder»
+                getFileBaseFolder
 
-                «checkAndCreateAllUploadFolders»
+                checkAndCreateAllUploadFolders
 
-                «checkAndCreateUploadFolder»
-            «ENDIF»
-            «IF hasGeographical»
+                checkAndCreateUploadFolder
+            ENDIF
+            IF hasGeographical
 
-                «performGeoCoding»
-            «ENDIF»
+                performGeoCoding
+            ENDIF
         }
     '''
 
     def private getObjectTypes(Application it) '''
         /**
-         * Returns an array of all allowed object types in «appName».
+         * Returns an array of all allowed object types in appName.
          *
-         * @param string $context Usage context (allowed values: controllerAction, api«IF !targets('1.3.5')», helper«ENDIF», actionHandler, block, contentType, util).
+         * @param string $context Usage context (allowed values: controllerAction, apiIF !targets('1.3.5'), helperENDIF, actionHandler, block, contentType, util).
          * @param array  $args    Additional arguments.
          *
          * @return array List of allowed object types.
          */
         public function getObjectTypes($context = '', $args = array())
         {
-            if (!in_array($context, array('controllerAction', 'api'«IF !targets('1.3.5')», 'helper'«ENDIF», 'actionHandler', 'block', 'contentType', 'util'))) {
+            if (!in_array($context, array('controllerAction', 'api'IF !targets('1.3.5'), 'helper'ENDIF, 'actionHandler', 'block', 'contentType', 'util'))) {
                 $context = 'controllerAction';
             }
 
             $allowedObjectTypes = array();
-            «FOR entity : getAllEntities»
-                $allowedObjectTypes[] = '«entity.name.formatForCode»';
-            «ENDFOR»
+            FOR entity : getAllEntities
+                $allowedObjectTypes[] = 'entity.name.formatForCode';
+            ENDFOR
 
             return $allowedObjectTypes;
         }
@@ -110,20 +110,20 @@ class ControllerUtil {
 
     def private getDefaultObjectType(Application it) '''
         /**
-         * Returns the default object type in «appName».
+         * Returns the default object type in appName.
          *
-         * @param string $context Usage context (allowed values: controllerAction, api«IF !targets('1.3.5')», helper«ENDIF», actionHandler, block, contentType, util).
+         * @param string $context Usage context (allowed values: controllerAction, apiIF !targets('1.3.5'), helperENDIF, actionHandler, block, contentType, util).
          * @param array  $args    Additional arguments.
          *
          * @return string The name of the default object type.
          */
         public function getDefaultObjectType($context = '', $args = array())
         {
-            if (!in_array($context, array('controllerAction', 'api'«IF !targets('1.3.5')», 'helper'«ENDIF», 'actionHandler', 'block', 'contentType', 'util'))) {
+            if (!in_array($context, array('controllerAction', 'api'IF !targets('1.3.5'), 'helper'ENDIF, 'actionHandler', 'block', 'contentType', 'util'))) {
                 $context = 'controllerAction';
             }
 
-            $defaultObjectType = '«getLeadingEntity.name.formatForCode»';
+            $defaultObjectType = 'getLeadingEntity.name.formatForCode';
 
             return $defaultObjectType;
         }
@@ -140,10 +140,10 @@ class ControllerUtil {
         public function hasCompositeKeys($objectType)
         {
             switch ($objectType) {
-                «FOR entity : getAllEntities»
-                    case '«entity.name.formatForCode»':
-                        return «entity.hasCompositeKeys.displayBool»;
-                «ENDFOR»
+                FOR entity : getAllEntities
+                    case 'entity.name.formatForCode':
+                        return entity.hasCompositeKeys.displayBool;
+                ENDFOR
                     default:
                         return false;
             }
@@ -164,28 +164,28 @@ class ControllerUtil {
         public function retrieveIdentifier(Zikula_Request_Http $request, array $args, $objectType = '', array $idFields)
         {
             $idValues = array();
-            «IF !targets('1.3.5')»
+            IF !targets('1.3.5')
                 $routeParams = $request->get('_route_params', array());
-            «ENDIF»
+            ENDIF
             foreach ($idFields as $idField) {
                 $defaultValue = isset($args[$idField]) && is_numeric($args[$idField]) ? $args[$idField] : 0;
                 if ($this->hasCompositeKeys($objectType)) {
                     // composite key may be alphanumeric
-                    «IF !targets('1.3.5')»
+                    IF !targets('1.3.5')
                     if (array_key_exists($idField, $routeParams)) {
                         $id = !empty($routeParams[$idField]) ? $routeParams[$idField] : $defaultValue;
-                    } else«ENDIF»if ($request->query->has($idField)) {
-                        $id = $request->query->filter($idField, $defaultValue«IF !targets('1.3.5')», false«ENDIF»);
+                    } elseENDIFif ($request->query->has($idField)) {
+                        $id = $request->query->filter($idField, $defaultValueIF !targets('1.3.5'), falseENDIF);
                     } else {
                         $id = $defaultValue;
                     }
                 } else {
                     // single identifier
-                    «IF !targets('1.3.5')»
+                    IF !targets('1.3.5')
                     if (array_key_exists($idField, $routeParams)) {
                         $id = (int) !empty($routeParams[$idField]) ? $routeParams[$idField] : $defaultValue;
-                    } else«ENDIF»if ($request->query->has($idField)) {
-                        $id = (int) $request->query->filter($idField, $defaultValue, «IF !targets('1.3.5')»false, «ENDIF»FILTER_VALIDATE_INT);
+                    } elseENDIFif ($request->query->has($idField)) {
+                        $id = (int) $request->query->filter($idField, $defaultValue, IF !targets('1.3.5')false, ENDIFFILTER_VALIDATE_INT);
                     } else {
                         $id = $defaultValue;
                     }
@@ -194,11 +194,11 @@ class ControllerUtil {
                 // fallback if id has not been found yet
                 if (!$id && $idField != 'id' && count($idFields) == 1) {
                     $defaultValue = isset($args['id']) && is_numeric($args['id']) ? $args['id'] : 0;
-                    «IF !targets('1.3.5')»
+                    IF !targets('1.3.5')
                     if (array_key_exists('id', $routeParams)) {
                         $id = (int) !empty($routeParams['id']) ? $routeParams['id'] : $defaultValue;
-                    } else«ENDIF»if ($request->query->has('id')) {
-                        $id = (int) $request->query->filter('id', $defaultValue, «IF !targets('1.3.5')»false, «ENDIF»FILTER_VALIDATE_INT);
+                    } elseENDIFif ($request->query->has('id')) {
+                        $id = (int) $request->query->filter('id', $defaultValue, IF !targets('1.3.5')false, ENDIFFILTER_VALIDATE_INT);
                     } else {
                         $id = $defaultValue;
                     }
@@ -245,7 +245,7 @@ class ControllerUtil {
          */
         public function formatPermalink($name)
         {
-            $name = str_replace(array('ä', 'ö', 'ü', 'Ä', 'Ö', 'Ü', 'ß', '.', '?', '"', '/', ':', 'é', 'è', 'â'),
+            $name = str_replace(array('', '', '', '', '', '', '', '.', '?', '"', '/', ':', '', '', ''),
                                 array('ae', 'oe', 'ue', 'Ae', 'Oe', 'Ue', 'ss', '', '', '', '-', '-', 'e', 'e', 'a'),
                                 $name);
             $name = DataUtil::formatPermalink($name);
@@ -271,26 +271,26 @@ class ControllerUtil {
                 throw new Exception('Error! Invalid object type received.');
             }
 
-            $basePath = FileUtil::getDataDirectory() . '/«appName»/';
+            $basePath = FileUtil::getDataDirectory() . '/appName/';
 
             switch ($objectType) {
-                «FOR entity : getUploadEntities»
-                    «val uploadFields = entity.getUploadFieldsEntity»
-                    case '«entity.name.formatForCode»':
-                        «IF uploadFields.size > 1»
-                            $basePath .= '«entity.nameMultiple.formatForDB»/';
+                FOR entity : getUploadEntities
+                    val uploadFields = entity.getUploadFieldsEntity
+                    case 'entity.name.formatForCode':
+                        IF uploadFields.size > 1
+                            $basePath .= 'entity.nameMultiple.formatForDB/';
                             switch ($fieldName) {
-                                «FOR uploadField : uploadFields»
-                                    case '«uploadField.name.formatForCode»':
-                                        $basePath .= '«uploadField.subFolderPathSegment»/';
+                                FOR uploadField : uploadFields
+                                    case 'uploadField.name.formatForCode':
+                                        $basePath .= 'uploadField.subFolderPathSegment/';
                                         break;
-                                «ENDFOR»
+                                ENDFOR
                             }
-                        «ELSE»
-                            $basePath .= '«entity.nameMultiple.formatForDB»/«uploadFields.head.subFolderPathSegment»/';
-                        «ENDIF»
+                        ELSE
+                            $basePath .= 'entity.nameMultiple.formatForDB/uploadFields.head.subFolderPathSegment/';
+                        ENDIF
                     break;
-                «ENDFOR»
+                ENDFOR
             }
 
             $result = DataUtil::formatForOS($basePath);
@@ -316,12 +316,12 @@ class ControllerUtil {
         public function checkAndCreateAllUploadFolders()
         {
             $result = true;
-            «FOR uploadEntity : getUploadEntities»
+            FOR uploadEntity : getUploadEntities
 
-                «FOR uploadField : uploadEntity.getUploadFieldsEntity»
-                    $result &= $this->checkAndCreateUploadFolder('«uploadField.entity.name.formatForCode»', '«uploadField.name.formatForCode»', '«uploadField.allowedExtensions»');
-                «ENDFOR»
-            «ENDFOR»
+                FOR uploadField : uploadEntity.getUploadFieldsEntity
+                    $result &= $this->checkAndCreateUploadFolder('uploadField.entity.name.formatForCode', 'uploadField.name.formatForCode', 'uploadField.allowedExtensions');
+                ENDFOR
+            ENDFOR
 
             return $result;
         }
@@ -341,7 +341,7 @@ class ControllerUtil {
         {
             $uploadPath = $this->getFileBaseFolder($objectType, $fieldName, true);
 
-            «IF targets('1.3.5')»
+            IF targets('1.3.5')
                 // Check if directory exist and try to create it if needed
                 if (!is_dir($uploadPath) && !FileUtil::mkdirs($uploadPath, 0777)) {
                     LogUtil::registerStatus($this->__f('The upload directory "%s" does not exist and could not be created. Try to create it yourself and make sure that this folder is accessible via the web and writable by the webserver.', array($uploadPath)));
@@ -356,7 +356,7 @@ class ControllerUtil {
 
                 // Write a htaccess file into the upload directory
                 $htaccessFilePath = $uploadPath . '/.htaccess';
-                $htaccessFileTemplate = '«rootFolder»/«appName»/docs/htaccessTemplate';
+                $htaccessFileTemplate = 'rootFolder/appName/docs/htaccessTemplate';
                 if (!file_exists($htaccessFilePath) && file_exists($htaccessFileTemplate)) {
                     $extensions = str_replace(',', '|', str_replace(' ', '', $allowedExtensions));
                     $htaccessContent = str_replace('__EXTENSIONS__', $extensions, FileUtil::readFile($htaccessFileTemplate));
@@ -365,7 +365,7 @@ class ControllerUtil {
                         return false;
                     }
                 }
-            «ELSE»
+            ELSE
                 $session = $this->serviceManager->get('session');
                 $logger = $this->serviceManager->get('logger');
 
@@ -375,20 +375,20 @@ class ControllerUtil {
                     // Check if directory exist and try to create it if needed
                     if (!$fs->exists($uploadPath) && !$fs->mkdir($uploadPath, 0777)) {
                         $session->getFlashBag()->add('error', $this->__f('The upload directory "%s" does not exist and could not be created. Try to create it yourself and make sure that this folder is accessible via the web and writable by the webserver.', array($uploadPath)));
-                        $logger->error('{app}: The upload directory {directory} does not exist and could not be created.', array('app' => '«appName»', 'directory' => $uploadPath));
+                        $logger->error('{app}: The upload directory {directory} does not exist and could not be created.', array('app' => 'appName', 'directory' => $uploadPath));
                         return false;
                     }
 
                     // Check if directory is writable and change permissions if needed
                     if (!is_writable($uploadPath) && !$fs->chmod($uploadPath, 0777)) {
                         $session->getFlashBag()->add('warning', $this->__f('Warning! The upload directory at "%s" exists but is not writable by the webserver.', array($uploadPath)));
-                        $logger->error('{app}: The upload directory {directory} exists but is not writable by the webserver.', array('app' => '«appName»', 'directory' => $uploadPath));
+                        $logger->error('{app}: The upload directory {directory} exists but is not writable by the webserver.', array('app' => 'appName', 'directory' => $uploadPath));
                         return false;
                     }
 
                     // Write a htaccess file into the upload directory
                     $htaccessFilePath = $uploadPath . '/.htaccess';
-                    $htaccessFileTemplate = '«rootFolder»/«getAppDocPath»htaccessTemplate';
+                    $htaccessFileTemplate = 'rootFolder/getAppDocPathhtaccessTemplate';
                     if (!$fs->exists($htaccessFilePath) && $fs->exists($htaccessFileTemplate)) {
                         $extensions = str_replace(',', '|', str_replace(' ', '', $allowedExtensions));
                         $htaccessContent = str_replace('__EXTENSIONS__', $extensions, file_get_contents(DataUtil::formatForOS($htaccessFileTemplate, false)));
@@ -396,9 +396,9 @@ class ControllerUtil {
                     }
                 } catch (IOExceptionInterface $e) {
                     $session->getFlashBag()->add('error', $this->__f('An error occured during creation of the .htaccess file in directory "%s".', array($e->getPath())));
-                    $logger->error('{app}: An error occured during creation of the .htaccess file in directory {directory}.', array('app' => '«appName»', 'directory' => $uploadPath));
+                    $logger->error('{app}: An error occured during creation of the .htaccess file in directory {directory}.', array('app' => 'appName', 'directory' => $uploadPath));
                 }
-            «ENDIF»
+            ENDIF
 
             return true;
         }
@@ -410,7 +410,7 @@ class ControllerUtil {
          * To use this please customise it to your needs in the concrete subclass.
          * Also you have to call this method in a PrePersist-Handler of the
          * corresponding entity class.
-         * There is also a method on JS level available in «getAppJsPath»«appName»«IF targets('1.3.5')»_e«ELSE».E«ENDIF»ditFunctions.js.
+         * There is also a method on JS level available in getAppJsPathappNameIF targets('1.3.5')_eELSE.EENDIFditFunctions.js.
          *
          * @param string $address The address input string.
          *
@@ -425,7 +425,7 @@ class ControllerUtil {
             $json = '';
 
             // we can either use Snoopy if available
-            //require_once('«rootFolder»/«IF targets('1.3.5')»«appName»/lib/«ENDIF»vendor/Snoopy/Snoopy.class.php');
+            //require_once('rootFolder/IF targets('1.3.5')appName/lib/ENDIFvendor/Snoopy/Snoopy.class.php');
             //$snoopy = new Snoopy();
             //$snoopy->fetch($url);
             //$json = $snoopy->results;
@@ -459,10 +459,10 @@ class ControllerUtil {
                     $result['latitude'] = str_replace(',', '.', $location->lat);
                     $result['longitude'] = str_replace(',', '.', $location->lng);
                 } else {
-                    «IF !targets('1.3.5')»
+                    IF !targets('1.3.5')
                         $logger = $this->serviceManager->get('logger');
-                        $logger->warning('{app}: User {user} tried geocoding for address "{address}", but failed.', array('app' => '«appName»', 'user' => UserUtil::getVar('uname'), 'field' => $field, 'address' => $address));
-                    «ENDIF»
+                        $logger->warning('{app}: User {user} tried geocoding for address "{address}", but failed.', array('app' => 'appName', 'user' => UserUtil::getVar('uname'), 'field' => $field, 'address' => $address));
+                    ENDIF
                 }
             }
 
@@ -471,20 +471,20 @@ class ControllerUtil {
     '''
 
     def private controllerFunctionsImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Util;
+        IF !targets('1.3.5')
+            namespace appNamespace\Util;
 
-            use «appNamespace»\Util\Base\ControllerUtil as BaseControllerUtil;
+            use appNamespace\Util\Base\ControllerUtil as BaseControllerUtil;
 
-        «ENDIF»
+        ENDIF
         /**
          * Utility implementation class for controller helper methods.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Util_Controller extends «appName»_Util_Base_Controller
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Util_Controller extends appName_Util_Base_Controller
+        ELSE
         class ControllerUtil extends BaseControllerUtil
-        «ENDIF»
+        ENDIF
         {
             // feel free to add your own convenience methods here
         }

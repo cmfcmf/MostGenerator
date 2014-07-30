@@ -21,7 +21,7 @@ class GetListEntry {
 
     def private getListEntryImpl(Application it) '''
         /**
-         * The «appName.formatForDB»GetListEntry modifier displays the name
+         * The appName.formatForDBGetListEntry modifier displays the name
          * or names for a given list item.
          *
          * @param string $value      The dropdown value to process.
@@ -31,18 +31,18 @@ class GetListEntry {
          *
          * @return string List item name.
          */
-        function smarty_modifier_«appName.formatForDB»GetListEntry($value, $objectType = '', $fieldName = '', $delimiter = ', ')
+        function smarty_modifier_appName.formatForDBGetListEntry($value, $objectType = '', $fieldName = '', $delimiter = ', ')
         {
             if (empty($value) || empty($objectType) || empty($fieldName)) {
                 return $value;
             }
 
             $serviceManager = ServiceUtil::getManager();
-            «IF targets('1.3.5')»
-                $helper = new «appName»_Util_ListEntries($serviceManager);
-            «ELSE»
-                $helper = $serviceManager->get('«appName.formatForDB».listentries_helper');
-            «ENDIF»
+            IF targets('1.3.5')
+                $helper = new appName_Util_ListEntries($serviceManager);
+            ELSE
+                $helper = $serviceManager->get('appName.formatForDB.listentries_helper');
+            ENDIF
 
             return $helper->resolve($value, $objectType, $fieldName, $delimiter);
         }

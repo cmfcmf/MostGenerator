@@ -37,32 +37,32 @@ class Custom {
     }
 
     def private customView(CustomAction it, Application app, Controller controller) '''
-        {* purpose of this template: show output of «name.formatForDisplay» action in «controller.formattedName» area *}
-        {include file='«IF app.targets('1.3.5')»«controller.formattedName»«ELSE»«controller.formattedName.toFirstUpper»«ENDIF»/header.tpl'}
-        <div class="«app.appName.toLowerCase»-«name.formatForDB» «app.appName.toLowerCase»-«name.formatForDB»">
-            {gt text='«name.formatForDisplayCapital»' assign='templateTitle'}
+        {* purpose of this template: show output of name.formatForDisplay action in controller.formattedName area *}
+        {include file='IF app.targets('1.3.5')controller.formattedNameELSEcontroller.formattedName.toFirstUpperENDIF/header.tpl'}
+        <div class="app.appName.toLowerCase-name.formatForDB app.appName.toLowerCase-name.formatForDB">
+            {gt text='name.formatForDisplayCapital' assign='templateTitle'}
             {pagesetvar name='title' value=$templateTitle}
-            «controller.templateHeader(name)»
+            controller.templateHeader(name)
 
-            <p>Please override this template by moving it from <em>/«app.rootFolder»/«app.appName»/«IF app.targets('1.3.5')»templates/«controller.formattedName»«ELSE»«app.getViewPath»«controller.formattedName.toFirstUpper»«ENDIF»/«name.formatForCode.toFirstLower».tpl</em> to either your <em>/themes/YourTheme/templates/modules/«app.appName»/«IF app.targets('1.3.5')»«controller.formattedName»«ELSE»«controller.formattedName.toFirstUpper»«ENDIF»/«name.formatForCode.toFirstLower».tpl</em> or <em>/config/templates/«app.appName»/«IF app.targets('1.3.5')»«controller.formattedName»«ELSE»«controller.formattedName.toFirstUpper»«ENDIF»/«name.formatForCode.toFirstLower».tpl</em>.</p>
+            <p>Please override this template by moving it from <em>/app.rootFolder/app.appName/IF app.targets('1.3.5')templates/controller.formattedNameELSEapp.getViewPathcontroller.formattedName.toFirstUpperENDIF/name.formatForCode.toFirstLower.tpl</em> to either your <em>/themes/YourTheme/templates/modules/app.appName/IF app.targets('1.3.5')controller.formattedNameELSEcontroller.formattedName.toFirstUpperENDIF/name.formatForCode.toFirstLower.tpl</em> or <em>/config/templates/app.appName/IF app.targets('1.3.5')controller.formattedNameELSEcontroller.formattedName.toFirstUpperENDIF/name.formatForCode.toFirstLower.tpl</em>.</p>
         </div>
-        {include file='«IF app.targets('1.3.5')»«controller.formattedName»«ELSE»«controller.formattedName.toFirstUpper»«ENDIF»/footer.tpl'}
+        {include file='IF app.targets('1.3.5')controller.formattedNameELSEcontroller.formattedName.toFirstUpperENDIF/footer.tpl'}
     '''
 
     def private templateHeader(Controller it, String actionName) {
         switch it {
             AdminController: '''
-                «IF container.application.targets('1.3.5')»
+                IF container.application.targets('1.3.5')
                     <div class="z-admin-content-pagetitle">
-                        {icon type='options' size='small' __alt='«actionName.formatForDisplayCapital»'}
+                        {icon type='options' size='small' __alt='actionName.formatForDisplayCapital'}
                         <h3>{$templateTitle}</h3>
                     </div>
-                «ELSE»
+                ELSE
                     <h3>
                         <span class="fa fa-square"></span>
                         {$templateTitle}
                     </h3>
-                «ENDIF»
+                ENDIF
             '''
             default: '''
                 <h2>{$templateTitle}</h2>

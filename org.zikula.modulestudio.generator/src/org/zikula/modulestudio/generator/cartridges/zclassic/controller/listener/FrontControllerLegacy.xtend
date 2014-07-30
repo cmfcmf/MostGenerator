@@ -17,11 +17,11 @@ class FrontControllerLegacy {
          */
         public static function preDispatch(Zikula_Event $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::preDispatch($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
     '''
 }

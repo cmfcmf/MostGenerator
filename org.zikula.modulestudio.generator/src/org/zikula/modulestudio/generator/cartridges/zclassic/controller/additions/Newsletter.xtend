@@ -35,27 +35,27 @@ class Newsletter {
     }
 
     def private newsletterClass(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\NewsletterPlugin;
+        IF !targets('1.3.5')
+            namespace appNamespace\NewsletterPlugin;
 
             use FormUtil;
             use ModUtil;
             use Newsletter_AbstractPlugin;
             use SecurityUtil;
             use ServiceUtil;
-        «ENDIF»
+        ENDIF
 
         /**
          * Newsletter plugin class.
          */
-        class «IF targets('1.3.5')»«appName»_NewsletterPlugin_ItemList«ELSE»ItemListPlugin«ENDIF» extends Newsletter_AbstractPlugin
+        class IF targets('1.3.5')appName_NewsletterPlugin_ItemListELSEItemListPluginENDIF extends Newsletter_AbstractPlugin
         {
-            «newsletterImpl»
+            newsletterImpl
         }
     '''
 
     def private newsletterImpl(Application it) '''
-        «val itemDesc = getLeadingEntity.nameMultiple.formatForDisplay»
+        val itemDesc = getLeadingEntity.nameMultiple.formatForDisplay
         /**
          * Returns a title being used in the newsletter. Should be short.
          *
@@ -63,7 +63,7 @@ class Newsletter {
          */
         public function getTitle()
         {
-            return $this->__('Latest «IF getAllEntities.size < 2»«itemDesc»«ELSE»«appName» items«ENDIF»');
+            return $this->__('Latest IF getAllEntities.size < 2itemDescELSEappName itemsENDIF');
         }
 
         /**
@@ -73,7 +73,7 @@ class Newsletter {
          */
         public function getDisplayName()
         {
-            return $this->__('List of «itemDesc»«IF getAllEntities.size > 1» and other «appName» items«ENDIF»');
+            return $this->__('List of itemDescIF getAllEntities.size > 1 and other appName itemsENDIF');
         }
 
         /**
@@ -83,7 +83,7 @@ class Newsletter {
          */
         public function getDescription()
         {
-            return $this->__('This plugin shows a list of «itemDesc»«IF getAllEntities.size > 1» and other items«ENDIF» of the «appName» module.');
+            return $this->__('This plugin shows a list of itemDescIF getAllEntities.size > 1 and other itemsENDIF of the appName module.');
         }
 
         /**
@@ -106,9 +106,9 @@ class Newsletter {
         {
             $objectTypes = array();
             if (ModUtil::available($this->modname) && ModUtil::loadApi($this->modname)) {
-                «FOR entity : getAllEntities»
-                    $objectTypes['«entity.name.formatForCode»'] = array('name' => $this->__('«entity.nameMultiple.formatForDisplayCapital»'));
-                «ENDFOR»
+                FOR entity : getAllEntities
+                    $objectTypes['entity.name.formatForCode'] = array('name' => $this->__('entity.nameMultiple.formatForDisplayCapital'));
+                ENDFOR
             }
         
             $active = $this->getPluginVar('ObjectTypes', array());
@@ -211,16 +211,16 @@ class Newsletter {
         protected function selectPluginData($args, $filtAfterDate = null)
         {
             $objectType = $args['objectType'];
-            «IF targets('1.3.5')»
-                $entityClass = '«appName»_Entity_' . ucfirst($objectType);
-            «ENDIF»
+            IF targets('1.3.5')
+                $entityClass = 'appName_Entity_' . ucfirst($objectType);
+            ENDIF
             $serviceManager = ServiceUtil::getManager();
-            «IF targets('1.3.5')»
-                $entityManager = $serviceManager->get«IF targets('1.3.5')»Service«ENDIF»('doctrine.entitymanager');
+            IF targets('1.3.5')
+                $entityManager = $serviceManager->getIF targets('1.3.5')ServiceENDIF('doctrine.entitymanager');
                 $repository = $entityManager->getRepository($entityClass);
-            «ELSE»
-                $repository = $serviceManager->get('«appName.formatForDB».' . $objectType . '_factory')->getRepository();
-            «ENDIF»
+            ELSE
+                $repository = $serviceManager->get('appName.formatForDB.' . $objectType . '_factory')->getRepository();
+            ENDIF
 
             // create query
             $where = isset($args['filter']) ? $args['filter'] : '';
@@ -243,9 +243,9 @@ class Newsletter {
 
             // post processing
             $descriptionFieldName = $repository->getDescriptionFieldName();
-            «IF hasImageFields»
+            IF hasImageFields
                 $previewFieldName = $repository->getPreviewFieldName();
-            «ENDIF»
+            ENDIF
 
             $items = array();
             foreach ($entities as $k => $item) {
@@ -254,18 +254,18 @@ class Newsletter {
                 // Set title of this item.
                 $items[$k]['nl_title'] = $item->getTitleFromDisplayPattern();
 
-                «IF hasUserController && getMainUserController.hasActions('display')»
+                IF hasUserController && getMainUserController.hasActions('display')
                     // Set (full qualified) link of title
                     $urlArgs = $item->createUrlArgs();
                     $urlArgs['lang'] = $this->lang;
-                    «IF targets('1.3.5')»
+                    IF targets('1.3.5')
                         $items[$k]['nl_url_title'] = ModUtil::url($this->modname, 'user', 'display', $urlArgs, null, null, true);
-                    «ELSE»
-                        $url = $serviceManager->get('router')->generate('«appName.formatForDB»_' . $objectType . '_display', $urlArgs, true);
-                    «ENDIF»
-                «ELSE»
+                    ELSE
+                        $url = $serviceManager->get('router')->generate('appName.formatForDB_' . $objectType . '_display', $urlArgs, true);
+                    ENDIF
+                ELSE
                     $items[$k]['nl_url_title'] = null;
-                «ENDIF»
+                ENDIF
 
                 // Set main content of the item.
                 $items[$k]['nl_content'] = $descriptionFieldName ? $item[$descriptionFieldName] : '';
@@ -274,11 +274,11 @@ class Newsletter {
                 $items[$k]['nl_url_readmore'] = $items[$k]['nl_url_title'];
 
                 // A picture to display in Newsletter next to the item
-                «IF hasImageFields»
+                IF hasImageFields
                     $items[$k]['nl_picture'] = $previewFieldName != '' ? $item[$previewFieldName . 'FullPath'] : null;
-                «ELSE»
+                ELSE
                     $items[$k]['nl_picture'] = '';
-                «ENDIF»
+                ENDIF
             }
 
             return $items;

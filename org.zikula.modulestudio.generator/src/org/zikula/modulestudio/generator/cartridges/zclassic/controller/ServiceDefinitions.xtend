@@ -47,119 +47,119 @@ class ServiceDefinitions {
 
     def private ymlContent(Application it) '''
         parameters:
-            «parametersRouting»
+            parametersRouting
 
-            «IF hasUploads»
-                «parametersUploadHandler»
+            IF hasUploads
+                parametersUploadHandler
 
-            «ENDIF»
-            «parametersEntityFactories»
+            ENDIF
+            parametersEntityFactories
 
-            «parametersEventSubscriber»
+            parametersEventSubscriber
 
-            «parametersHelper»
+            parametersHelper
 
-            «parametersLogger»
+            parametersLogger
 
         services:
-            «IF hasUploads»
-                «servicesUploadHandler»
+            IF hasUploads
+                servicesUploadHandler
 
-            «ENDIF»
-            «servicesEntityFactories»
+            ENDIF
+            servicesEntityFactories
 
-            «servicesEventSubscriber»
+            servicesEventSubscriber
 
-            «servicesHelper»
+            servicesHelper
 
-            «servicesLogger»
+            servicesLogger
     '''
 
     def private parametersRouting(Application it) '''
         # Route parts
-        «modPrefix».routing.ajax: ajax
-        «modPrefix».routing.external: external
-        «modPrefix».routing.view.suffix: view
-        «FOR entity : getAllEntities»
-            «modPrefix».routing.«entity.name.formatForCode».singular: «entity.name.formatForCode»
-            «modPrefix».routing.«entity.name.formatForCode».plural: «entity.nameMultiple.formatForCode»
-        «ENDFOR»
-        «modPrefix».routing.formats.view: html«IF getListOfViewFormats.size > 0»|«FOR format : getListOfViewFormats SEPARATOR '|'»«format»«ENDFOR»«ENDIF»
-        «modPrefix».routing.formats.display: html«IF getListOfDisplayFormats.size > 0»|«FOR format : getListOfDisplayFormats SEPARATOR '|'»«format»«ENDFOR»«ENDIF»
+        modPrefix.routing.ajax: ajax
+        modPrefix.routing.external: external
+        modPrefix.routing.view.suffix: view
+        FOR entity : getAllEntities
+            modPrefix.routing.entity.name.formatForCode.singular: entity.name.formatForCode
+            modPrefix.routing.entity.name.formatForCode.plural: entity.nameMultiple.formatForCode
+        ENDFOR
+        modPrefix.routing.formats.view: htmlIF getListOfViewFormats.size > 0|FOR format : getListOfViewFormats SEPARATOR '|'formatENDFORENDIF
+        modPrefix.routing.formats.display: htmlIF getListOfDisplayFormats.size > 0|FOR format : getListOfDisplayFormats SEPARATOR '|'formatENDFORENDIF
     '''
 
     def private parametersUploadHandler(Application it) '''
         # Upload handler class
-        «modPrefix».upload_handler.class: «appNamespace»\UploadHandler
+        modPrefix.upload_handler.class: appNamespace\UploadHandler
     '''
 
     def private parametersEntityFactories(Application it) '''
         # Entity factory classes
-        «FOR entity : getAllEntities»
-            «modPrefix».entity.factory.«entity.name.formatForCode».class: «vendor.formatForCodeCapital»\«name.formatForCodeCapital»Module\Entity\Factory\«entity.name.formatForCodeCapital»Factory
-        «ENDFOR»
+        FOR entity : getAllEntities
+            modPrefix.entity.factory.entity.name.formatForCode.class: vendor.formatForCodeCapital\name.formatForCodeCapitalModule\Entity\Factory\entity.name.formatForCodeCapitalFactory
+        ENDFOR
     '''
 
     def private parametersEventSubscriber(Application it) '''
-        «val nsBase = appNamespace + '\\Listener\\'»
+        val nsBase = appNamespace + '\\Listener\\'
         # Listener classes
-        «FOR className : getSubscriberNames»
-            «modPrefix».«className.toLowerCase»_listener.class: «nsBase»«className»Listener
-        «ENDFOR»
+        FOR className : getSubscriberNames
+            modPrefix.className.toLowerCase_listener.class: nsBaseclassNameListener
+        ENDFOR
     '''
 
     def private parametersHelper(Application it) '''
-        «val nsBase = appNamespace + '\\Util\\'»
+        val nsBase = appNamespace + '\\Util\\'
         # Util classes
-        «FOR className : getHelperNames»
-            «modPrefix».«className.toLowerCase»_helper.class: «nsBase»«className»Util
-        «ENDFOR»
+        FOR className : getHelperNames
+            modPrefix.className.toLowerCase_helper.class: nsBaseclassNameUtil
+        ENDFOR
     '''
 
     def private parametersLogger(Application it) '''
 
         # Log processor
-        «modPrefix».log.processor.class: Monolog\Processor\PsrLogMessageProcessor
+        modPrefix.log.processor.class: Monolog\Processor\PsrLogMessageProcessor
     '''
 
     def private servicesUploadHandler(Application it) '''
-        «modPrefix».upload_handler:
-            class: "%«modPrefix».upload_handler.class%"
+        modPrefix.upload_handler:
+            class: "%modPrefix.upload_handler.class%"
     '''
 
     def private servicesEntityFactories(Application it) '''
-        «FOR entity : getAllEntities»
-            «modPrefix».«entity.name.formatForCode»_factory:
-                class: "%«modPrefix».entity.factory.«entity.name.formatForCode».class%"
+        FOR entity : getAllEntities
+            modPrefix.entity.name.formatForCode_factory:
+                class: "%modPrefix.entity.factory.entity.name.formatForCode.class%"
                 arguments:
                     objectManager: "@doctrine.orm.entity_manager"
-                    className: «vendor.formatForCodeCapital»\«name.formatForCodeCapital»Module\Entity\«entity.name.formatForCodeCapital»Entity
+                    className: vendor.formatForCodeCapital\name.formatForCodeCapitalModule\Entity\entity.name.formatForCodeCapitalEntity
 
-        «ENDFOR»
+        ENDFOR
     '''
 
     def private servicesEventSubscriber(Application it) '''
-        «FOR className : getSubscriberNames»
-            «modPrefix».«className.toLowerCase»_listener:
-                class: "%«modPrefix».«className.toLowerCase»_listener.class%"
+        FOR className : getSubscriberNames
+            modPrefix.className.toLowerCase_listener:
+                class: "%modPrefix.className.toLowerCase_listener.class%"
                 tags:
                     - { name: kernel.event_subscriber }
 
-        «ENDFOR»
+        ENDFOR
     '''
 
     def private servicesHelper(Application it) '''
-        «FOR className : getHelperNames»
-            «modPrefix».«className.toLowerCase»_helper:
-                class: "%«modPrefix».«className.toLowerCase»_helper.class%"
-                arguments: ["@service_container", "@=service('kernel').getBundle('«appName»')"]
+        FOR className : getHelperNames
+            modPrefix.className.toLowerCase_helper:
+                class: "%modPrefix.className.toLowerCase_helper.class%"
+                arguments: ["@service_container", "@=service('kernel').getBundle('appName')"]
 
-        «ENDFOR»
+        ENDFOR
     '''
 
     def private servicesLogger(Application it) '''
-        «modPrefix».log.processor:
-            class: "%«modPrefix».log.processor.class%"
+        modPrefix.log.processor:
+            class: "%modPrefix.log.processor.class%"
             tags:
                 - { name: monolog.processor }
     '''

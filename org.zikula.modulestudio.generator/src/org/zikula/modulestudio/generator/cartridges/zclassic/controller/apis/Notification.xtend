@@ -24,8 +24,8 @@ class Notification {
     }
 
     def private notificationApiBaseClass(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Api\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Api\Base;
 
             use ModUtil;
             use ServiceUtil;
@@ -35,13 +35,13 @@ class Notification {
             use Zikula_AbstractApi;
             use Zikula_View;
 
-        «ENDIF»
+        ENDIF
         /**
          * Notification api base class.
          */
-        class «IF targets('1.3.5')»«appName»_Api_Base_Notification«ELSE»NotificationApi«ENDIF» extends Zikula_AbstractApi
+        class IF targets('1.3.5')appName_Api_Base_NotificationELSENotificationApiENDIF extends Zikula_AbstractApi
         {
-            «notificationApiBaseImpl»
+            notificationApiBaseImpl
         }
     '''
 
@@ -104,17 +104,17 @@ class Notification {
                 return true;
             }
 
-            if (!ModUtil::available('«IF targets('1.3.5')»Mailer«ELSE»ZikulaMailerModule«ENDIF»') || !ModUtil::loadApi('«IF targets('1.3.5')»Mailer«ELSE»ZikulaMailerModule«ENDIF»', 'user')) {
+            if (!ModUtil::available('IF targets('1.3.5')MailerELSEZikulaMailerModuleENDIF') || !ModUtil::loadApi('IF targets('1.3.5')MailerELSEZikulaMailerModuleENDIF', 'user')) {
                 return LogUtil::registerError($this->__('Could not inform other persons about your amendments, because the Mailer module is not available - please contact an administrator about that!'));
             }
 
             $result = $this->sendMails();
 
-            «IF targets('1.3.5')»
+            IF targets('1.3.5')
                 SessionUtil::delVar($this->name . 'AdditionalNotificationRemarks');
-            «ELSE»
+            ELSE
                 $this->request->getSession()->del($this->name . 'AdditionalNotificationRemarks');
-            «ENDIF»
+            ENDIF
 
             return $result;
         }
@@ -133,7 +133,7 @@ class Notification {
                     $moderatorGroupId = $this->getVar('superModerationGroupFor' . $objectType, 2);
                 }
 
-                $moderatorGroup = ModUtil::apiFunc('«IF targets('1.3.5')»Groups«ELSE»ZikulaGroupsModule«ENDIF»', 'user', 'get', array('gid' => $moderatorGroupId));
+                $moderatorGroup = ModUtil::apiFunc('IF targets('1.3.5')GroupsELSEZikulaGroupsModuleENDIF', 'user', 'get', array('gid' => $moderatorGroupId));
                 foreach (array_keys($moderatorGroup['members']) as $uid) {
                     $this->addRecipient($uid);
                 }
@@ -174,9 +174,9 @@ class Notification {
             $objectType = $this->entity['_objectType'];
             $siteName = System::getVar('sitename');
 
-            $view = Zikula_View::getInstance('«appName»');
+            $view = Zikula_View::getInstance('appName');
             $templateType = $this->recipientType == 'creator' ? 'Creator' : 'Moderator';
-            $template = '«IF targets('1.3.5')»email«ELSE»Email«ENDIF»/notify' . ucfirst($objectType) . $templateType .  '.tpl';
+            $template = 'IF targets('1.3.5')emailELSEEmailENDIF/notify' . ucfirst($objectType) . $templateType .  '.tpl';
 
             $mailData = $this->prepareEmailData();
 
@@ -202,7 +202,7 @@ class Notification {
                     'html' => true
                 );
 
-                $totalResult &= ModUtil::apiFunc('«IF targets('1.3.5')»Mailer«ELSE»ZikulaMailerModule«ENDIF»', 'user', 'sendmessage', $mailArgs);
+                $totalResult &= ModUtil::apiFunc('IF targets('1.3.5')MailerELSEZikulaMailerModuleENDIF', 'user', 'sendmessage', $mailArgs);
             }
 
             return $totalResult;
@@ -227,67 +227,67 @@ class Notification {
         protected function prepareEmailData()
         {
             $serviceManager = ServiceUtil::getManager();
-            «IF targets('1.3.5')»
-                $workflowHelper = new «appName»_Util_Workflow($serviceManager);
-            «ELSE»
-                $workflowHelper = $serviceManager->get('«appName.formatForDB».workflow_helper');
-            «ENDIF»
+            IF targets('1.3.5')
+                $workflowHelper = new appName_Util_Workflow($serviceManager);
+            ELSE
+                $workflowHelper = $serviceManager->get('appName.formatForDB.workflow_helper');
+            ENDIF
 
             $objectType = $this->entity['_objectType'];
             $state = $this->entity['workflowState'];
             $stateInfo = $workflowHelper->getStateInfo($state);
 
-            «IF targets('1.3.5')»
+            IF targets('1.3.5')
                 $remarks = SessionUtil::getVar($this->name . 'AdditionalNotificationRemarks', '');
-            «ELSE»
+            ELSE
                 $remarks = $this->request->getSession()->get($this->name . 'AdditionalNotificationRemarks', '');
-            «ENDIF»
+            ENDIF
 
             $urlArgs = $this->entity->createUrlArgs();
             $displayUrl = '';
             $editUrl = '';
 
             if ($this->recipientType == 'moderator' || $this->recipientType == 'superModerator') {
-                «IF !targets('1.3.5') && (hasAdminController && getAllAdminControllers.head.hasActions('display')
+                IF !targets('1.3.5') && (hasAdminController && getAllAdminControllers.head.hasActions('display')
                     || hasUserController && getMainUserController.hasActions('display')
                     || hasAdminController && getAllAdminControllers.head.hasActions('edit')
-                    || hasUserController && getMainUserController.hasActions('edit'))»
-                    $urlArgs['lct'] = '«IF hasAdminController && getAllAdminControllers.head.hasActions('display')»admin«ELSE»user«ENDIF»';
-                «ENDIF»
-                «IF hasAdminController && getAllAdminControllers.head.hasActions('display')
-                    || hasUserController && getMainUserController.hasActions('display')»
-                    «IF targets('1.3.5')»
-                        $displayUrl = ModUtil::url($this->name, '«IF hasAdminController && getAllAdminControllers.head.hasActions('display')»admin«ELSE»user«ENDIF»', 'display', $urlArgs, null, null, true); // absolute
-                    «ELSE»
-                        $displayUrl = $serviceManager->get('router')->generate('«appName.formatForDB»_' . $objectType . '_display', $urlArgs, true);
-                    «ENDIF»
-                «ENDIF»
-                «IF hasAdminController && getAllAdminControllers.head.hasActions('edit')
-                    || hasUserController && getMainUserController.hasActions('edit')»
-                    «IF targets('1.3.5')»
-                        $editUrl = ModUtil::url($this->name, '«IF hasAdminController && getAllAdminControllers.head.hasActions('display')»admin«ELSE»user«ENDIF»', 'edit', $urlArgs, null, null, true); // absolute
-                    «ELSE»
-                        $editUrl = $serviceManager->get('router')->generate('«appName.formatForDB»_' . $objectType . '_edit', $urlArgs, true);
-                    «ENDIF»
-                «ENDIF»
+                    || hasUserController && getMainUserController.hasActions('edit'))
+                    $urlArgs['lct'] = 'IF hasAdminController && getAllAdminControllers.head.hasActions('display')adminELSEuserENDIF';
+                ENDIF
+                IF hasAdminController && getAllAdminControllers.head.hasActions('display')
+                    || hasUserController && getMainUserController.hasActions('display')
+                    IF targets('1.3.5')
+                        $displayUrl = ModUtil::url($this->name, 'IF hasAdminController && getAllAdminControllers.head.hasActions('display')adminELSEuserENDIF', 'display', $urlArgs, null, null, true); // absolute
+                    ELSE
+                        $displayUrl = $serviceManager->get('router')->generate('appName.formatForDB_' . $objectType . '_display', $urlArgs, true);
+                    ENDIF
+                ENDIF
+                IF hasAdminController && getAllAdminControllers.head.hasActions('edit')
+                    || hasUserController && getMainUserController.hasActions('edit')
+                    IF targets('1.3.5')
+                        $editUrl = ModUtil::url($this->name, 'IF hasAdminController && getAllAdminControllers.head.hasActions('display')adminELSEuserENDIF', 'edit', $urlArgs, null, null, true); // absolute
+                    ELSE
+                        $editUrl = $serviceManager->get('router')->generate('appName.formatForDB_' . $objectType . '_edit', $urlArgs, true);
+                    ENDIF
+                ENDIF
             } elseif ($this->recipientType == 'creator') {
-                «IF !targets('1.3.5') && (getMainUserController.hasActions('display') || getMainUserController.hasActions('edit'))»
+                IF !targets('1.3.5') && (getMainUserController.hasActions('display') || getMainUserController.hasActions('edit'))
                     $urlArgs['lct'] = 'user';
-                «ENDIF»
-                «IF getMainUserController.hasActions('display')»
-                    «IF targets('1.3.5')»
+                ENDIF
+                IF getMainUserController.hasActions('display')
+                    IF targets('1.3.5')
                         $displayUrl = ModUtil::url($this->name, 'user', 'display', $urlArgs, null, null, true); // absolute
-                    «ELSE»
-                        $displayUrl = $serviceManager->get('router')->generate('«appName.formatForDB»_' . $objectType . '_display', $urlArgs, true);
-                    «ENDIF»
-                «ENDIF»
-                «IF getMainUserController.hasActions('edit')»
-                    «IF targets('1.3.5')»
+                    ELSE
+                        $displayUrl = $serviceManager->get('router')->generate('appName.formatForDB_' . $objectType . '_display', $urlArgs, true);
+                    ENDIF
+                ENDIF
+                IF getMainUserController.hasActions('edit')
+                    IF targets('1.3.5')
                         $editUrl = ModUtil::url($this->name, 'user', 'edit', $urlArgs, null, null, true); // absolute
-                    «ELSE»
-                        $editUrl = $serviceManager->get('router')->generate('«appName.formatForDB»_' . $objectType . '_edit', $urlArgs, true);
-                    «ENDIF»
-                «ENDIF»
+                    ELSE
+                        $editUrl = $serviceManager->get('router')->generate('appName.formatForDB_' . $objectType . '_edit', $urlArgs, true);
+                    ENDIF
+                ENDIF
             }
 
             $emailData = array(
@@ -303,20 +303,20 @@ class Notification {
     '''
 
     def private notificationApiImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Api;
+        IF !targets('1.3.5')
+            namespace appNamespace\Api;
 
-            use «appNamespace»\Api\Base\NotificationApi as BaseNotificationApi;
+            use appNamespace\Api\Base\NotificationApi as BaseNotificationApi;
 
-        «ENDIF»
+        ENDIF
         /**
          * Notification api implementation class.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Api_Notification extends «appName»_Api_Base_Notification
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Api_Notification extends appName_Api_Base_Notification
+        ELSE
         class NotificationApi extends BaseNotificationApi
-        «ENDIF»
+        ENDIF
         {
             // feel free to extend the notification api here
         }

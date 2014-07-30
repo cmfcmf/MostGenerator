@@ -83,20 +83,20 @@ abstract class AbstractExtension implements EntityExtensionInterface {
     }
 
     def protected extensionClassBaseImpl(Entity it) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Entity\Base;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Entity\Base;
 
-        «ENDIF»
-        «extensionClassImports»
+        ENDIF
+        extensionClassImports
 
         /**
-         * «extensionClassDescription»
+         * extensionClassDescription
          *
-         * This is the base «classType.formatForDisplay» class for «it.name.formatForDisplay» entities.
+         * This is the base classType.formatForDisplay class for it.name.formatForDisplay entities.
          */
-        «IF !app.targets('1.3.5')»abstract «ENDIF»class «IF !app.targets('1.3.5')»Abstract«name.formatForCodeCapital»«classType.formatForCodeCapital»Entity«ELSE»«entityClassName(classType, true)»«ENDIF» extends «extensionBaseClass»
+        IF !app.targets('1.3.5')abstract ENDIFclass IF !app.targets('1.3.5')Abstractname.formatForCodeCapitalclassType.formatForCodeCapitalEntityELSEentityClassName(classType, true)ENDIF extends extensionBaseClass
         {
-            «extensionClassBaseAnnotations»
+            extensionClassBaseAnnotations
         }
     '''
 
@@ -136,11 +136,11 @@ abstract class AbstractExtension implements EntityExtensionInterface {
     }
 
     def protected extensionClassEntityAccessors(Entity it) '''
-        «val app = container.application»
+        val app = container.application
         /**
          * Get reference to owning entity.
          *
-         * @return «IF !app.targets('1.3.5')»\«ENDIF»«entityClassName('', false)»
+         * @return IF !app.targets('1.3.5')\ENDIFentityClassName('', false)
          */
         public function getEntity()
         {
@@ -150,34 +150,34 @@ abstract class AbstractExtension implements EntityExtensionInterface {
         /**
          * Set reference to owning entity.
          *
-         * @param «IF !app.targets('1.3.5')»\«ENDIF»«entityClassName('', false)» $entity
+         * @param IF !app.targets('1.3.5')\ENDIFentityClassName('', false) $entity
          */
-        public function setEntity(/*«IF !app.targets('1.3.5')»\«ENDIF»«entityClassName('', false)» */$entity)
+        public function setEntity(/*IF !app.targets('1.3.5')\ENDIFentityClassName('', false) */$entity)
         {
             $this->entity = $entity;
         }
     '''
 
     def protected extensionClassImpl(Entity it) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Entity;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Entity;
 
-            use «app.appNamespace»\Entity\«IF isInheriting»«parentType.name.formatForCodeCapital»«classType.formatForCodeCapital»Entity«ELSE»Base\Abstract«name.formatForCodeCapital»«classType.formatForCodeCapital»Entity«ENDIF» as Base«IF isInheriting»«parentType.name.formatForCodeCapital»«classType.formatForCodeCapital»«ELSE»Abstract«name.formatForCodeCapital»«classType.formatForCodeCapital»«ENDIF»Entity;
+            use app.appNamespace\Entity\IF isInheritingparentType.name.formatForCodeCapitalclassType.formatForCodeCapitalEntityELSEBase\Abstractname.formatForCodeCapitalclassType.formatForCodeCapitalEntityENDIF as BaseIF isInheritingparentType.name.formatForCodeCapitalclassType.formatForCodeCapitalELSEAbstractname.formatForCodeCapitalclassType.formatForCodeCapitalENDIFEntity;
 
-        «ENDIF»
+        ENDIF
         use Doctrine\ORM\Mapping as ORM;
 
         /**
-         * «extensionClassDescription»
+         * extensionClassDescription
          *
-         * This is the concrete «classType.formatForDisplay» class for «it.name.formatForDisplay» entities.
-        «extensionClassImplAnnotations»
+         * This is the concrete classType.formatForDisplay class for it.name.formatForDisplay entities.
+        extensionClassImplAnnotations
          */
-        «IF app.targets('1.3.5')»
-        class «entityClassName(classType, false)» extends «IF isInheriting»«parentType.entityClassName(classType, false)»«ELSE»«entityClassName(classType, true)»«ENDIF»
-        «ELSE»
-        class «name.formatForCodeCapital»«classType.formatForCodeCapital»Entity extends Base«IF isInheriting»«parentType.name.formatForCodeCapital»«classType.formatForCodeCapital»«ELSE»Abstract«name.formatForCodeCapital»«classType.formatForCodeCapital»«ENDIF»Entity
-        «ENDIF»
+        IF app.targets('1.3.5')
+        class entityClassName(classType, false) extends IF isInheritingparentType.entityClassName(classType, false)ELSEentityClassName(classType, true)ENDIF
+        ELSE
+        class name.formatForCodeCapitalclassType.formatForCodeCapitalEntity extends BaseIF isInheritingparentType.name.formatForCodeCapitalclassType.formatForCodeCapitalELSEAbstractname.formatForCodeCapitalclassType.formatForCodeCapitalENDIFEntity
+        ENDIF
         {
             // feel free to add your own methods here
         }
@@ -198,49 +198,49 @@ abstract class AbstractExtension implements EntityExtensionInterface {
     }
 
     def protected extensionClassRepositoryBaseImpl(Entity it) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Entity\Repository\Base;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Entity\Repository\Base;
 
-        «ENDIF»
-        «IF classType == 'translation'»
+        ENDIF
+        IF classType == 'translation'
             use Gedmo\Translatable\Entity\Repository\TranslationRepository;
-        «ELSEIF classType == 'logEntry'»
+        ELSEIF classType == 'logEntry'
             use Gedmo\Loggable\Entity\Repository\LogEntryRepository;
-        «ELSE»
+        ELSE
             use Doctrine\ORM\EntityRepository;
-        «ENDIF»
+        ENDIF
 
         /**
          * Repository class used to implement own convenience methods for performing certain DQL queries.
          *
-         * This is the base repository class for «it.name.formatForDisplay» «classType.formatForDisplay» entities.
+         * This is the base repository class for it.name.formatForDisplay classType.formatForDisplay entities.
          */
-        «IF app.targets('1.3.5')»
-        class «app.appName»_Entity_Repository_Base_«name.formatForCodeCapital»«classType.formatForCodeCapital» extends «IF classType == 'translation'»Translation«ELSEIF classType == 'logEntry'»LogEntry«ELSE»Entity«ENDIF»Repository
-        «ELSE»
-        class «name.formatForCodeCapital»«classType.formatForCodeCapital» extends «IF classType == 'translation'»Translation«ELSEIF classType == 'logEntry'»LogEntry«ELSE»Entity«ENDIF»Repository
-        «ENDIF»
+        IF app.targets('1.3.5')
+        class app.appName_Entity_Repository_Base_name.formatForCodeCapitalclassType.formatForCodeCapital extends IF classType == 'translation'TranslationELSEIF classType == 'logEntry'LogEntryELSEEntityENDIFRepository
+        ELSE
+        class name.formatForCodeCapitalclassType.formatForCodeCapital extends IF classType == 'translation'TranslationELSEIF classType == 'logEntry'LogEntryELSEEntityENDIFRepository
+        ENDIF
         {
         }
     '''
 
     def protected extensionClassRepositoryImpl(Entity it) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Entity\Repository;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Entity\Repository;
 
-            use «app.appNamespace»\Entity\Repository\«IF isInheriting»«parentType.name.formatForCodeCapital»«classType.formatForCodeCapital»«ELSE»Base\«name.formatForCodeCapital»«classType.formatForCodeCapital»«ENDIF» as Base«IF isInheriting»«parentType.name.formatForCodeCapital»«ELSE»«name.formatForCodeCapital»«ENDIF»«classType.formatForCodeCapital»;
+            use app.appNamespace\Entity\Repository\IF isInheritingparentType.name.formatForCodeCapitalclassType.formatForCodeCapitalELSEBase\name.formatForCodeCapitalclassType.formatForCodeCapitalENDIF as BaseIF isInheritingparentType.name.formatForCodeCapitalELSEname.formatForCodeCapitalENDIFclassType.formatForCodeCapital;
 
-        «ENDIF»
+        ENDIF
         /**
          * Repository class used to implement own convenience methods for performing certain DQL queries.
          *
-         * This is the concrete repository class for «it.name.formatForDisplay» «classType.formatForDisplay» entities.
+         * This is the concrete repository class for it.name.formatForDisplay classType.formatForDisplay entities.
          */
-        «IF app.targets('1.3.5')»
-        class «app.appName»_Entity_Repository_«name.formatForCodeCapital»«classType.formatForCodeCapital» extends «IF isInheriting»«app.appName»_Entity_Repository_«parentType.name.formatForCodeCapital»«classType.formatForCodeCapital»«ELSE»«app.appName»_Entity_Repository_Base_«name.formatForCodeCapital»«classType.formatForCodeCapital»«ENDIF»
-        «ELSE»
-        class «name.formatForCodeCapital»«classType.formatForCodeCapital» extends Base«IF isInheriting»«parentType.name.formatForCodeCapital»«ELSE»«name.formatForCodeCapital»«ENDIF»«classType.formatForCodeCapital»
-        «ENDIF»
+        IF app.targets('1.3.5')
+        class app.appName_Entity_Repository_name.formatForCodeCapitalclassType.formatForCodeCapital extends IF isInheritingapp.appName_Entity_Repository_parentType.name.formatForCodeCapitalclassType.formatForCodeCapitalELSEapp.appName_Entity_Repository_Base_name.formatForCodeCapitalclassType.formatForCodeCapitalENDIF
+        ELSE
+        class name.formatForCodeCapitalclassType.formatForCodeCapital extends BaseIF isInheritingparentType.name.formatForCodeCapitalELSEname.formatForCodeCapitalENDIFclassType.formatForCodeCapital
+        ENDIF
         {
             // feel free to add your own methods here
         }

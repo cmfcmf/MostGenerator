@@ -25,28 +25,28 @@ class Category {
     }
 
     def private categoryBaseClass(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Api\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Api\Base;
 
             use CategoryRegistryUtil;
             use ModUtil;
             use UserUtil;
             use Zikula_AbstractApi;
 
-        «ENDIF»
+        ENDIF
 
         /**
          * Category api base class.
          */
-        class «IF targets('1.3.5')»«appName»_Api_Base_Category«ELSE»CategoryApi«ENDIF» extends Zikula_AbstractApi
+        class IF targets('1.3.5')appName_Api_Base_CategoryELSECategoryApiENDIF extends Zikula_AbstractApi
         {
-            «categoryBaseImpl»
+            categoryBaseImpl
         }
     '''
 
     def private categoryBaseImpl(Application it) '''
         /**
-         * Retrieves the main/default category of «appName».
+         * Retrieves the main/default category of appName.
          *
          * @param string $args['ot']       The object type to be treated (optional).
          * @param string $args['registry'] Name of category registry to be used (optional).
@@ -61,11 +61,11 @@ class Category {
             }
 
             $objectType = $this->determineObjectType($args, 'getMainCat');
-            «IF !targets('1.3.5')»
+            IF !targets('1.3.5')
 
                 $logger = $this->serviceManager->get('logger');
-                $logger->warning('{app}: User {user} called CategoryApi#getMainCat which is deprecated.', array('app' => '«appName»', 'user' => UserUtil::getVar('uname')));
-            «ENDIF»
+                $logger->warning('{app}: User {user} called CategoryApi#getMainCat which is deprecated.', array('app' => 'appName', 'user' => UserUtil::getVar('uname')));
+            ENDIF
 
             return CategoryRegistryUtil::getRegisteredModuleCategory($this->name, ucfirst($objectType), $args['registry'], 32); // 32 == /__System/Modules/Global
         }
@@ -94,11 +94,11 @@ class Category {
 
             $result = false;
             switch ($objectType) {
-                «FOR entity : getCategorisableEntities»
-                    case '«entity.name.formatForCode»':
-                        $result = «entity.categorisableMultiSelection.displayBool»;
+                FOR entity : getCategorisableEntities
+                    case 'entity.name.formatForCode':
+                        $result = entity.categorisableMultiSelection.displayBool;
                         break;
-                «ENDFOR»
+                ENDFOR
             }
 
             return $result;
@@ -133,7 +133,7 @@ class Category {
                     }
                 } else {
                     $argName = 'catid' . $propertyName;
-                    $inputVal = (int) $dataSource->filter($argName, 0, «IF !targets('1.3.5')»false, «ENDIF»FILTER_VALIDATE_INT);
+                    $inputVal = (int) $dataSource->filter($argName, 0, IF !targets('1.3.5')false, ENDIFFILTER_VALIDATE_INT);
                     $inputValue = array();
                     if ($inputVal > 0) {
                         $inputValue[] = $inputVal;
@@ -186,8 +186,8 @@ class Category {
                 if (count($filtersPerRegistry) == 1) {
                     $qb->andWhere($filtersPerRegistry[0]);
                 } else {
-                    «/* See http://stackoverflow.com/questions/9815047/chaining-orx-in-doctrine2-query-builder
-                    $qb->andWhere($qb->expr()->orX()->addMultiple($filtersPerRegistry));*/»$qb->andWhere('(' . implode(' OR ', $filtersPerRegistry) . ')');
+                    /* See http://stackoverflow.com/questions/9815047/chaining-orx-in-doctrine2-query-builder
+                    $qb->andWhere($qb->expr()->orX()->addMultiple($filtersPerRegistry));*/$qb->andWhere('(' . implode(' OR ', $filtersPerRegistry) . ')');
                 }
                 foreach ($filterParameters['values'] as $propertyName => $filterValue) {
                     $qb->setParameter('propName' . $propertyName, $filterValue)
@@ -279,11 +279,11 @@ class Category {
         protected function determineObjectType(array $args = array(), $methodName = '')
         {
             $objectType = isset($args['ot']) ? $args['ot'] : '';
-            «IF targets('1.3.5')»
-                $controllerHelper = new «appName»_Util_Controller($this->serviceManager);
-            «ELSE»
-                $controllerHelper = $this->serviceManager->get('«appName.formatForDB».controller_helper');
-            «ENDIF»
+            IF targets('1.3.5')
+                $controllerHelper = new appName_Util_Controller($this->serviceManager);
+            ELSE
+                $controllerHelper = $this->serviceManager->get('appName.formatForDB.controller_helper');
+            ENDIF
             $utilArgs = array('api' => 'category', 'action' => $methodName);
             if (!in_array($objectType, $controllerHelper->getObjectTypes('api', $utilArgs))) {
                 $objectType = $controllerHelper->getDefaultObjectType('api', $utilArgs);
@@ -294,20 +294,20 @@ class Category {
     '''
 
     def private categoryImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Api;
+        IF !targets('1.3.5')
+            namespace appNamespace\Api;
 
-            use «appNamespace»\Api\Base\CategoryApi as BaseCategoryApi;
+            use appNamespace\Api\Base\CategoryApi as BaseCategoryApi;
 
-        «ENDIF»
+        ENDIF
         /**
          * Category api implementation class.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Api_Category extends «appName»_Api_Base_Category
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Api_Category extends appName_Api_Base_Category
+        ELSE
         class CategoryApi extends BaseCategoryApi
-        «ENDIF»
+        ENDIF
         {
             // feel free to extend the category api at this place
         }

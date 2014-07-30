@@ -24,22 +24,22 @@ class RelationSelectorList {
     }
 
     def private relationSelectorBaseImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Form\Plugin\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Form\Plugin\Base;
 
-            use «appNamespace»\Form\Plugin\AbstractObjectSelector as BaseAbstractObjectSelector;
+            use appNamespace\Form\Plugin\AbstractObjectSelector as BaseAbstractObjectSelector;
 
             use Zikula_Form_View;
 
-        «ENDIF»
+        ENDIF
         /**
          * Relation selector plugin base class.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Form_Plugin_Base_RelationSelectorList extends «appName»_Form_Plugin_AbstractObjectSelector
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Form_Plugin_Base_RelationSelectorList extends appName_Form_Plugin_AbstractObjectSelector
+        ELSE
         class RelationSelectorList extends BaseAbstractObjectSelector
-        «ENDIF»
+        ENDIF
         {
             /**
              * Get filename of this file.
@@ -97,20 +97,20 @@ class RelationSelectorList {
     '''
 
     def private relationSelectorImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Form\Plugin;
+        IF !targets('1.3.5')
+            namespace appNamespace\Form\Plugin;
 
-            use «appNamespace»\Form\Plugin\Base\RelationSelectorList as BaseRelationSelectorList;
+            use appNamespace\Form\Plugin\Base\RelationSelectorList as BaseRelationSelectorList;
 
-        «ENDIF»
+        ENDIF
         /**
          * Relation selector plugin implementation class.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Form_Plugin_RelationSelectorList extends «appName»_Form_Plugin_Base_RelationSelectorList
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Form_Plugin_RelationSelectorList extends appName_Form_Plugin_Base_RelationSelectorList
+        ELSE
         class RelationSelectorList extends BaseRelationSelectorList
-        «ENDIF»
+        ENDIF
         {
             // feel free to add your customisation here
         }
@@ -118,16 +118,16 @@ class RelationSelectorList {
 
     def private relationSelectorPluginImpl(Application it) '''
         /**
-         * The «appName.formatForDB»RelationSelectorList plugin provides a dropdown selector for related items.
+         * The appName.formatForDBRelationSelectorList plugin provides a dropdown selector for related items.
          *
          * @param  array            $params All attributes passed to this function from the template.
          * @param  Zikula_Form_View $view   Reference to the view object.
          *
          * @return string The output of the plugin.
          */
-        function smarty_function_«appName.formatForDB»RelationSelectorList($params, $view)
+        function smarty_function_appName.formatForDBRelationSelectorList($params, $view)
         {
-            return $view->registerPlugin('«IF targets('1.3.5')»«appName»_Form_Plugin_RelationSelectorList«ELSE»\\«vendor.formatForCodeCapital»\\«name.formatForCodeCapital»Module\\Form\\Plugin\\RelationSelectorList«ENDIF»', $params);
+            return $view->registerPlugin('IF targets('1.3.5')appName_Form_Plugin_RelationSelectorListELSE\\vendor.formatForCodeCapital\\name.formatForCodeCapitalModule\\Form\\Plugin\\RelationSelectorListENDIF', $params);
         }
     '''
 }

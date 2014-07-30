@@ -32,9 +32,9 @@ class Routing {
     }
 
     def private routingConfig(Application it) '''
-        «appName.toLowerCase»:
+        appName.toLowerCase:
             # define routing support for these controllers
-            resource: "@«appName»/Controller"
+            resource: "@appName/Controller"
             # enable support for defining routes by annotations
             type:     annotation
     '''

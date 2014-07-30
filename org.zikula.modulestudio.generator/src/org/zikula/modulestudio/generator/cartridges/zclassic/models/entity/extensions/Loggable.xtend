@@ -18,15 +18,15 @@ class Loggable extends AbstractExtension implements EntityExtensionInterface {
      * Generates additional annotations on class level.
      */
     override classAnnotations(Entity it) '''
-         «' '»* @Gedmo\Loggable(logEntryClass="«IF !container.application.targets('1.3.5')»\«ENDIF»«entityClassName('logEntry', false)»")
+         ' '* @Gedmo\Loggable(logEntryClass="IF !container.application.targets('1.3.5')\ENDIFentityClassName('logEntry', false)")
     '''
 
     /**
      * Additional field annotations.
      */
     override columnAnnotations(DerivedField it) '''
-        «IF entity.loggable» * @Gedmo\Versioned
-        «ENDIF»
+        IF entity.loggable * @Gedmo\Versioned
+        ENDIF
     '''
 
     /**
@@ -52,7 +52,7 @@ class Loggable extends AbstractExtension implements EntityExtensionInterface {
      * Returns the extension class import statements.
      */
     override extensionClassImports(Entity it) '''
-        use Gedmo\Loggable\Entity\«IF !container.application.targets('1.3.5')»MappedSuperclass\«ENDIF»«extensionBaseClass»;
+        use Gedmo\Loggable\Entity\IF !container.application.targets('1.3.5')MappedSuperclass\ENDIFextensionBaseClass;
     '''
 
     /**
@@ -73,14 +73,14 @@ class Loggable extends AbstractExtension implements EntityExtensionInterface {
      * Returns the extension implementation class ORM annotations.
      */
     override extensionClassImplAnnotations(Entity it) '''
-         «' '»*
-         «' '»* @ORM\Entity(repositoryClass="«repositoryClass(extensionClassType)»")
-         «' '»* @ORM\Table(name="«fullEntityTableName»_log_entry",
-         «' '»*     indexes={
-         «' '»*         @ORM\Index(name="log_class_lookup_idx", columns={"object_class"}),
-         «' '»*         @ORM\Index(name="log_date_lookup_idx", columns={"logged_at"}),
-         «' '»*         @ORM\Index(name="log_user_lookup_idx", columns={"username"})
-         «' '»*     }
-         «' '»* )
+         ' '*
+         ' '* @ORM\Entity(repositoryClass="repositoryClass(extensionClassType)")
+         ' '* @ORM\Table(name="fullEntityTableName_log_entry",
+         ' '*     indexes={
+         ' '*         @ORM\Index(name="log_class_lookup_idx", columns={"object_class"}),
+         ' '*         @ORM\Index(name="log_date_lookup_idx", columns={"logged_at"}),
+         ' '*         @ORM\Index(name="log_user_lookup_idx", columns={"username"})
+         ' '*     }
+         ' '* )
     '''
 }

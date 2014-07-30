@@ -24,31 +24,31 @@ class ModuleFile {
     }
 
     def private moduleBaseImpl(Application it) '''
-        namespace «appNamespace»\Base;
+        namespace appNamespace\Base;
 
-        «IF isSystemModule»
+        IF isSystemModule
             use Zikula\Bundle\CoreBundle\Bundle\AbstractCoreModule;
-        «ELSE»
+        ELSE
             use Zikula\Core\AbstractModule;
-        «ENDIF»
+        ENDIF
 
         /**
          * Module base class.
          */
-        class «appName» extends Abstract«IF isSystemModule»Core«ENDIF»Module
+        class appName extends AbstractIF isSystemModuleCoreENDIFModule
         {
         }
     '''
 
     def private moduleInfoImpl(Application it) '''
-        namespace «appNamespace»;
+        namespace appNamespace;
 
-        use «appNamespace»\Base\«appName» as Base«appName»;
+        use appNamespace\Base\appName as BaseappName;
 
         /**
          * Module implementation class.
          */
-        class «appName» extends Base«appName»
+        class appName extends BaseappName
         {
             // custom enhancements can go here
         }

@@ -25,8 +25,8 @@ class Account {
     }
 
     def private accountApiBaseClass(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Api\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Api\Base;
 
             use ModUtil;
             use SecurityUtil;
@@ -34,13 +34,13 @@ class Account {
             use UserUtil;
             use Zikula_AbstractApi;
 
-        «ENDIF»
+        ENDIF
         /**
          * Account api base class.
          */
-        class «IF targets('1.3.5')»«appName»_Api_Base_Account«ELSE»AccountApi«ENDIF» extends Zikula_AbstractApi
+        class IF targets('1.3.5')appName_Api_Base_AccountELSEAccountApiENDIF extends Zikula_AbstractApi
         {
-            «accountApiBaseImpl»
+            accountApiBaseImpl
         }
     '''
 
@@ -73,40 +73,40 @@ class Account {
                 return $items;
             }
 
-            «IF !targets('1.3.5')»
+            IF !targets('1.3.5')
                 $serviceManager = ServiceUtil::getManager();
-            «ENDIF»
+            ENDIF
 
             // Create an array of links to return
-            «IF !getAllUserControllers.empty && getMainUserController.hasActions('view')»
-                «FOR entity : getAllEntities.filter[standardFields && ownerPermission]»
-                    $objectType = '«entity.name.formatForCode»';
+            IF !getAllUserControllers.empty && getMainUserController.hasActions('view')
+                FOR entity : getAllEntities.filter[standardFields && ownerPermission]
+                    $objectType = 'entity.name.formatForCode';
                     if (SecurityUtil::checkPermission($this->name . ':' . ucfirst($objectType) . ':', '::', ACCESS_READ)) {
                         $items[] = array(
-                            «IF targets('1.3.5')»
+                            IF targets('1.3.5')
                                 'url' => ModUtil::url($this->name, 'user', 'view', array('ot' => $objectType, 'own' => 1)),
-                            «ELSE»
-                                'url' => $serviceManager->get('router')->generate('«appName.formatForDB»_' . $objectType . '_view', array('lct' => 'user', 'own' => 1)),
-                            «ENDIF»
-                            'title'   => $this->__('My «entity.nameMultiple.formatForDisplay»'),
+                            ELSE
+                                'url' => $serviceManager->get('router')->generate('appName.formatForDB_' . $objectType . '_view', array('lct' => 'user', 'own' => 1)),
+                            ENDIF
+                            'title'   => $this->__('My entity.nameMultiple.formatForDisplay'),
                             'icon'    => 'windowlist.png',
                             'module'  => 'core',
                             'set'     => 'icons/large'
                         );
                     }
-                «ENDFOR»
-            «ENDIF»
-            «IF !getAllAdminControllers.empty»
+                ENDFOR
+            ENDIF
+            IF !getAllAdminControllers.empty
                 if (SecurityUtil::checkPermission($this->name . '::', '::', ACCESS_ADMIN)) {
                     $items[] = array(
-                        'url'   => ModUtil::url($this->name, 'admin', '«IF targets('1.3.5')»main«ELSE»index«ENDIF»'),
-                        'title' => $this->__('«name.formatForDisplayCapital» Backend'),
+                        'url'   => ModUtil::url($this->name, 'admin', 'IF targets('1.3.5')mainELSEindexENDIF'),
+                        'title' => $this->__('name.formatForDisplayCapital Backend'),
                         'icon'   => 'configure.png',
                         'module' => 'core',
                         'set'    => 'icons/large'
                     );
                 }
-            «ENDIF»
+            ENDIF
 
             // return the items
             return $items;
@@ -114,20 +114,20 @@ class Account {
     '''
 
     def private accountApiImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Api;
+        IF !targets('1.3.5')
+            namespace appNamespace\Api;
 
-            use «appNamespace»\Api\Base\AccountApi as BaseAccountApi;
+            use appNamespace\Api\Base\AccountApi as BaseAccountApi;
 
-        «ENDIF»
+        ENDIF
         /**
          * Account api implementation class.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Api_Account extends «appName»_Api_Base_Account
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Api_Account extends appName_Api_Base_Account
+        ELSE
         class AccountApi extends BaseAccountApi
-        «ENDIF»
+        ENDIF
         {
             // feel free to extend the account api here
         }

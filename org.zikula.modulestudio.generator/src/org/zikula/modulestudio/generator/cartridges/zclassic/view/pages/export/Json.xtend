@@ -32,24 +32,24 @@ class Json {
     }
 
     def private jsonView(Entity it, String appName) '''
-        {* purpose of this template: «nameMultiple.formatForDisplay» view json view *}
-        «IF container.application.targets('1.3.5')»
-            {«appName.formatForDB»TemplateHeaders contentType='application/json'}
-        «ENDIF»
+        {* purpose of this template: nameMultiple.formatForDisplay view json view *}
+        IF container.application.targets('1.3.5')
+            {appName.formatForDBTemplateHeaders contentType='application/json'}
+        ENDIF
         [
-        {foreach item='item' from=$items name='«nameMultiple.formatForCode»'}
-            {if not $smarty.foreach.«nameMultiple.formatForCode».first},{/if}
+        {foreach item='item' from=$items name='nameMultiple.formatForCode'}
+            {if not $smarty.foreach.nameMultiple.formatForCode.first},{/if}
             {$item->toJson()}
         {/foreach}
         ]
     '''
 
     def private jsonDisplay(Entity it, String appName) '''
-        «val objName = name.formatForCode»
-        {* purpose of this template: «nameMultiple.formatForDisplay» display json view *}
-        «IF container.application.targets('1.3.5')»
-            {«appName.formatForDB»TemplateHeaders contentType='application/json'}
-        «ENDIF»
-        {$«objName»->toJson()}
+        val objName = name.formatForCode
+        {* purpose of this template: nameMultiple.formatForDisplay display json view *}
+        IF container.application.targets('1.3.5')
+            {appName.formatForDBTemplateHeaders contentType='application/json'}
+        ENDIF
+        {$objName->toJson()}
     '''
 }

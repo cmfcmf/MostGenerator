@@ -20,21 +20,21 @@ class Joins {
          */
         protected function addJoinsToSelection()
         {
-            $selection = '«FOR relation : getBidirectionalIncomingJoinRelations.filter[source.container.application == app]»«relation.addJoin(false, 'select')»«ENDFOR»«FOR relation : getOutgoingJoinRelations.filter[target.container.application == app]»«relation.addJoin(true, 'select')»«ENDFOR»';
-            «FOR relation : getBidirectionalIncomingJoinRelations.filter[source.container.application != app]»
-                if (ModUtil::available('«relation.source.container.application.name.formatForCodeCapital»')) {
-                    $selection .= '«relation.addJoin(false, 'select')»';
+            $selection = 'FOR relation : getBidirectionalIncomingJoinRelations.filter[source.container.application == app]relation.addJoin(false, 'select')ENDFORFOR relation : getOutgoingJoinRelations.filter[target.container.application == app]relation.addJoin(true, 'select')ENDFOR';
+            FOR relation : getBidirectionalIncomingJoinRelations.filter[source.container.application != app]
+                if (ModUtil::available('relation.source.container.application.name.formatForCodeCapital')) {
+                    $selection .= 'relation.addJoin(false, 'select')';
                 }
-            «ENDFOR»
-            «FOR relation : getOutgoingJoinRelations.filter[target.container.application != app]»
-                if (ModUtil::available('«relation.target.container.application.name.formatForCodeCapital»')) {
-                    $selection .= '«relation.addJoin(true, 'select')»';
+            ENDFOR
+            FOR relation : getOutgoingJoinRelations.filter[target.container.application != app]
+                if (ModUtil::available('relation.target.container.application.name.formatForCodeCapital')) {
+                    $selection .= 'relation.addJoin(true, 'select')';
                 }
-            «ENDFOR»
-            «IF categorisable»
+            ENDFOR
+            IF categorisable
 
                 $selection = ', tblCategories';
-            «ENDIF»
+            ENDIF
 
             return $selection;
         }
@@ -48,22 +48,22 @@ class Joins {
          */
         protected function addJoinsToFrom(QueryBuilder $qb)
         {
-            «FOR relation : getBidirectionalIncomingJoinRelations.filter[source.container.application == app]»«relation.addJoin(false, 'from')»«ENDFOR»
-            «FOR relation : getOutgoingJoinRelations.filter[target.container.application == app]»«relation.addJoin(true, 'from')»«ENDFOR»
-            «FOR relation : getBidirectionalIncomingJoinRelations.filter[source.container.application != app]»
-                if (ModUtil::available('«relation.source.container.application.name.formatForCodeCapital»')) {
-                    «relation.addJoin(false, 'from')»
+            FOR relation : getBidirectionalIncomingJoinRelations.filter[source.container.application == app]relation.addJoin(false, 'from')ENDFOR
+            FOR relation : getOutgoingJoinRelations.filter[target.container.application == app]relation.addJoin(true, 'from')ENDFOR
+            FOR relation : getBidirectionalIncomingJoinRelations.filter[source.container.application != app]
+                if (ModUtil::available('relation.source.container.application.name.formatForCodeCapital')) {
+                    relation.addJoin(false, 'from')
                 }
-            «ENDFOR»
-            «FOR relation : getOutgoingJoinRelations.filter[target.container.application != app]»
-                if (ModUtil::available('«relation.target.container.application.name.formatForCodeCapital»')) {
-                    «relation.addJoin(true, 'from')»
+            ENDFOR
+            FOR relation : getOutgoingJoinRelations.filter[target.container.application != app]
+                if (ModUtil::available('relation.target.container.application.name.formatForCodeCapital')) {
+                    relation.addJoin(true, 'from')
                 }
-            «ENDFOR»
-            «IF categorisable»
+            ENDFOR
+            IF categorisable
 
                 $qb->leftJoin('tbl.categories', 'tblCategories');
-            «ENDIF»
+            ENDIF
 
             return $qb;
         }
@@ -71,9 +71,9 @@ class Joins {
 
     def private addJoin(JoinRelationship it, Boolean incoming, String target) {
         val relationAliasName = getRelationAliasName(incoming).formatForCodeCapital
-        if (target == 'select') ''', tbl«relationAliasName»'''
+        if (target == 'select') ''', tblrelationAliasName'''
         else if (target == 'from') '''
-            $qb->leftJoin('tbl.«relationAliasName.toFirstLower»', 'tbl«relationAliasName»');
+            $qb->leftJoin('tbl.relationAliasName.toFirstLower', 'tblrelationAliasName');
         '''
     }
 }

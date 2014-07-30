@@ -33,8 +33,8 @@ class Config {
     }
 
     def private configHandlerBaseImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Form\Handler\«configController.toFirstUpper»\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Form\Handler\configController.toFirstUpper\Base;
 
             use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -45,11 +45,11 @@ class Config {
             use Zikula_Form_AbstractHandler;
             use Zikula_Form_View;
 
-        «ENDIF»
+        ENDIF
         /**
          * Configuration handler base class.
          */
-        class «IF targets('1.3.5')»«appName»_Form_Handler_«configController.toFirstUpper»_Base_Config«ELSE»ConfigHandler«ENDIF» extends Zikula_Form_AbstractHandler
+        class IF targets('1.3.5')appName_Form_Handler_configController.toFirstUpper_Base_ConfigELSEConfigHandlerENDIF extends Zikula_Form_AbstractHandler
         {
             /**
              * Post construction hook.
@@ -68,26 +68,26 @@ class Config {
              * @param Zikula_Form_View $view The form view instance.
              *
              * @return boolean False in case of initialization errors, otherwise true.
-             «IF !targets('1.3.5')»
+             IF !targets('1.3.5')
              *
              * @throws AccessDeniedException Thrown if the user doesn't have admin permissions
              * @throws RuntimeException          Thrown if persisting configuration vars fails
-             «ENDIF»
+             ENDIF
              */
             public function initialize(Zikula_Form_View $view)
             {
                 // permission check
                 if (!SecurityUtil::checkPermission($this->name . '::', '::', ACCESS_ADMIN)) {
-                    «IF targets('1.3.5')»
+                    IF targets('1.3.5')
                         return $view->registerError(LogUtil::registerPermissionError());
-                    «ELSE»
+                    ELSE
                         throw new AccessDeniedException();
-                    «ENDIF»
+                    ENDIF
                 }
-                «IF !getAllVariables.filter(IntVar).filter[isUserGroupSelector].empty»
+                IF !getAllVariables.filter(IntVar).filter[isUserGroupSelector].empty
 
                     // prepare list of user groups for moderation group selectors
-                    $userGroups = ModUtil::apiFunc('«IF targets('1.3.5')»Groups«ELSE»ZikulaGroupsModule«ENDIF»', 'user', 'getall');
+                    $userGroups = ModUtil::apiFunc('IF targets('1.3.5')GroupsELSEZikulaGroupsModuleENDIF', 'user', 'getall');
                     $userGroupItems = array();
                     foreach ($userGroups as $userGroup) {
                         $userGroupItems[] = array(
@@ -95,12 +95,12 @@ class Config {
                             'text' => $userGroup['name']
                         );
                     }
-                «ENDIF»
+                ENDIF
 
                 // retrieve module vars
                 $modVars = $this->getVars();
 
-                «FOR modvar : getAllVariables»«modvar.init»«ENDFOR»
+                FOR modvar : getAllVariablesmodvar.initENDFOR
 
                 // assign all module vars
                 $this->view->assign('config', $modVars);
@@ -156,10 +156,10 @@ class Config {
              */
             public function handleCommand(Zikula_Form_View $view, &$args)
             {
-                «IF !targets('1.3.5')»
+                IF !targets('1.3.5')
                     $serviceManager = ServiceUtil::getManager();
 
-                «ENDIF»
+                ENDIF
                 if ($args['commandName'] == 'save') {
                     // check if all fields are valid
                     if (!$this->view->isValid()) {
@@ -177,32 +177,32 @@ class Config {
                         if (System::isDevelopmentMode()) {
                             $msg .= ' ' . $e->getMessage();
                         }
-                        «IF targets('1.3.5')»
+                        IF targets('1.3.5')
                             return LogUtil::registerError($msg);
-                        «ELSE»
+                        ELSE
                             $this->request->getSession()->getFlashBag()->add('error', $msg);
                             return false;
-                        «ENDIF»
+                        ENDIF
                     }
 
-                    «IF targets('1.3.5')»
+                    IF targets('1.3.5')
                         LogUtil::registerStatus($this->__('Done! Module configuration updated.'));
-                    «ELSE»
+                    ELSE
                         $this->request->getSession()->getFlashBag()->add('status', $this->__('Done! Module configuration updated.'));
 
                         $logger = $serviceManager->get('logger');
-                        $logger->notice('{app}: User {user} updated the configuration.', array('app' => '«appName»', 'user' => UserUtil::getVar('uname')));
-                    «ENDIF»
+                        $logger->notice('{app}: User {user} updated the configuration.', array('app' => 'appName', 'user' => UserUtil::getVar('uname')));
+                    ENDIF
                 } else if ($args['commandName'] == 'cancel') {
                     // nothing to do there
                 }
 
                 // redirect back to the config page
-                «IF targets('1.3.5')»
-                    $url = ModUtil::url($this->name, '«configController.formatForDB»', 'config');
-                «ELSE»
-                    $url = $serviceManager->get('router')->generate('«appName.formatForDB»_«configController.formatForDB»_config');
-                «ENDIF»
+                IF targets('1.3.5')
+                    $url = ModUtil::url($this->name, 'configController.formatForDB', 'config');
+                ELSE
+                    $url = $serviceManager->get('router')->generate('appName.formatForDB_configController.formatForDB_config');
+                ENDIF
 
                 return $this->view->redirect($url);
             }
@@ -213,37 +213,37 @@ class Config {
     }
 
     def private dispatch init(IntVar it) '''
-        «IF isUserGroupSelector»
-            $modVars['«name.formatForCode»Items'] = $userGroupItems;
-        «ENDIF»
+        IF isUserGroupSelector
+            $modVars['name.formatForCodeItems'] = $userGroupItems;
+        ENDIF
     '''
 
     def private dispatch init(ListVar it) '''
-        // initialise list entries for the '«name.formatForDisplay»' setting
-        «/*        $listEntries = $modVars['«name.formatForCode)»'];*/»
-        $modVars['«name.formatForCode»Items'] = array(«FOR item : items SEPARATOR ','»«item.itemDefinition»«ENDFOR»
+        // initialise list entries for the 'name.formatForDisplay' setting
+        /*        $listEntries = $modVars['name.formatForCode)'];*/
+        $modVars['name.formatForCodeItems'] = array(FOR item : items SEPARATOR ','item.itemDefinitionENDFOR
         );
     '''
 
     def private itemDefinition(ListVarItem it) '''
-            array('value' => '«name.formatForCode»', 'text' => '«name.formatForDisplayCapital»')
+            array('value' => 'name.formatForCode', 'text' => 'name.formatForDisplayCapital')
     '''
 
     def private configHandlerImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Form\Handler\«configController.toFirstUpper»;
+        IF !targets('1.3.5')
+            namespace appNamespace\Form\Handler\configController.toFirstUpper;
 
-            use «appNamespace»\Form\Handler\«configController.toFirstUpper»\Base\ConfigHandler as BaseConfigHandler;
+            use appNamespace\Form\Handler\configController.toFirstUpper\Base\ConfigHandler as BaseConfigHandler;
 
-        «ENDIF»
+        ENDIF
         /**
          * Configuration handler implementation class.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Form_Handler_«configController.toFirstUpper»_Config extends «appName»_Form_Handler_«configController.toFirstUpper»_Base_Config
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Form_Handler_configController.toFirstUpper_Config extends appName_Form_Handler_configController.toFirstUpper_Base_Config
+        ELSE
         class ConfigHandler extends BaseConfigHandler
-        «ENDIF»
+        ENDIF
         {
             // feel free to extend the base handler class here
         }

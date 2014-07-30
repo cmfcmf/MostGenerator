@@ -25,8 +25,8 @@ class BlockModeration {
     }
 
     def private moderationBlockBaseClass(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Block\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Block\Base;
 
             use BlockUtil;
             use ModUtil;
@@ -35,24 +35,24 @@ class BlockModeration {
             use Zikula_Controller_AbstractBlock;
             use Zikula_View;
 
-        «ENDIF»
+        ENDIF
         /**
          * Moderation block base class.
          */
-        class «IF targets('1.3.5')»«appName»_Block_Base_Moderation«ELSE»ModerationBlock«ENDIF» extends Zikula_Controller_AbstractBlock
+        class IF targets('1.3.5')appName_Block_Base_ModerationELSEModerationBlockENDIF extends Zikula_Controller_AbstractBlock
         {
-            «moderationBlockBaseImpl»
+            moderationBlockBaseImpl
         }
     '''
 
     def private moderationBlockBaseImpl(Application it) '''
-        «init»
+        init
 
-        «info»
+        info
 
-        «display»
+        display
 
-        «getDisplayTemplate»
+        getDisplayTemplate
     '''
 
     def private init(Application it) '''
@@ -61,7 +61,7 @@ class BlockModeration {
          */
         public function init()
         {
-            SecurityUtil::registerPermissionSchema('«appName»:ModerationBlock:', 'Block title::');
+            SecurityUtil::registerPermissionSchema('appName:ModerationBlock:', 'Block title::');
         }
     '''
 
@@ -75,11 +75,11 @@ class BlockModeration {
         {
             $requirementMessage = '';
             // check if the module is available at all
-            if (!ModUtil::available('«appName»')) {
-                $requirementMessage .= $this->__('Notice: This block will not be displayed until you activate the «appName» module.');
+            if (!ModUtil::available('appName')) {
+                $requirementMessage .= $this->__('Notice: This block will not be displayed until you activate the appName module.');
             }
 
-            return array('module'          => '«appName»',
+            return array('module'          => 'appName',
                          'text_type'       => $this->__('Moderation'),
                          'text_type_long'  => $this->__('Show a list of pending tasks to moderators.'),
                          'allow_multiple'  => true,
@@ -102,12 +102,12 @@ class BlockModeration {
         public function display($blockinfo)
         {
             // only show block content if the user has the required permissions
-            if (!SecurityUtil::checkPermission('«appName»:ModerationBlock:', "$blockinfo[title]::", ACCESS_OVERVIEW)) {
+            if (!SecurityUtil::checkPermission('appName:ModerationBlock:', "$blockinfo[title]::", ACCESS_OVERVIEW)) {
                 return false;
             }
 
             // check if the module is available at all
-            if (!ModUtil::available('«appName»')) {
+            if (!ModUtil::available('appName')) {
                 return false;
             }
 
@@ -115,16 +115,16 @@ class BlockModeration {
                 return false;
             }
 
-            ModUtil::initOOModule('«appName»');
+            ModUtil::initOOModule('appName');
 
             $this->view->setCaching(Zikula_View::CACHE_DISABLED);
             $template = $this->getDisplayTemplate($vars);
 
-            «IF targets('1.3.5')»
-                $workflowHelper = new appName»_Util_Workflow($this->serviceManager);
-            «ELSE»
-                $workflowHelper = $this->serviceManager->get('«appName.formatForDB».workflow_helper');
-            «ENDIF»
+            IF targets('1.3.5')
+                $workflowHelper = new appName_Util_Workflow($this->serviceManager);
+            ELSE
+                $workflowHelper = $this->serviceManager->get('appName.formatForDB.workflow_helper');
+            ENDIF
             $amounts = $workflowHelper->collectAmountOfModerationItems();
 
             // assign block vars and fetched data
@@ -152,27 +152,27 @@ class BlockModeration {
          */
         protected function getDisplayTemplate($vars)
         {
-            $template = '«IF targets('1.3.5')»block«ELSE»Block«ENDIF»/moderation.tpl';
+            $template = 'IF targets('1.3.5')blockELSEBlockENDIF/moderation.tpl';
 
             return $template;
         }
     '''
 
     def private moderationBlockImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Block;
+        IF !targets('1.3.5')
+            namespace appNamespace\Block;
 
-            use «appNamespace»\Block\Base\ModerationBlock as BaseModerationBlock;
+            use appNamespace\Block\Base\ModerationBlock as BaseModerationBlock;
 
-        «ENDIF»
+        ENDIF
         /**
          * Moderation block implementation class.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Block_Moderation extends «appName»_Block_Base_Moderation
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Block_Moderation extends appName_Block_Base_Moderation
+        ELSE
         class ModerationBlock extends BaseModerationBlock
-        «ENDIF»
+        ENDIF
         {
             // feel free to extend the moderation block here
         }

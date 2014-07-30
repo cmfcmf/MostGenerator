@@ -24,7 +24,7 @@ class TemplateHeaders {
 
     def private templateHeadersImpl(Application it) '''
         /**
-         * The «appName.formatForDB»TemplateHeaders plugin performs header() operations
+         * The appName.formatForDBTemplateHeaders plugin performs header() operations
          * to change the content type provided to the user agent.
          *
          * Available parameters:
@@ -37,10 +37,10 @@ class TemplateHeaders {
          *
          * @return boolean false.
          */
-        function smarty_function_«appName.formatForDB»TemplateHeaders($params, $view)
+        function smarty_function_appName.formatForDBTemplateHeaders($params, $view)
         {
             if (!isset($params['contentType'])) {
-                $view->trigger_error($view->__f('%1$s: missing parameter \'%2$s\'', array('«appName.formatForDB»TemplateHeaders', 'contentType')));
+                $view->trigger_error($view->__f('%1$s: missing parameter \'%2$s\'', array('appName.formatForDBTemplateHeaders', 'contentType')));
             }
 
             // apply header

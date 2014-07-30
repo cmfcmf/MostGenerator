@@ -28,60 +28,60 @@ class EntityMethods {
     extension Utils = new Utils
 
     def generate(Entity it, Application app, Property thProp) '''
-        «propertyChangedListener»
+        propertyChangedListener
 
-        «getTitleFromDisplayPattern(app)»
+        getTitleFromDisplayPattern(app)
 
-        «IF app.targets('1.3.5')»
-            «initValidator»
-        «ELSE»
-            «val thVal = new ValidationConstraints»
-            «IF hasListFieldsEntity»
-                «FOR listField : getListFieldsEntity»
+        IF app.targets('1.3.5')
+            initValidator
+        ELSE
+            val thVal = new ValidationConstraints
+            IF hasListFieldsEntity
+                FOR listField : getListFieldsEntity
 
-                    «thVal.validationMethods(listField)»
-                «ENDFOR»
-            «ENDIF»
-            «IF hasUserFieldsEntity»
-                «FOR userField : getUserFieldsEntity»
+                    thVal.validationMethods(listField)
+                ENDFOR
+            ENDIF
+            IF hasUserFieldsEntity
+                FOR userField : getUserFieldsEntity
 
-                    «thVal.validationMethods(userField)»
-                «ENDFOR»
-            «ENDIF»
-            «val dateTimeFields = fields.filter(AbstractDateField)»
-            «IF !dateTimeFields.empty»
-                «FOR dateField : dateTimeFields»
+                    thVal.validationMethods(userField)
+                ENDFOR
+            ENDIF
+            val dateTimeFields = fields.filter(AbstractDateField)
+            IF !dateTimeFields.empty
+                FOR dateField : dateTimeFields
 
-                    «thVal.validationMethods(dateField)»
-                «ENDFOR»
-            «ENDIF»
-        «ENDIF»
+                    thVal.validationMethods(dateField)
+                ENDFOR
+            ENDIF
+        ENDIF
 
-        «initWorkflow(app)»
+        initWorkflow(app)
 
-        «resetWorkflow(app)»
+        resetWorkflow(app)
 
-        «validate»
+        validate
 
-        «toJson»
+        toJson
 
-        «new ItemActions().prepareItemActions(it, app)»
+        new ItemActions().prepareItemActions(it, app)
 
-        «createUrlArgs»
+        createUrlArgs
 
-        «createCompositeIdentifier»
+        createCompositeIdentifier
 
-        «getHookAreaPrefix»
+        getHookAreaPrefix
 
-        «relatedObjectsImpl(app)»
+        relatedObjectsImpl(app)
 
-        «toStringImpl(app)»
+        toStringImpl(app)
 
-        «cloneImpl(app, thProp)»
+        cloneImpl(app, thProp)
     '''
 
     def private propertyChangedListener(Entity it) '''
-        «IF hasNotifyPolicy»
+        IF hasNotifyPolicy
 
             /**
              * Adds a property change listener.
@@ -108,7 +108,7 @@ class EntityMethods {
                     }
                 }
             }
-        «ENDIF»
+        ENDIF
     '''
 
     def private getTitleFromDisplayPattern(Entity it, Application app) '''
@@ -118,16 +118,16 @@ class EntityMethods {
          */
         public function getTitleFromDisplayPattern()
         {
-            «IF hasListFieldsEntity»
+            IF hasListFieldsEntity
                 $serviceManager = ServiceUtil::getManager();
-                «IF app.targets('1.3.5')»
-                    $listHelper = new «app.appName»_Util_ListEntries(ServiceUtil::getManager());
-                «ELSE»
-                    $listHelper = $serviceManager->get('«app.appName.formatForDB».listentries_helper');
-                «ENDIF»
+                IF app.targets('1.3.5')
+                    $listHelper = new app.appName_Util_ListEntries(ServiceUtil::getManager());
+                ELSE
+                    $listHelper = $serviceManager->get('app.appName.formatForDB.listentries_helper');
+                ENDIF
 
-            «ENDIF»
-            $formattedTitle = «parseDisplayPattern»;
+            ENDIF
+            $formattedTitle = parseDisplayPattern;
 
             return $formattedTitle;
         }
@@ -161,12 +161,12 @@ class EntityMethods {
 
     def private formatFieldValue(EntityField it, CharSequence value) {
         switch it {
-            DecimalField: '''DataUtil::format«IF currency»Currency(«value»)«ELSE»Number(«value», 2)«ENDIF»'''
-            FloatField: '''DataUtil::format«IF currency»Currency(«value»)«ELSE»Number(«value», 2)«ENDIF»'''
-            ListField: '''$listHelper->resolve(«value», '«entity.name.formatForCode»', '«name.formatForCode»')'''
-            DateField: '''DateUtil::formatDatetime(«value», 'datebrief')'''
-            DatetimeField: '''DateUtil::formatDatetime(«value», 'datetimebrief')'''
-            TimeField: '''DateUtil::formatDatetime(«value», 'timebrief')'''
+            DecimalField: '''DataUtil::formatIF currencyCurrency(value)ELSENumber(value, 2)ENDIF'''
+            FloatField: '''DataUtil::formatIF currencyCurrency(value)ELSENumber(value, 2)ENDIF'''
+            ListField: '''$listHelper->resolve(value, 'entity.name.formatForCode', 'name.formatForCode')'''
+            DateField: '''DateUtil::formatDatetime(value, 'datebrief')'''
+            DatetimeField: '''DateUtil::formatDatetime(value, 'datetimebrief')'''
+            TimeField: '''DateUtil::formatDatetime(value, 'timebrief')'''
             default: value
         }
     }
@@ -175,18 +175,18 @@ class EntityMethods {
      * Initialises the validator instance. Used for 1.3.x target only, replaced by Symfony Validator in 1.4.x.
      */
     def private initValidator(Entity it) '''
-        «val validatorClassLegacy = container.application.appName + '_Entity_Validator_' + name.formatForCodeCapital»
+        val validatorClassLegacy = container.application.appName + '_Entity_Validator_' + name.formatForCodeCapital
         /**
          * Initialises the validator and return it's instance.
          *
-         * @return «validatorClassLegacy» The validator for this entity.
+         * @return validatorClassLegacy The validator for this entity.
          */
         public function initValidator()
         {
             if (!is_null($this->_validator)) {
                 return $this->_validator;
             }
-            $this->_validator = new «validatorClassLegacy»($this);
+            $this->_validator = new validatorClassLegacy($this);
 
             return $this->_validator;
         }
@@ -197,17 +197,17 @@ class EntityMethods {
          * Sets/retrieves the workflow details.
          *
          * @param boolean $forceLoading load the workflow record.
-         «IF !app.targets('1.3.5')»
+         IF !app.targets('1.3.5')
          *
          * @throws RuntimeException Thrown if retrieving the workflow object fails
-         «ENDIF»
+         ENDIF
          */
         public function initWorkflow($forceLoading = false)
         {
-            $currentFunc = FormUtil::getPassedValue('func', '«IF app.targets('1.3.5')»main«ELSE»index«ENDIF»', 'GETPOST', FILTER_SANITIZE_STRING);
+            $currentFunc = FormUtil::getPassedValue('func', 'IF app.targets('1.3.5')mainELSEindexENDIF', 'GETPOST', FILTER_SANITIZE_STRING);
             $isReuse = FormUtil::getPassedValue('astemplate', '', 'GETPOST', FILTER_SANITIZE_STRING);
 
-            «loadWorkflow»
+            loadWorkflow
         }
     '''
 
@@ -221,25 +221,25 @@ class EntityMethods {
             $this->setWorkflowState('initial');
 
             $serviceManager = ServiceUtil::getManager();
-            «IF app.targets('1.3.5')»
-                $workflowHelper = new «app.appName»_Util_Workflow($serviceManager);
-            «ELSE»
-                $workflowHelper = $serviceManager->get('«app.appName.formatForDB».workflow_helper');
-            «ENDIF»
+            IF app.targets('1.3.5')
+                $workflowHelper = new app.appName_Util_Workflow($serviceManager);
+            ELSE
+                $workflowHelper = $serviceManager->get('app.appName.formatForDB.workflow_helper');
+            ENDIF
 
             $schemaName = $workflowHelper->getWorkflowName($this['_objectType']);
             $this['__WORKFLOW__'] = array(
-                'module' => '«app.appName»',
+                'module' => 'app.appName',
                 'state' => $this['workflowState'],
-                «IF app.targets('1.3.5')»
+                IF app.targets('1.3.5')
                     'obj_table' => $this['_objectType'],
-                    'obj_idcolumn' => '«primaryKeyFields.head.name.formatForCode»',
+                    'obj_idcolumn' => 'primaryKeyFields.head.name.formatForCode',
                     'obj_id' => 0,
-                «ELSE»
+                ELSE
                     'objTable' => $this['_objectType'],
-                    'objIdcolumn' => '«primaryKeyFields.head.name.formatForCode»',
+                    'objIdcolumn' => 'primaryKeyFields.head.name.formatForCode',
                     'objId' => 0,
-                «ENDIF»
+                ENDIF
                 'schemaname' => $schemaName);
         }
     '''
@@ -252,10 +252,10 @@ class EntityMethods {
          * Start validation and raise exception if invalid data is found.
          *
          * @return void.
-        «IF container.application.targets('1.3.5')»
-            «' '»*
-            «' '»* @throws Zikula_Exception Thrown if a validation error occurs
-        «ENDIF»
+        IF container.application.targets('1.3.5')
+            ' '*
+            ' '* @throws Zikula_Exception Thrown if a validation error occurs
+        ENDIF
          */
         public function validate()
         {
@@ -263,21 +263,21 @@ class EntityMethods {
                 return;
             }
 
-        «val emailFields = getDerivedFields.filter(EmailField)»
-            «IF emailFields.size > 0»
+        val emailFields = getDerivedFields.filter(EmailField)
+            IF emailFields.size > 0
                 // decode possibly encoded mail addresses (#201)
-                «FOR emailField : emailFields»
-                    if (strpos($this['«emailField.name.formatForCode»'], '&#') !== false) {
-                        $this['«emailField.name.formatForCode»'] = html_entity_decode($this['«emailField.name.formatForCode»']);
+                FOR emailField : emailFields
+                    if (strpos($this['emailField.name.formatForCode'], '&#') !== false) {
+                        $this['emailField.name.formatForCode'] = html_entity_decode($this['emailField.name.formatForCode']);
                     }
-                «ENDFOR»
-            «ENDIF»
-            «IF container.application.targets('1.3.5')»
+                ENDFOR
+            ENDIF
+            IF container.application.targets('1.3.5')
                 $result = $this->initValidator()->validateAll();
                 if (is_array($result)) {
                     throw new Zikula_Exception($result['message'], $result['code'], $result['debugArray']);
                 }
-            «ELSE»
+            ELSE
                 $serviceManager = ServiceUtil::getManager();
 
                 $validator = $serviceManager->get('validator');
@@ -289,7 +289,7 @@ class EntityMethods {
                         $session->getFlashBag()->add('error', $error->getMessage());
                     }
                 }
-            «ENDIF»
+            ENDIF
         }
     '''
 
@@ -314,15 +314,15 @@ class EntityMethods {
          */
         public function createUrlArgs()
         {
-            $args = array(«IF container.application.targets('1.3.5')»'ot' => $this['_objectType']«ENDIF»);
+            $args = array(IF container.application.targets('1.3.5')'ot' => $this['_objectType']ENDIF);
 
-            «IF hasCompositeKeys»
-                «FOR pkField : getPrimaryKeyFields»
-                    $args['«pkField.name.formatForCode»'] = $this['«pkField.name.formatForCode»'];
-                «ENDFOR»
-            «ELSE»
-                $args['«getFirstPrimaryKey.name.formatForCode»'] = $this['«getFirstPrimaryKey.name.formatForCode»'];
-            «ENDIF»
+            IF hasCompositeKeys
+                FOR pkField : getPrimaryKeyFields
+                    $args['pkField.name.formatForCode'] = $this['pkField.name.formatForCode'];
+                ENDFOR
+            ELSE
+                $args['getFirstPrimaryKey.name.formatForCode'] = $this['getFirstPrimaryKey.name.formatForCode'];
+            ENDIF
 
             if (isset($this['slug'])) {
                 $args['slug'] = $this['slug'];
@@ -340,14 +340,14 @@ class EntityMethods {
          */
         public function createCompositeIdentifier()
         {
-            «IF hasCompositeKeys»
+            IF hasCompositeKeys
                 $itemId = '';
-                «FOR pkField : getPrimaryKeyFields»
-                    $itemId .= ((!empty($itemId)) ? '_' : '') . $this['«pkField.name.formatForCode»'];
-                «ENDFOR»
-            «ELSE»
-                $itemId = $this['«getFirstPrimaryKey.name.formatForCode»'];
-            «ENDIF»
+                FOR pkField : getPrimaryKeyFields
+                    $itemId .= ((!empty($itemId)) ? '_' : '') . $this['pkField.name.formatForCode'];
+                ENDFOR
+            ELSE
+                $itemId = $this['getFirstPrimaryKey.name.formatForCode'];
+            ENDIF
 
             return $itemId;
         }
@@ -361,49 +361,49 @@ class EntityMethods {
          */
         public function getHookAreaPrefix()
         {
-            return '«container.application.name.formatForDB».ui_hooks.«nameMultiple.formatForDB»';
+            return 'container.application.name.formatForDB.ui_hooks.nameMultiple.formatForDB';
         }
     '''
 
     def private loadWorkflow(Entity it) '''
-        «val app = container.application»
+        val app = container.application
         // apply workflow with most important information
-        $idColumn = '«primaryKeyFields.head.name.formatForCode»';
+        $idColumn = 'primaryKeyFields.head.name.formatForCode';
 
         $serviceManager = ServiceUtil::getManager();
-        «IF app.targets('1.3.5')»
-            $workflowHelper = new «app.appName»_Util_Workflow($serviceManager);
-        «ELSE»
-            $workflowHelper = $serviceManager->get('«app.appName.formatForDB».workflow_helper');
-        «ENDIF»
+        IF app.targets('1.3.5')
+            $workflowHelper = new app.appName_Util_Workflow($serviceManager);
+        ELSE
+            $workflowHelper = $serviceManager->get('app.appName.formatForDB.workflow_helper');
+        ENDIF
 
         $schemaName = $workflowHelper->getWorkflowName($this['_objectType']);
         $this['__WORKFLOW__'] = array(
-            'module' => '«app.appName»',
+            'module' => 'app.appName',
             'state' => $this['workflowState'],
-            «IF app.targets('1.3.5')»
+            IF app.targets('1.3.5')
                 'obj_table' => $this['_objectType'],
                 'obj_idcolumn' => $idColumn,
                 'obj_id' => $this[$idColumn],
-            «ELSE»
+            ELSE
                 'objTable' => $this['_objectType'],
                 'objIdcolumn' => $idColumn,
                 'objId' => $this[$idColumn],
-            «ENDIF»
+            ENDIF
             'schemaname' => $schemaName);
 
         // load the real workflow only when required (e. g. when func is edit or delete)
-        if ((!in_array($currentFunc, array('«IF app.targets('1.3.5')»main«ELSE»index«ENDIF»', 'view', 'display')) && empty($isReuse)) || $forceLoading) {
-            $result = Zikula_Workflow_Util::getWorkflowForObject($this, $this['_objectType'], $idColumn, '«app.appName»');
+        if ((!in_array($currentFunc, array('IF app.targets('1.3.5')mainELSEindexENDIF', 'view', 'display')) && empty($isReuse)) || $forceLoading) {
+            $result = Zikula_Workflow_Util::getWorkflowForObject($this, $this['_objectType'], $idColumn, 'app.appName');
             if (!$result) {
-                $dom = ZLanguage::getModuleDomain('«app.appName»');
-                «IF app.targets('1.3.5')»
+                $dom = ZLanguage::getModuleDomain('app.appName');
+                IF app.targets('1.3.5')
                     LogUtil::registerError(__('Error! Could not load the associated workflow.', $dom));
-                «ELSE»
+                ELSE
                     $serviceManager = ServiceUtil::getManager();
                     $session = $serviceManager->get('session');
                     $session->getFlashBag()->add('error', __('Error! Could not load the associated workflow.', $dom));
-                «ENDIF»
+                ENDIF
             }
         }
 
@@ -421,19 +421,19 @@ class EntityMethods {
          */
         public function __toString()
         {
-            «IF hasCompositeKeys»
+            IF hasCompositeKeys
                 $output = '';
-                «FOR field : primaryKeyFields»
+                FOR field : primaryKeyFields
                     if (!empty($output)) {
                         $output .= "\n";
                     }
-                    $output .= $this->get«field.name.formatForCodeCapital»();
-                «ENDFOR»
+                    $output .= $this->getfield.name.formatForCodeCapital();
+                ENDFOR
 
                 return $output;
-            «ELSE»
-                return $this->get«primaryKeyFields.head.name.formatForCodeCapital»();
-            «ENDIF»
+            ELSE
+                return $this->getprimaryKeyFields.head.name.formatForCodeCapital();
+            ENDIF
         }
     '''
 
@@ -446,39 +446,39 @@ class EntityMethods {
          * @return array of entity objects.
          */
         public function getRelatedObjectsToPersist(&$objects = array()) {
-            «val joinsIn = incomingJoinRelationsForCloning.filter[!(it instanceof ManyToManyRelationship)]»
-            «val joinsOut = outgoingJoinRelationsForCloning.filter[!(it instanceof ManyToManyRelationship)]»
-            «IF !joinsIn.empty || !joinsOut.empty»
-                «FOR out : newArrayList(false, true)»
-                    «FOR relation : if (out) joinsOut else joinsIn»
-                        «var aliasName = relation.getRelationAliasName(out)»
-                        foreach ($this->«aliasName» as $rel) {
+            val joinsIn = incomingJoinRelationsForCloning.filter[!(it instanceof ManyToManyRelationship)]
+            val joinsOut = outgoingJoinRelationsForCloning.filter[!(it instanceof ManyToManyRelationship)]
+            IF !joinsIn.empty || !joinsOut.empty
+                FOR out : newArrayList(false, true)
+                    FOR relation : if (out) joinsOut else joinsIn
+                        var aliasName = relation.getRelationAliasName(out)
+                        foreach ($this->aliasName as $rel) {
                             if (!in_array($rel, $objects, true)) {
                                 $objects[] = $rel;
                                 $rel->getRelatedObjectsToPersist($objects);
                             }
                         }
-                    «ENDFOR»
-                «ENDFOR»
+                    ENDFOR
+                ENDFOR
 
                 return $objects;
-             «ELSE»
+             ELSE
                 return array();
-             «ENDIF»
+             ENDIF
          }
     '''
 
     def private cloneImpl(Entity it, Application app, Property thProp) '''
-        «val joinsIn = incomingJoinRelationsForCloning»
-        «val joinsOut = outgoingJoinRelationsForCloning»
+        val joinsIn = incomingJoinRelationsForCloning
+        val joinsOut = outgoingJoinRelationsForCloning
         /**
          * Clone interceptor implementation.
          * This method is for example called by the reuse functionality.
-         «IF joinsIn.empty && joinsOut.empty»
+         IF joinsIn.empty && joinsOut.empty
          * Performs a quite simple shallow copy.
-         «ELSE»
+         ELSE
          * Performs a deep copy.
-         «ENDIF»
+         ENDIF
          *
          * See also:
          * (1) http://docs.doctrine-project.org/en/latest/cookbook/implementing-wakeup-or-clone.html
@@ -489,51 +489,51 @@ class EntityMethods {
         public function __clone()
         {
             // If the entity has an identity, proceed as normal.
-            if («FOR field : primaryKeyFields SEPARATOR ' && '»$this->«field.name.formatForCode»«ENDFOR») {
+            if (FOR field : primaryKeyFields SEPARATOR ' && '$this->field.name.formatForCodeENDFOR) {
                 // unset identifiers
-                «FOR field : primaryKeyFields»
-                    $this->set«field.name.formatForCodeCapital»(«thProp.defaultFieldData(field)»);
-                «ENDFOR»
-                «IF app.targets('1.3.5')»
+                FOR field : primaryKeyFields
+                    $this->setfield.name.formatForCodeCapital(thProp.defaultFieldData(field));
+                ENDFOR
+                IF app.targets('1.3.5')
 
                     // init validator
                     $this->initValidator();
-                «ENDIF»
+                ENDIF
 
                 // reset Workflow
                 $this->resetWorkflow();
-                «IF hasUploadFieldsEntity»
+                IF hasUploadFieldsEntity
 
                     // reset upload fields
-                    «FOR field : getUploadFieldsEntity»
-                        $this->set«field.name.formatForCodeCapital»('');
-                        $this->set«field.name.formatForCodeCapital»Meta(array());
-                    «ENDFOR»
-                «ENDIF»
-                «IF standardFields»
+                    FOR field : getUploadFieldsEntity
+                        $this->setfield.name.formatForCodeCapital('');
+                        $this->setfield.name.formatForCodeCapitalMeta(array());
+                    ENDFOR
+                ENDIF
+                IF standardFields
 
                     $this->setCreatedDate(null);
                     $this->setCreatedUserId(null);
                     $this->setUpdatedDate(null);
                     $this->setUpdatedUserId(null);
-                «ENDIF»
+                ENDIF
 
-                «IF !joinsIn.empty || !joinsOut.empty»
+                IF !joinsIn.empty || !joinsOut.empty
                     // handle related objects
                     // prevent shared references by doing a deep copy - see (2) and (3) for more information
                     // clone referenced objects only if a new record is necessary
-                    «FOR out: newArrayList(false, true)»
-                        «FOR relation : if (out) joinsOut else joinsIn»
-                            «var aliasName = relation.getRelationAliasName(out)»
-                            $collection = $this->«aliasName»;
-                            $this->«aliasName» = new ArrayCollection();
+                    FOR out: newArrayList(false, true)
+                        FOR relation : if (out) joinsOut else joinsIn
+                            var aliasName = relation.getRelationAliasName(out)
+                            $collection = $this->aliasName;
+                            $this->aliasName = new ArrayCollection();
                             foreach ($collection as $rel) {
-                                $this->add«aliasName.formatForCodeCapital»(«IF !(relation instanceof ManyToManyRelationship)» clone«ENDIF» $rel);
+                                $this->addaliasName.formatForCodeCapital(IF !(relation instanceof ManyToManyRelationship) cloneENDIF $rel);
                             }
-                        «ENDFOR»
-                    «ENDFOR»
-                «ENDIF»
-                «IF categorisable»
+                        ENDFOR
+                    ENDFOR
+                ENDIF
+                IF categorisable
 
                     // clone categories
                     $categories = $this->categories;
@@ -543,8 +543,8 @@ class EntityMethods {
                         $this->categories->add($newCat);
                         $newCat->setEntity($this);
                     }
-                «ENDIF»
-                «IF attributable»
+                ENDIF
+                IF attributable
 
                     // clone attributes
                     $attributes = $this->attributes;
@@ -554,8 +554,8 @@ class EntityMethods {
                         $this->attributes->add($newAttr);
                         $newAttr->setEntity($this);
                     }
-                «ENDIF»
-                «/* TODO consider other extensions here (meta data, translatable, loggable, maybe more) */»
+                ENDIF
+                /* TODO consider other extensions here (meta data, translatable, loggable, maybe more) */
             }
             // otherwise do nothing, do NOT throw an exception!
         }

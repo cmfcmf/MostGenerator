@@ -97,34 +97,34 @@ class Entities {
 
     def private imports(Entity it) '''
         use Doctrine\ORM\Mapping as ORM;
-        «IF hasCollections || attributable || categorisable»
+        IF hasCollections || attributable || categorisable
             use Doctrine\Common\Collections\ArrayCollection;
-        «ENDIF»
+        ENDIF
         use Gedmo\Mapping\Annotation as Gedmo;
-        «IF hasNotifyPolicy»
+        IF hasNotifyPolicy
             use Doctrine\Common\NotifyPropertyChanged;
             use Doctrine\Common\PropertyChangedListener;
-        «ENDIF»
-        «IF standardFields»
+        ENDIF
+        IF standardFields
             use DoctrineExtensions\StandardFields\Mapping\Annotation as ZK;
-        «ENDIF»
-        «IF !container.application.targets('1.3.5')»
+        ENDIF
+        IF !container.application.targets('1.3.5')
             use Symfony\Component\Validator\Constraints as Assert;
-            «IF !getUniqueDerivedFields.filter[!primaryKey].empty || (hasSluggableFields && slugUnique) || !getIncomingJoinRelations.filter[unique].empty || !getOutgoingJoinRelations.filter[unique].empty || !getUniqueIndexes.empty»
+            IF !getUniqueDerivedFields.filter[!primaryKey].empty || (hasSluggableFields && slugUnique) || !getIncomingJoinRelations.filter[unique].empty || !getOutgoingJoinRelations.filter[unique].empty || !getUniqueIndexes.empty
                 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-            «ENDIF»
-        «ENDIF»
+            ENDIF
+        ENDIF
     '''
 
     def private modelEntityBaseImpl(Entity it, Application app) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Entity\Base;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Entity\Base;
 
-            use «app.appNamespace»\«app.name.formatForCodeCapital»Events;
-            use «app.appNamespace»\Event\Filter«name.formatForCodeCapital»Event;
-        «ENDIF»
-        «imports»
-        «IF !app.targets('1.3.5')»
+            use app.appNamespace\app.name.formatForCodeCapitalEvents;
+            use app.appNamespace\Event\Filtername.formatForCodeCapitalEvent;
+        ENDIF
+        imports
+        IF !app.targets('1.3.5')
 
             use DataUtil;
             use FormUtil;
@@ -137,12 +137,12 @@ class Entities {
             use Zikula_Exception;
             use Zikula_Workflow_Util;
             use ZLanguage;
-        «ENDIF»
+        ENDIF
 
         /**
          * Entity class that defines the entity structure and behaviours.
          *
-         * This is the base entity class for «name.formatForDisplay» entities.
+         * This is the base entity class for name.formatForDisplay entities.
          * The following annotation marks it as a mapped superclass so subclasses
          * inherit orm properties.
          *
@@ -150,23 +150,23 @@ class Entities {
          *
          * @abstract
          */
-        «IF app.targets('1.3.5')»
-        abstract class «app.appName»_Entity_Base_«name.formatForCodeCapital» extends Zikula_EntityAccess«IF hasNotifyPolicy» implements NotifyPropertyChanged«ENDIF»
-        «ELSE»
-        abstract class Abstract«name.formatForCodeCapital»Entity extends Zikula_EntityAccess«IF hasNotifyPolicy» implements
-            NotifyPropertyChanged«ENDIF»
-        «ENDIF»
+        IF app.targets('1.3.5')
+        abstract class app.appName_Entity_Base_name.formatForCodeCapital extends Zikula_EntityAccessIF hasNotifyPolicy implements NotifyPropertyChangedENDIF
+        ELSE
+        abstract class Abstractname.formatForCodeCapitalEntity extends Zikula_EntityAccessIF hasNotifyPolicy implements
+            NotifyPropertyChangedENDIF
+        ENDIF
         {
-            «val validatorClassLegacy = if (app.targets('1.3.5')) app.appName + '_Entity_Validator_' + name.formatForCodeCapital else '\\' + app.vendor.formatForCodeCapital + '\\' + app.name.formatForCodeCapital + 'Module\\Entity\\Validator\\' + name.formatForCodeCapital + 'Validator'»
-            «memberVars(validatorClassLegacy)»
+            val validatorClassLegacy = if (app.targets('1.3.5')) app.appName + '_Entity_Validator_' + name.formatForCodeCapital else '\\' + app.vendor.formatForCodeCapital + '\\' + app.name.formatForCodeCapital + 'Module\\Entity\\Validator\\' + name.formatForCodeCapital + 'Validator'
+            memberVars(validatorClassLegacy)
     
-            «new EntityConstructor().constructor(it, false)»
+            new EntityConstructor().constructor(it, false)
     
-            «accessors(validatorClassLegacy)»
+            accessors(validatorClassLegacy)
     
-            «thEvLi.generateBase(it)»
+            thEvLi.generateBase(it)
     
-            «new EntityMethods().generate(it, app, thProp)»
+            new EntityMethods().generate(it, app, thProp)
         }
     '''
 
@@ -174,37 +174,37 @@ class Entities {
         /**
          * @var string The tablename this object maps to.
          */
-        protected $_objectType = '«name.formatForCode»';
-        «IF container.application.targets('1.3.5')»
+        protected $_objectType = 'name.formatForCode';
+        IF container.application.targets('1.3.5')
 
             /**
-             * @var «validatorClassLegacy» The validator for this entity.
+             * @var validatorClassLegacy The validator for this entity.
              */
             protected $_validator = null;
-        «ENDIF»
+        ENDIF
 
         /**
-         «IF !container.application.targets('1.3.5')»
+         IF !container.application.targets('1.3.5')
          * @Assert\Type(type="bool")
-         «ENDIF»
+         ENDIF
          * @var boolean Option to bypass validation if needed.
          */
         protected $_bypassValidation = false;
-        «IF hasNotifyPolicy»
+        IF hasNotifyPolicy
 
             /**
-             «IF !container.application.targets('1.3.5')»
+             IF !container.application.targets('1.3.5')
              * @Assert\Type(type="array")
-             «ENDIF»
+             ENDIF
              * @var array List of change notification listeners.
              */
             protected $_propertyChangedListeners = array();
-        «ENDIF»
+        ENDIF
 
         /**
-         «IF !container.application.targets('1.3.5')»
+         IF !container.application.targets('1.3.5')
          * @Assert\Type(type="array")
-         «ENDIF»
+         ENDIF
          * @var array List of available item actions.
          */
         protected $_actions = array();
@@ -214,62 +214,62 @@ class Entities {
          */
         protected $__WORKFLOW__ = array();
 
-        «FOR field : getDerivedFields»«thProp.persistentProperty(field)»«ENDFOR»
-        «extMan.additionalProperties»
+        FOR field : getDerivedFieldsthProp.persistentProperty(field)ENDFOR
+        extMan.additionalProperties
 
-        «FOR relation : getBidirectionalIncomingJoinRelations»«thAssoc.generate(relation, false)»«ENDFOR»
-        «FOR relation : getOutgoingJoinRelations»«thAssoc.generate(relation, true)»«ENDFOR»
+        FOR relation : getBidirectionalIncomingJoinRelationsthAssoc.generate(relation, false)ENDFOR
+        FOR relation : getOutgoingJoinRelationsthAssoc.generate(relation, true)ENDFOR
     '''
 
     def private accessors(Entity it, String validatorClassLegacy) '''
-        «fh.getterAndSetterMethods(it, '_objectType', 'string', false, false, '', '')»
-        «IF container.application.targets('1.3.5')»
-            «fh.getterAndSetterMethods(it, '_validator', validatorClassLegacy, false, true, 'null', '')»
-        «ENDIF»
-        «fh.getterAndSetterMethods(it, '_bypassValidation', 'boolean', false, false, '', '')»
-        «fh.getterAndSetterMethods(it, '_actions', 'array', false, true, 'Array()', '')»
-        «fh.getterAndSetterMethods(it, '__WORKFLOW__', 'array', false, true, 'Array()', '')»
+        fh.getterAndSetterMethods(it, '_objectType', 'string', false, false, '', '')
+        IF container.application.targets('1.3.5')
+            fh.getterAndSetterMethods(it, '_validator', validatorClassLegacy, false, true, 'null', '')
+        ENDIF
+        fh.getterAndSetterMethods(it, '_bypassValidation', 'boolean', false, false, '', '')
+        fh.getterAndSetterMethods(it, '_actions', 'array', false, true, 'Array()', '')
+        fh.getterAndSetterMethods(it, '__WORKFLOW__', 'array', false, true, 'Array()', '')
 
-        «FOR field : getDerivedFields»«thProp.fieldAccessor(field)»«ENDFOR»
-        «extMan.additionalAccessors»
+        FOR field : getDerivedFieldsthProp.fieldAccessor(field)ENDFOR
+        extMan.additionalAccessors
 
-        «FOR relation : getBidirectionalIncomingJoinRelations»«thAssoc.relationAccessor(relation, false)»«ENDFOR»
-        «FOR relation : getOutgoingJoinRelations»«thAssoc.relationAccessor(relation, true)»«ENDFOR»
+        FOR relation : getBidirectionalIncomingJoinRelationsthAssoc.relationAccessor(relation, false)ENDFOR
+        FOR relation : getOutgoingJoinRelationsthAssoc.relationAccessor(relation, true)ENDFOR
     '''
 
     def private modelEntityImpl(Entity it, Application app) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Entity;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Entity;
 
-            use «app.appNamespace»\Entity\«IF isInheriting»«parentType.name.formatForCodeCapital»«ELSE»Base\Abstract«name.formatForCodeCapital»Entity«ENDIF» as Base«IF isInheriting»«parentType.name.formatForCodeCapital»«ELSE»Abstract«name.formatForCodeCapital»Entity«ENDIF»;
+            use app.appNamespace\Entity\IF isInheritingparentType.name.formatForCodeCapitalELSEBase\Abstractname.formatForCodeCapitalEntityENDIF as BaseIF isInheritingparentType.name.formatForCodeCapitalELSEAbstractname.formatForCodeCapitalEntityENDIF;
 
-        «ENDIF»
-        «imports»
+        ENDIF
+        imports
 
-        «entityImplClassDocblock(app)»
-        «IF app.targets('1.3.5')»
-        class «entityClassName('', false)» extends «IF isInheriting»«parentType.entityClassName('', false)»«ELSE»«entityClassName('', true)»«ENDIF»
-        «ELSE»
-        class «name.formatForCodeCapital»Entity extends Base«IF isInheriting»«parentType.name.formatForCodeCapital»«ELSE»Abstract«name.formatForCodeCapital»Entity«ENDIF»
-        «ENDIF»
+        entityImplClassDocblock(app)
+        IF app.targets('1.3.5')
+        class entityClassName('', false) extends IF isInheritingparentType.entityClassName('', false)ELSEentityClassName('', true)ENDIF
+        ELSE
+        class name.formatForCodeCapitalEntity extends BaseIF isInheritingparentType.name.formatForCodeCapitalELSEAbstractname.formatForCodeCapitalEntityENDIF
+        ENDIF
         {
             // feel free to add your own methods here
-            «IF isInheriting»
-                «FOR field : getDerivedFields»«thProp.persistentProperty(field)»«ENDFOR»
-                «extMan.additionalProperties»
+            IF isInheriting
+                FOR field : getDerivedFieldsthProp.persistentProperty(field)ENDFOR
+                extMan.additionalProperties
 
-                «FOR relation : getBidirectionalIncomingJoinRelations»«thAssoc.generate(relation, false)»«ENDFOR»
-                «FOR relation : getOutgoingJoinRelations»«thAssoc.generate(relation, true)»«ENDFOR»
-                «new EntityConstructor().constructor(it, true)»
+                FOR relation : getBidirectionalIncomingJoinRelationsthAssoc.generate(relation, false)ENDFOR
+                FOR relation : getOutgoingJoinRelationsthAssoc.generate(relation, true)ENDFOR
+                new EntityConstructor().constructor(it, true)
 
-                «FOR field : getDerivedFields»«thProp.fieldAccessor(field)»«ENDFOR»
-                «extMan.additionalAccessors»
+                FOR field : getDerivedFieldsthProp.fieldAccessor(field)ENDFOR
+                extMan.additionalAccessors
 
-                «FOR relation : getBidirectionalIncomingJoinRelations»«thAssoc.relationAccessor(relation, false)»«ENDFOR»
-                «FOR relation : getOutgoingJoinRelations»«thAssoc.relationAccessor(relation, true)»«ENDFOR»
-            «ENDIF»
+                FOR relation : getBidirectionalIncomingJoinRelationsthAssoc.relationAccessor(relation, false)ENDFOR
+                FOR relation : getOutgoingJoinRelationsthAssoc.relationAccessor(relation, true)ENDFOR
+            ENDIF
 
-            «thEvLi.generateImpl(it)»
+            thEvLi.generateImpl(it)
         }
     '''
 
@@ -277,54 +277,54 @@ class Entities {
         /**
          * Entity class that defines the entity structure and behaviours.
          *
-         * This is the concrete entity class for «name.formatForDisplay» entities.
-         «extMan.classAnnotations»
-         «IF mappedSuperClass»
+         * This is the concrete entity class for name.formatForDisplay entities.
+         extMan.classAnnotations
+         IF mappedSuperClass
           * @ORM\MappedSuperclass
-         «ELSE»
-          * @ORM\Entity(repositoryClass="«IF app.targets('1.3.5')»«app.appName»_Entity_Repository_«name.formatForCodeCapital»«ELSE»\«app.appNamespace»\Entity\Repository\«name.formatForCodeCapital»«ENDIF»"«IF readOnly», readOnly=true«ENDIF»)
-         «ENDIF»
-        «entityImplClassDocblockAdditions(app)»
+         ELSE
+          * @ORM\Entity(repositoryClass="IF app.targets('1.3.5')app.appName_Entity_Repository_name.formatForCodeCapitalELSE\app.appNamespace\Entity\Repository\name.formatForCodeCapitalENDIF"IF readOnly, readOnly=trueENDIF)
+         ENDIF
+        entityImplClassDocblockAdditions(app)
          */
     '''
 
     def private entityImplClassDocblockAdditions(Entity it, Application app) '''
-         «IF indexes.empty»
-          * @ORM\Table(name="«fullEntityTableName»")
-         «ELSE»
-          * @ORM\Table(name="«fullEntityTableName»",
-         «IF hasNormalIndexes»
+         IF indexes.empty
+          * @ORM\Table(name="fullEntityTableName")
+         ELSE
+          * @ORM\Table(name="fullEntityTableName",
+         IF hasNormalIndexes
           *     indexes={
-         «FOR index : getNormalIndexes SEPARATOR ','»«index.index('Index')»«ENDFOR»
-          *     }«IF hasUniqueIndexes»,«ENDIF»
-         «ENDIF»
-         «IF hasUniqueIndexes»
+         FOR index : getNormalIndexes SEPARATOR ','index.index('Index')ENDFOR
+          *     }IF hasUniqueIndexes,ENDIF
+         ENDIF
+         IF hasUniqueIndexes
           *     uniqueConstraints={
-         «FOR index : getUniqueIndexes SEPARATOR ','»«index.index('UniqueConstraint')»«ENDFOR»
+         FOR index : getUniqueIndexes SEPARATOR ','index.index('UniqueConstraint')ENDFOR
           *     }
-         «ENDIF»
+         ENDIF
           * )
-         «ENDIF»
-         «IF isTopSuperClass»
-          * @ORM\InheritanceType("«getChildRelations.head.strategy.literal»")
-          * @ORM\DiscriminatorColumn(name="«getChildRelations.head.discriminatorColumn.formatForCode»"«/*, type="string"*/»)
-          * @ORM\Discriminatormap[{"«name.formatForCode»" = "«entityClassName('', false)»"«FOR relation : getChildRelations»«relation.discriminatorInfo»«ENDFOR»})
-         «ENDIF»
-         «IF changeTrackingPolicy != EntityChangeTrackingPolicy::DEFERRED_IMPLICIT»
-          * @ORM\ChangeTrackingPolicy("«changeTrackingPolicy.literal»")
-         «ENDIF»
+         ENDIF
+         IF isTopSuperClass
+          * @ORM\InheritanceType("getChildRelations.head.strategy.literal")
+          * @ORM\DiscriminatorColumn(name="getChildRelations.head.discriminatorColumn.formatForCode"/*, type="string"*/)
+          * @ORM\Discriminatormap[{"name.formatForCode" = "entityClassName('', false)"FOR relation : getChildRelationsrelation.discriminatorInfoENDFOR})
+         ENDIF
+         IF changeTrackingPolicy != EntityChangeTrackingPolicy::DEFERRED_IMPLICIT
+          * @ORM\ChangeTrackingPolicy("changeTrackingPolicy.literal")
+         ENDIF
          * @ORM\HasLifecycleCallbacks
-        «IF !app.targets('1.3.5')»
-            «new ValidationConstraints().classAnnotations(it)»
-        «ENDIF»
+        IF !app.targets('1.3.5')
+            new ValidationConstraints().classAnnotations(it)
+        ENDIF
     '''
 
     def private index(EntityIndex it, String indexType) '''
-         *         @ORM\«indexType.toFirstUpper»(name="«name.formatForDB»", columns={«FOR item : items SEPARATOR ','»«item.indexField»«ENDFOR»})
+         *         @ORM\indexType.toFirstUpper(name="name.formatForDB", columns={FOR item : items SEPARATOR ','item.indexFieldENDFOR})
     '''
-    def private indexField(EntityIndexItem it) '''"«name.formatForCode»"'''
+    def private indexField(EntityIndexItem it) '''"name.formatForCode"'''
 
     def private discriminatorInfo(InheritanceRelationship it) '''
-        , "«source.name.formatForCode»" = "«source.entityClassName('', false)»"
+        , "source.name.formatForCode" = "source.entityClassName('', false)"
     '''
 }

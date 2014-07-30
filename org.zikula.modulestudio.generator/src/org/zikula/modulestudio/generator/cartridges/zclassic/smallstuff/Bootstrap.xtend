@@ -37,34 +37,34 @@ class Bootstrap {
     '''
 
     def private bootstrapBaseImpl(Application it) '''
-        «bootstrapDocs»
-        «initExtensions»
-        «IF !referredApplications.empty»
+        bootstrapDocs
+        initExtensions
+        IF !referredApplications.empty
 
-            «FOR referredApp : referredApplications»
-                if (ModUtil::available('«referredApp.name.formatForCodeCapital»')) {
-                    // load Doctrine 2 data of «referredApp.name.formatForCodeCapital»
-                    ModUtil::initOOModule('«referredApp.name.formatForCodeCapital»');
+            FOR referredApp : referredApplications
+                if (ModUtil::available('referredApp.name.formatForCodeCapital')) {
+                    // load Doctrine 2 data of referredApp.name.formatForCodeCapital
+                    ModUtil::initOOModule('referredApp.name.formatForCodeCapital');
                 }
-            «ENDFOR»
-        «ENDIF»
-        «archiveObjectsCall»
+            ENDFOR
+        ENDIF
+        archiveObjectsCall
 
     '''
 
     def private initExtensions(Application it) '''
-        «IF needsExtensionListener»
+        IF needsExtensionListener
             // initialise doctrine extension listeners
-            $helper = ServiceUtil::get«IF targets('1.3.5')»Service«ENDIF»('doctrine_extensions');
-            «initTree»
-            «initLoggable»
-            «initSluggable»
-            «initSoftDeleteable»
-            «initSortable»
-            «initTimestampable»
-            «initStandardFields»
-            «initTranslatable»
-        «ENDIF»
+            $helper = ServiceUtil::getIF targets('1.3.5')ServiceENDIF('doctrine_extensions');
+            initTree
+            initLoggable
+            initSluggable
+            initSoftDeleteable
+            initSortable
+            initTimestampable
+            initStandardFields
+            initTranslatable
+        ENDIF
     '''
 
     def private needsExtensionListener(Application it) {
@@ -72,52 +72,52 @@ class Bootstrap {
     }
 
     def private initTree(Application it) '''
-        «IF hasTrees»
+        IF hasTrees
             $helper->getListener('tree');
-        «ENDIF»
+        ENDIF
     '''
 
     def private initLoggable(Application it) '''
-        «IF hasLoggable»
+        IF hasLoggable
             $loggableListener = $helper->getListener('loggable');
             // set current user name to loggable listener
             $userName = UserUtil::isLoggedIn() ? UserUtil::getVar('uname') : __('Guest');
             $loggableListener->setUsername($userName);
-        «ENDIF»
+        ENDIF
     '''
 
     def private initSluggable(Application it) '''
-        «IF hasSluggable»
+        IF hasSluggable
             $helper->getListener('sluggable');
-        «ENDIF»
+        ENDIF
     '''
 
     def private initSoftDeleteable(Application it) '''
-        «IF hasSoftDeleteable && !targets('1.3.5')»
+        IF hasSoftDeleteable && !targets('1.3.5')
             $helper->getListener('softdeleteable');
-        «ENDIF»
+        ENDIF
     '''
 
     def private initSortable(Application it) '''
-        «IF hasSortable»
+        IF hasSortable
             $helper->getListener('sortable');
-        «ENDIF»
+        ENDIF
     '''
 
     def private initTimestampable(Application it) '''
-        «IF hasTimestampable || hasStandardFieldEntities»
+        IF hasTimestampable || hasStandardFieldEntities
             $helper->getListener('timestampable');
-        «ENDIF»
+        ENDIF
     '''
 
     def private initStandardFields(Application it) '''
-        «IF hasStandardFieldEntities»
+        IF hasStandardFieldEntities
             $helper->getListener('standardfields');
-        «ENDIF»
+        ENDIF
     '''
 
     def private initTranslatable(Application it) '''
-        «IF hasTranslatable»
+        IF hasTranslatable
             $translatableListener = $helper->getListener('translatable');
             //$translatableListener->setTranslatableLocale(ZLanguage::getLanguageCode());
             $currentLanguage = preg_replace('#[^a-z-].#', '', FormUtil::getPassedValue('lang', System::getVar('language_i18n', 'en'), 'GET'));
@@ -129,17 +129,17 @@ class Bootstrap {
              * if current locale is not a default.
              */
             //$translatableListener->setDefaultLocale(System::getVar('language_i18n', 'en'));
-        «ENDIF»
+        ENDIF
     '''
 
     def private archiveObjectsCall(Application it) '''
-        «val entitiesWithArchive = getAllEntities.filter[hasArchive && getEndDateField !== null]»
-        «IF !entitiesWithArchive.empty»
-            «prefix()»PerformRegularAmendments();
+        val entitiesWithArchive = getAllEntities.filter[hasArchive && getEndDateField !== null]
+        IF !entitiesWithArchive.empty
+            prefix()PerformRegularAmendments();
             
-            function «prefix()»PerformRegularAmendments()
+            function prefix()PerformRegularAmendments()
             {
-                $currentFunc = FormUtil::getPassedValue('func', '«IF targets('1.3.5')»main«ELSE»index«ENDIF»', 'GETPOST', FILTER_SANITIZE_STRING);
+                $currentFunc = FormUtil::getPassedValue('func', 'IF targets('1.3.5')mainELSEindexENDIF', 'GETPOST', FILTER_SANITIZE_STRING);
                 if ($currentFunc == 'edit' || $currentFunc == 'initialize') {
                     return;
                 }
@@ -150,37 +150,37 @@ class Bootstrap {
                     return;
                 }
 
-                PageUtil::registerVar('«appName»AutomaticArchiving', false, true);
+                PageUtil::registerVar('appNameAutomaticArchiving', false, true);
                 $serviceManager = ServiceUtil::getManager();
-                «IF targets('1.3.5')»
-                    $entityManager = $serviceManager->get«IF targets('1.3.5')»Service«ENDIF»('doctrine.entitymanager');
-                «ELSE»
+                IF targets('1.3.5')
+                    $entityManager = $serviceManager->getIF targets('1.3.5')ServiceENDIF('doctrine.entitymanager');
+                ELSE
                     $logger = $serviceManager->get('logger');
-                «ENDIF»
-                «FOR entity : entitiesWithArchive»
+                ENDIF
+                FOR entity : entitiesWithArchive
 
-                    // perform update for «entity.nameMultiple.formatForDisplay» becoming archived
-                    «IF !targets('1.3.5')»
-                        $logger->notice('{app}: Automatic archiving for the {entity} entity started.', array('app' => '«appName»', 'entity' => '«entity.name.formatForCode»'));
-                    «ENDIF»
-                    «IF targets('1.3.5')»
-                        $entityClass = '«appName»_Entity_«entity.name.formatForCodeCapital»';
+                    // perform update for entity.nameMultiple.formatForDisplay becoming archived
+                    IF !targets('1.3.5')
+                        $logger->notice('{app}: Automatic archiving for the {entity} entity started.', array('app' => 'appName', 'entity' => 'entity.name.formatForCode'));
+                    ENDIF
+                    IF targets('1.3.5')
+                        $entityClass = 'appName_Entity_entity.name.formatForCodeCapital';
                         $repository = $entityManager->getRepository($entityClass);
-                    «ELSE»
-                        $repository = $serviceManager->get('«appName.formatForDB».«entity.name.formatForCode»_factory')->getRepository();
-                    «ENDIF»
+                    ELSE
+                        $repository = $serviceManager->get('appName.formatForDB.entity.name.formatForCode_factory')->getRepository();
+                    ENDIF
                     $repository->archiveObjects();
-                    «IF !targets('1.3.5')»
-                        $logger->notice('{app}: Automatic archiving for the {entity} entity completed.', array('app' => '«appName»', 'entity' => '«entity.name.formatForCode»'));
-                    «ENDIF»
-                «ENDFOR»
-                PageUtil::setVar('«appName»AutomaticArchiving', false);
+                    IF !targets('1.3.5')
+                        $logger->notice('{app}: Automatic archiving for the {entity} entity completed.', array('app' => 'appName', 'entity' => 'entity.name.formatForCode'));
+                    ENDIF
+                ENDFOR
+                PageUtil::setVar('appNameAutomaticArchiving', false);
             }
-        «ENDIF»
+        ENDIF
     '''
 
     def private bootstrapImpl(Application it) '''
-        «bootstrapDocs»
+        bootstrapDocs
 
         include_once 'Base/bootstrap.php';
     '''

@@ -113,7 +113,7 @@ class ControllerExtensions {
     /**
      * Determines the default action used for linking to a certain entity.
      */
-    def defaultAction(Entity it) '''«IF hasActions('display')»display«ELSEIF hasActions('view')»view«ELSE»«IF container.application.targets('1.3.5')»main«ELSE»index«ENDIF»«ENDIF»'''
+    def defaultAction(Entity it) '''IF hasActions('display')displayELSEIF hasActions('view')viewELSEIF container.application.targets('1.3.5')mainELSEindexENDIFENDIF'''
 
     /**
      * Returns a unique list of actions contained in either admin or user controller.

@@ -169,36 +169,36 @@ class Scribite {
         SCRIBITE INTEGRATION
         --------------------
 
-        It is easy to include «appName» in your Scribite editors.
-        «appName» contains already the a popup for selecting «getLeadingEntity.nameMultiple.formatForDisplay»«IF getAllEntities.size() > 1» and other items«ENDIF».
+        It is easy to include appName in your Scribite editors.
+        appName contains already the a popup for selecting getLeadingEntity.nameMultiple.formatForDisplayIF getAllEntities.size() > 1 and other itemsENDIF.
         Please note that Scribite 5.0 is required for this.
 
         To activate the popup for the editor of your choice (currently supported: CKEditor, TinyMCE, Xinha)
-        check if the plugins for «appName» are in Scribite/plugins/EDITOR/vendor/plugins.
+        check if the plugins for appName are in Scribite/plugins/EDITOR/vendor/plugins.
         If not then copy from
-            «rootFolder»/«IF targets('1.3.5')»«appName»/docs«ELSE»«getAppDocPath»«ENDIF»/scribite/plugins into modules/Scribite/plugins.
+            rootFolder/IF targets('1.3.5')appName/docsELSEgetAppDocPathENDIF/scribite/plugins into modules/Scribite/plugins.
     '''
 
     def private ckPlugin(Application it) '''
-        CKEDITOR.plugins.add('«appName»', {
+        CKEDITOR.plugins.add('appName', {
             requires: 'popup',
             lang: 'en,nl,de',
             init: function (editor) {
-                editor.addCommand('insert«appName»', {
+                editor.addCommand('insertappName', {
                     exec: function (editor) {
-                        «IF targets('1.3.5')»
-                            var url = Zikula.Config.baseURL + Zikula.Config.entrypoint + '?module=«appName»&type=external&func=finder&editor=ckeditor';
-                        «ELSE»
-                            var url = Routing.generate('«appName.formatForDB»_external_finder', { editor: 'ckeditor' });
-                        «ENDIF»
-                        // call method in «appName»«IF targets('1.3.5')»_f«ELSE».F«ENDIF»inder.js and provide current editor
-                        «appName»FinderCKEditor(editor, url);
+                        IF targets('1.3.5')
+                            var url = Zikula.Config.baseURL + Zikula.Config.entrypoint + '?module=appName&type=external&func=finder&editor=ckeditor';
+                        ELSE
+                            var url = Routing.generate('appName.formatForDB_external_finder', { editor: 'ckeditor' });
+                        ENDIF
+                        // call method in appNameIF targets('1.3.5')_fELSE.FENDIFinder.js and provide current editor
+                        appNameFinderCKEditor(editor, url);
                     }
                 });
-                editor.ui.addButton('«appName.formatForDB»', {
-                    label: editor.lang.«appName».title,
-                    command: 'insert«appName»',
-                 // icon: this.path + 'images/ed_«appName.formatForDB».png'
+                editor.ui.addButton('appName.formatForDB', {
+                    label: editor.lang.appName.title,
+                    command: 'insertappName',
+                 // icon: this.path + 'images/ed_appName.formatForDB.png'
                     icon: '/images/icons/extrasmall/favorites.png'
                 });
             }
@@ -206,23 +206,23 @@ class Scribite {
     '''
 
     def private ckLangDe(Application it) '''
-        CKEDITOR.plugins.setLang('«appName»', 'de', {
-            title : '«appName»-Objekt einfügen',
-            alt: '«appName»-Objekt einfügen'
+        CKEDITOR.plugins.setLang('appName', 'de', {
+            title : 'appName-Objekt einfgen',
+            alt: 'appName-Objekt einfgen'
         });
     '''
 
     def private ckLangEn(Application it) '''
-        CKEDITOR.plugins.setLang('«appName»', 'en', {
-            title: 'Insert «appName» object',
-            alt: 'Insert «appName» object'
+        CKEDITOR.plugins.setLang('appName', 'en', {
+            title: 'Insert appName object',
+            alt: 'Insert appName object'
         });
     '''
 
     def private ckLangNl(Application it) '''
-        CKEDITOR.plugins.setLang('«appName»', 'nl', {
-            title : '«appName» Object invoegen',
-            alt: '«appName» Object invoegen'
+        CKEDITOR.plugins.setLang('appName', 'nl', {
+            title : 'appName Object invoegen',
+            alt: 'appName Object invoegen'
         });
     '''
 
@@ -239,9 +239,9 @@ class Scribite {
 
         (function () {
             // Load plugin specific language pack
-            tinymce.PluginManager.requireLangPack('«name.formatForDB»');
+            tinymce.PluginManager.requireLangPack('name.formatForDB');
 
-            tinymce.create('tinymce.plugins.«appName»Plugin', {
+            tinymce.create('tinymce.plugins.appNamePlugin', {
                 /**
                  * Initializes the plugin, this will be executed after the plugin has been created.
                  * This call is done before the editor instance has finished it's initialization so use the onInit event
@@ -251,14 +251,14 @@ class Scribite {
                  * @param {string} url Absolute URL to where the plugin is located.
                  */
                 init : function (ed, url) {
-                    // Register the command so that it can be invoked by using tinyMCE.activeEditor.execCommand('mce«appName»');
-                    ed.addCommand('mce«appName»', function () {
+                    // Register the command so that it can be invoked by using tinyMCE.activeEditor.execCommand('mceappName');
+                    ed.addCommand('mceappName', function () {
                         ed.windowManager.open({
-                            «IF targets('1.3.5')»
-                                file : Zikula.Config.baseURL + Zikula.Config.entrypoint + '?module=«appName»&type=external&func=finder&editor=tinymce',
-                            «ELSE»
-                                file : Routing.generate('«appName.formatForDB»_external_finder', { editor: 'tinymce' }),
-                            «ENDIF»
+                            IF targets('1.3.5')
+                                file : Zikula.Config.baseURL + Zikula.Config.entrypoint + '?module=appName&type=external&func=finder&editor=tinymce',
+                            ELSE
+                                file : Routing.generate('appName.formatForDB_external_finder', { editor: 'tinymce' }),
+                            ENDIF
                             width : (screen.width * 0.75),
                             height : (screen.height * 0.66),
                             inline : 1,
@@ -270,17 +270,17 @@ class Scribite {
                         });
                     });
 
-                    // Register «name.formatForDB» button
-                    ed.addButton('«name.formatForDB»', {
-                        title : '«name.formatForDB».desc',
-                        cmd : 'mce«appName»',
-                     // image : url + '/img/«appName».gif'
+                    // Register name.formatForDB button
+                    ed.addButton('name.formatForDB', {
+                        title : 'name.formatForDB.desc',
+                        cmd : 'mceappName',
+                     // image : url + '/img/appName.gif'
                         image : '/images/icons/extrasmall/favorites.png'
                     });
 
                     // Add a node change handler, selects the button in the UI when a image is selected
                     ed.onNodeChange.add(function (ed, cm, n) {
-                        cm.setActive('«name.formatForDB»', n.nodeName === 'IMG');
+                        cm.setActive('name.formatForDB', n.nodeName === 'IMG');
                     });
                 },
 
@@ -306,50 +306,50 @@ class Scribite {
                  */
                 getInfo : function () {
                     return {
-                        longname : '«appName» for tinymce',
-                        author : '«author»',
-                        authorurl : '«url»',
-                        infourl : '«url»',
-                        version : '«version»'
+                        longname : 'appName for tinymce',
+                        author : 'author',
+                        authorurl : 'url',
+                        infourl : 'url',
+                        version : 'version'
                     };
                 }
             });
 
             // Register plugin
-            tinymce.PluginManager.add('«name.formatForDB»', tinymce.plugins.«appName»Plugin);
+            tinymce.PluginManager.add('name.formatForDB', tinymce.plugins.appNamePlugin);
         }());
     '''
 
     def private tinyLangDe(Application it) '''
-        tinyMCE.addI18n('de.«name.formatForDB»', {
-            desc : '«appName»-Objekt einfügen'
+        tinyMCE.addI18n('de.name.formatForDB', {
+            desc : 'appName-Objekt einfgen'
         });
     '''
 
     def private tinyLangEn(Application it) '''
-        tinyMCE.addI18n('en.«name.formatForDB»', {
-            desc : 'Insert «appName» object'
+        tinyMCE.addI18n('en.name.formatForDB', {
+            desc : 'Insert appName object'
         });
     '''
 
     def private tinyLangNl(Application it) '''
-        tinyMCE.addI18n('nl.«name.formatForDB»', {
-            desc : '«appName» Object invoegen'
+        tinyMCE.addI18n('nl.name.formatForDB', {
+            desc : 'appName Object invoegen'
         });
     '''
 
     def private xinhaPlugin(Application it) '''
-        // «appName» plugin for Xinha
-        // developed by «author»
+        // appName plugin for Xinha
+        // developed by author
         //
-        // requires «appName» module («url»)
+        // requires appName module (url)
         //
         // Distributed under the same terms as xinha itself.
         // This notice MUST stay intact for use (see license.txt).
 
         'use strict';
 
-        function «appName»(editor) {
+        function appName(editor) {
             var cfg, self;
 
             this.editor = editor;
@@ -357,30 +357,30 @@ class Scribite {
             self = this;
 
             cfg.registerButton({
-                id       : '«appName»',
-                tooltip  : 'Insert «appName» object',
-             // image    : _editor_url + 'plugins/«appName»/img/ed_«appName».gif',
+                id       : 'appName',
+                tooltip  : 'Insert appName object',
+             // image    : _editor_url + 'plugins/appName/img/ed_appName.gif',
                 image    : '/images/icons/extrasmall/favorites.png',
                 textMode : false,
                 action   : function (editor) {
-                    «IF targets('1.3.5')»
-                        var url = Zikula.Config.baseURL + 'index.php'/*Zikula.Config.entrypoint*/ + '?module=«appName»&type=external&func=finder&editor=xinha';
-                    «ELSE»
-                        var url = Routing.generate('«appName.formatForDB»_external_finder', { editor: 'xinha' });
-                    «ENDIF»
-                    «appName»FinderXinha(editor, url);
+                    IF targets('1.3.5')
+                        var url = Zikula.Config.baseURL + 'index.php'/*Zikula.Config.entrypoint*/ + '?module=appName&type=external&func=finder&editor=xinha';
+                    ELSE
+                        var url = Routing.generate('appName.formatForDB_external_finder', { editor: 'xinha' });
+                    ENDIF
+                    appNameFinderXinha(editor, url);
                 }
             });
-            cfg.addToolbarElement('«appName»', 'insertimage', 1);
+            cfg.addToolbarElement('appName', 'insertimage', 1);
         }
 
-        «appName»._pluginInfo = {
-            name          : '«appName» for xinha',
-            version       : '«version»',
-            developer     : '«author»',
-            developer_url : '«url»',
-            sponsor       : 'ModuleStudio «msVersion»',
-            sponsor_url   : '«msUrl»',
+        appName._pluginInfo = {
+            name          : 'appName for xinha',
+            version       : 'version',
+            developer     : 'author',
+            developer_url : 'url',
+            sponsor       : 'ModuleStudio msVersion',
+            sponsor_url   : 'msUrl',
             license       : 'htmlArea'
         };
     '''

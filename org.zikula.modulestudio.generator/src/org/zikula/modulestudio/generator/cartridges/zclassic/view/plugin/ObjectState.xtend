@@ -21,34 +21,34 @@ class ObjectState {
 
     def private objectStateImpl(Application it) '''
         /**
-         * The «appName.formatForDB»ObjectState modifier displays the name of a given object's workflow state.
+         * The appName.formatForDBObjectState modifier displays the name of a given object's workflow state.
          * Examples:
-         *    {$item.workflowState|«appName.formatForDB»ObjectState}       {* with visual feedback *}
-         *    {$item.workflowState|«appName.formatForDB»ObjectState:false} {* no ui feedback *}
+         *    {$item.workflowState|appName.formatForDBObjectState}       {* with visual feedback *}
+         *    {$item.workflowState|appName.formatForDBObjectState:false} {* no ui feedback *}
          *
          * @param string  $state      Name of given workflow state.
          * @param boolean $uiFeedback Whether the output should include some visual feedback about the state.
          *
          * @return string Enriched and translated workflow state ready for display.
          */
-        function smarty_modifier_«appName.formatForDB»ObjectState($state = 'initial', $uiFeedback = true)
+        function smarty_modifier_appName.formatForDBObjectState($state = 'initial', $uiFeedback = true)
         {
             $serviceManager = ServiceUtil::getManager();
-            «IF targets('1.3.5')»
-                $workflowHelper = new «appName»_Util_Workflow($serviceManager);
-            «ELSE»
-                $workflowHelper = $serviceManager->get('«appName.formatForDB».workflow_helper');
-            «ENDIF»
+            IF targets('1.3.5')
+                $workflowHelper = new appName_Util_Workflow($serviceManager);
+            ELSE
+                $workflowHelper = $serviceManager->get('appName.formatForDB.workflow_helper');
+            ENDIF
 
             $stateInfo = $workflowHelper->getStateInfo($state);
 
             $result = $stateInfo['text'];
             if ($uiFeedback === true) {
-                «IF targets('1.3.5')»«/* led images (legacy) */»
+                IF targets('1.3.5')/* led images (legacy) */
                     $result = '<img src="' . System::getBaseUrl() . 'images/icons/extrasmall/' . $stateInfo['ui'] . 'led.png" width="16" height="16" alt="' . $result . '" />&nbsp;&nbsp;' . $result;
-                «ELSE»«/* use Bootstrap labels instead of images */»
+                ELSE/* use Bootstrap labels instead of images */
                     $result = '<span class="label label-' . $stateInfo['ui'] . '">' . $result . '</span>';
-                «ENDIF»
+                ENDIF
             }
 
             return $result;

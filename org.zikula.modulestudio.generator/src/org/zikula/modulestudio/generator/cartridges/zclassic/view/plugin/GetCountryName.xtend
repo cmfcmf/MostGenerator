@@ -21,15 +21,15 @@ class GetCountryName {
 
     def private getCountryNameImpl(Application it) '''
         /**
-         * The «appName.formatForDB»GetCountryName modifier displays the country name for a given country code.
+         * The appName.formatForDBGetCountryName modifier displays the country name for a given country code.
          *
          * @param string $countryCode The country code to process.
          *
          * @return string Country name.
          */
-        function smarty_modifier_«appName.formatForDB»GetCountryName($countryCode)
+        function smarty_modifier_appName.formatForDBGetCountryName($countryCode)
         {
-            $result = «IF !targets('1.3.5')»\«ENDIF»ZLanguage::getCountryName($countryCode);
+            $result = IF !targets('1.3.5')\ENDIFZLanguage::getCountryName($countryCode);
             if ($result === false) {
                 $result = $countryCode;
             }

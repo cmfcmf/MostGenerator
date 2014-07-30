@@ -9,10 +9,10 @@ class ReplaceOperations {
         // in such a way that only 7-bit ASCII characters remain. 
 
         // initialize transformation parameters
-        $special1 = 'ÄÖÜäöüß';
+        $special1 = '';
         $special2 = 'AOUaous';
 
         // now perform our transformation 
-        $obj['«dest»'] = strtr($obj['«src»'], $special1, $special2);
+        $obj['dest'] = strtr($obj['src'], $special1, $special2);
     '''
 }

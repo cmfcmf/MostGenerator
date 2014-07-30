@@ -25,21 +25,21 @@ class Mailz {
     }
 
     def private mailzBaseClass(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Api\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Api\Base;
 
             use ModUtil;
             use ServiceUtil;
             use Zikula_AbstractApi;
             use Zikula_View;
 
-        «ENDIF»
+        ENDIF
         /**
          * Mailz api base class.
          */
-        class «IF targets('1.3.5')»«appName»_Api_Base_Mailz«ELSE»MailzApi«ENDIF» extends Zikula_AbstractApi
+        class IF targets('1.3.5')appName_Api_Base_MailzELSEMailzApiENDIF extends Zikula_AbstractApi
         {
-            «mailzBaseImpl»
+            mailzBaseImpl
         }
     '''
 
@@ -53,19 +53,19 @@ class Mailz {
          */
         public function getPlugins(array $args = array())
         {
-            «val itemDesc = getLeadingEntity.nameMultiple.formatForDisplay»
+            val itemDesc = getLeadingEntity.nameMultiple.formatForDisplay
             $plugins = array();
             $plugins[] = array(
                 'pluginid'      => 1,
-                'module'        => '«appName»',
-                'title'         => $this->__('3 newest «itemDesc»'),
-                'description'   => $this->__('A list of the three newest «itemDesc».')
+                'module'        => 'appName',
+                'title'         => $this->__('3 newest itemDesc'),
+                'description'   => $this->__('A list of the three newest itemDesc.')
             );
             $plugins[] = array(
                 'pluginid'      => 2,
-                'module'        => '«appName»',
-                'title'         => $this->__('3 random «itemDesc»'),
-                'description'   => $this->__('A list of three random «itemDesc».')
+                'module'        => 'appName',
+                'title'         => $this->__('3 random itemDesc'),
+                'description'   => $this->__('A list of three random itemDesc.')
             );
 
             return $plugins;
@@ -85,24 +85,24 @@ class Mailz {
          */
         public function getContent(array $args = array())
         {
-            ModUtil::initOOModule('«appName»');
+            ModUtil::initOOModule('appName');
             // $args is something like:
             // Array ( [uid] => 5 [contenttype] => h [pluginid] => 1 [nid] => 1 [last] => 0000-00-00 00:00:00 [params] => Array ( [] => ) ) 1
-            «val leadingEntity = getLeadingEntity»
-            $objectType = '«leadingEntity.name.formatForCode»';
+            val leadingEntity = getLeadingEntity
+            $objectType = 'leadingEntity.name.formatForCode';
 
-            «IF targets('1.3.5')»
-                $entityClass = '«appName»_Entity_' . ucfirst($objectType);
-            «ENDIF»
+            IF targets('1.3.5')
+                $entityClass = 'appName_Entity_' . ucfirst($objectType);
+            ENDIF
             $serviceManager = ServiceUtil::getManager();
-            «IF targets('1.3.5')»
-                $entityManager = $serviceManager->get«IF targets('1.3.5')»Service«ENDIF»('doctrine.entitymanager');
+            IF targets('1.3.5')
+                $entityManager = $serviceManager->getIF targets('1.3.5')ServiceENDIF('doctrine.entitymanager');
                 $repository = $entityManager->getRepository($entityClass);
-            «ELSE»
-                $repository = $serviceManager->get('«appName.formatForDB».' . $objectType . '_factory')->getRepository();
-            «ENDIF»
+            ELSE
+                $repository = $serviceManager->get('appName.formatForDB.' . $objectType . '_factory')->getRepository();
+            ENDIF
 
-            $idFields = ModUtil::apiFunc('«appName»', 'selection', 'getIdFields', array('ot' => $objectType));
+            $idFields = ModUtil::apiFunc('appName', 'selection', 'getIdFields', array('ot' => $objectType));
 
             $sortParam = '';
             if ($args['pluginid'] == 2) {
@@ -131,9 +131,9 @@ class Mailz {
                 'currentPage' => 1,
                 'resultsPerPage' => $resultsPerPage
             );
-            list($entities, $objectCount) = ModUtil::apiFunc('«appName»', 'selection', 'getEntitiesPaginated', $selectionArgs);
+            list($entities, $objectCount) = ModUtil::apiFunc('appName', 'selection', 'getEntitiesPaginated', $selectionArgs);
 
-            $view = Zikula_View::getInstance('«appName»', true);
+            $view = Zikula_View::getInstance('appName', true);
 
             //$data = array('sorting' => $this->sorting, 'amount' => $this->amount, 'filter' => $this->filter, 'template' => $this->template);
             //$view->assign('vars', $data);
@@ -143,29 +143,29 @@ class Mailz {
                  ->assign($repository->getAdditionalTemplateParameters('api', array('name' => 'mailz')));
 
             if ($args['contenttype'] == 't') { /* text */
-                return $view->fetch('«IF targets('1.3.5')»mailz«ELSE»Mailz«ENDIF»/itemlist_«leadingEntity.name.formatForCode»_text.tpl');
+                return $view->fetch('IF targets('1.3.5')mailzELSEMailzENDIF/itemlist_leadingEntity.name.formatForCode_text.tpl');
             }
 
-            //return $view->fetch('«IF targets('1.3.5')»contenttype«ELSE»ContentType«ENDIF»/itemlist_display.html');
-            return $view->fetch('«IF targets('1.3.5')»mailz«ELSE»Mailz«ENDIF»/itemlist_«leadingEntity.name.formatForCode»_html.tpl');
+            //return $view->fetch('IF targets('1.3.5')contenttypeELSEContentTypeENDIF/itemlist_display.html');
+            return $view->fetch('IF targets('1.3.5')mailzELSEMailzENDIF/itemlist_leadingEntity.name.formatForCode_html.tpl');
         }
     '''
 
     def private mailzImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Api;
+        IF !targets('1.3.5')
+            namespace appNamespace\Api;
 
-            use «appNamespace»\Api\Base\MailzApi as BaseMailzApi;
+            use appNamespace\Api\Base\MailzApi as BaseMailzApi;
 
-        «ENDIF»
+        ENDIF
         /**
          * Mailz api implementation class.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Api_Mailz extends «appName»_Api_Base_Mailz
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Api_Mailz extends appName_Api_Base_Mailz
+        ELSE
         class MailzApi extends BaseMailzApi
-        «ENDIF»
+        ENDIF
         {
             // feel free to extend the mailz api here
         }

@@ -50,56 +50,56 @@ class Xml {
     }
 
     def private xmlView(Entity it, String appName) '''
-        {* purpose of this template: «nameMultiple.formatForDisplay» view xml view *}
-        «IF container.application.targets('1.3.5')»{«appName.formatForDB»TemplateHeaders contentType='text/xml'}«ENDIF»<?xml version="1.0" encoding="{charset}" ?>
-        <«nameMultiple.formatForCode»>
+        {* purpose of this template: nameMultiple.formatForDisplay view xml view *}
+        IF container.application.targets('1.3.5'){appName.formatForDBTemplateHeaders contentType='text/xml'}ENDIF<?xml version="1.0" encoding="{charset}" ?>
+        <nameMultiple.formatForCode>
         {foreach item='item' from=$items}
-            {include file='«name.formatForCode»/include.xml.tpl'}
+            {include file='name.formatForCode/include.xml.tpl'}
         {foreachelse}
-            <no«name.formatForCodeCapital» />
+            <noname.formatForCodeCapital />
         {/foreach}
-        </«nameMultiple.formatForCode»>
+        </nameMultiple.formatForCode>
     '''
 
     def private xmlDisplay(Entity it, String appName) '''
-        {* purpose of this template: «nameMultiple.formatForDisplay» display xml view *}
-        «IF container.application.targets('1.3.5')»{«appName.formatForDB»TemplateHeaders contentType='text/xml'}«ENDIF»<?xml version="1.0" encoding="{charset}" ?>
+        {* purpose of this template: nameMultiple.formatForDisplay display xml view *}
+        IF container.application.targets('1.3.5'){appName.formatForDBTemplateHeaders contentType='text/xml'}ENDIF<?xml version="1.0" encoding="{charset}" ?>
         {getbaseurl assign='baseurl'}
-        {include file='«name.formatForCode»/include.xml.tpl' item=$«name.formatForCode»}
+        {include file='name.formatForCode/include.xml.tpl' item=$name.formatForCode}
     '''
 
     def private xmlInclude(Entity it, String appName) '''
-        {* purpose of this template: «nameMultiple.formatForDisplay» xml inclusion template *}
-        <«name.formatForDB»«FOR pkField : getPrimaryKeyFields» «pkField.name.formatForCode»="{$item.«pkField.name.formatForCode»}"«ENDFOR»«IF standardFields» createdon="{$item.createdDate|dateformat}" updatedon="{$item.updatedDate|dateformat}"«ENDIF»>
-            «FOR field : getDerivedFields.filter[primaryKey]»«field.displayEntry»«ENDFOR»
-            «FOR field : getDerivedFields.filter[!primaryKey && name != 'workflowState']»«field.displayEntry»«ENDFOR»
-            «IF geographical»
-                «FOR geoFieldName : newArrayList('latitude', 'longitude')»
-                    <«geoFieldName»>{$item.«geoFieldName»|«appName.formatForDB»FormatGeoData}</«geoFieldName»>
-                «ENDFOR»
-            «ENDIF»
-            «IF softDeleteable»
+        {* purpose of this template: nameMultiple.formatForDisplay xml inclusion template *}
+        <name.formatForDBFOR pkField : getPrimaryKeyFields pkField.name.formatForCode="{$item.pkField.name.formatForCode}"ENDFORIF standardFields createdon="{$item.createdDate|dateformat}" updatedon="{$item.updatedDate|dateformat}"ENDIF>
+            FOR field : getDerivedFields.filter[primaryKey]field.displayEntryENDFOR
+            FOR field : getDerivedFields.filter[!primaryKey && name != 'workflowState']field.displayEntryENDFOR
+            IF geographical
+                FOR geoFieldName : newArrayList('latitude', 'longitude')
+                    <geoFieldName>{$item.geoFieldName|appName.formatForDBFormatGeoData}</geoFieldName>
+                ENDFOR
+            ENDIF
+            IF softDeleteable
                 <deletedAt>{$item.deletedAt|dateformat:'datebrief'}</deletedAt>
-            «ENDIF»
-            <workflowState>{$item.workflowState|«appName.formatForDB»ObjectState:false|lower}</workflowState>
-            «FOR relation : incoming.filter(OneToManyRelationship).filter[bidirectional]»«relation.displayRelatedEntry(false)»«ENDFOR»
-            «FOR relation : outgoing.filter(OneToOneRelationship)»«relation.displayRelatedEntry(true)»«ENDFOR»
-            «FOR relation : incoming.filter(ManyToManyRelationship).filter[bidirectional]»«relation.displayRelatedEntries(false)»«ENDFOR»
-            «FOR relation : outgoing.filter(OneToManyRelationship)»«relation.displayRelatedEntries(true)»«ENDFOR»
-            «FOR relation : outgoing.filter(ManyToManyRelationship)»«relation.displayRelatedEntries(true)»«ENDFOR»
-        </«name.formatForDB»>
+            ENDIF
+            <workflowState>{$item.workflowState|appName.formatForDBObjectState:false|lower}</workflowState>
+            FOR relation : incoming.filter(OneToManyRelationship).filter[bidirectional]relation.displayRelatedEntry(false)ENDFOR
+            FOR relation : outgoing.filter(OneToOneRelationship)relation.displayRelatedEntry(true)ENDFOR
+            FOR relation : incoming.filter(ManyToManyRelationship).filter[bidirectional]relation.displayRelatedEntries(false)ENDFOR
+            FOR relation : outgoing.filter(OneToManyRelationship)relation.displayRelatedEntries(true)ENDFOR
+            FOR relation : outgoing.filter(ManyToManyRelationship)relation.displayRelatedEntries(true)ENDFOR
+        </name.formatForDB>
     '''
 
     def private dispatch displayEntry(DerivedField it) '''
-        <«name.formatForCode»>«fieldHelper.displayField(it, 'item', 'viewxml')»</«name.formatForCode»>
+        <name.formatForCode>fieldHelper.displayField(it, 'item', 'viewxml')</name.formatForCode>
     '''
 
     def private dispatch displayEntry(BooleanField it) '''
-        <«name.formatForCode»>{if !$item.«name.formatForCode»}0{else}1{/if}</«name.formatForCode»>
+        <name.formatForCode>{if !$item.name.formatForCode}0{else}1{/if}</name.formatForCode>
     '''
 
     def private displayEntryCdata(DerivedField it) '''
-        <«name.formatForCode»><![CDATA[«fieldHelper.displayField(it, 'item', 'viewxml')»]]></«name.formatForCode»>
+        <name.formatForCode><![CDATA[fieldHelper.displayField(it, 'item', 'viewxml')]]></name.formatForCode>
     '''
 
     def private dispatch displayEntry(StringField it) {
@@ -110,25 +110,25 @@ class Xml {
     }
 
     def private dispatch displayEntry(UploadField it) '''
-        <«name.formatForCode»«fieldHelper.displayField(it, 'item', 'viewxml')»</«name.formatForCode»>
+        <name.formatForCodefieldHelper.displayField(it, 'item', 'viewxml')</name.formatForCode>
     '''
 
     def private displayRelatedEntry(JoinRelationship it, Boolean useTarget) '''
-        «val relationAliasName = getRelationAliasName(useTarget).formatForCodeCapital»
-        «val relObjName = 'item.' + relationAliasName»
-        <«relationAliasName.toFirstLower»>{if isset($«relObjName») && $«relObjName» ne null}{$«relObjName»->getTitleFromDisplayPattern()|default:''}{/if}</«relationAliasName.toFirstLower»>
+        val relationAliasName = getRelationAliasName(useTarget).formatForCodeCapital
+        val relObjName = 'item.' + relationAliasName
+        <relationAliasName.toFirstLower>{if isset($relObjName) && $relObjName ne null}{$relObjName->getTitleFromDisplayPattern()|default:''}{/if}</relationAliasName.toFirstLower>
     '''
 
     def private displayRelatedEntries(JoinRelationship it, Boolean useTarget) '''
-        «val relationAliasName = getRelationAliasName(useTarget).formatForCodeCapital»
-        «val linkEntity = (if (useTarget) target else source)»
-        «val relObjName = 'item.' + relationAliasName»
-        <«relationAliasName.toFirstLower»>
-        {if isset($«relObjName») && $«relObjName» ne null}
-            {foreach name='relationLoop' item='relatedItem' from=$«relObjName»}
-            <«linkEntity.name.formatForCode»>{$relatedItem->getTitleFromDisplayPattern()|default:''}</«linkEntity.name.formatForCode»>
+        val relationAliasName = getRelationAliasName(useTarget).formatForCodeCapital
+        val linkEntity = (if (useTarget) target else source)
+        val relObjName = 'item.' + relationAliasName
+        <relationAliasName.toFirstLower>
+        {if isset($relObjName) && $relObjName ne null}
+            {foreach name='relationLoop' item='relatedItem' from=$relObjName}
+            <linkEntity.name.formatForCode>{$relatedItem->getTitleFromDisplayPattern()|default:''}</linkEntity.name.formatForCode>
             {/foreach}
         {/if}
-        </«relationAliasName.toFirstLower»>
+        </relationAliasName.toFirstLower>
     '''
 }

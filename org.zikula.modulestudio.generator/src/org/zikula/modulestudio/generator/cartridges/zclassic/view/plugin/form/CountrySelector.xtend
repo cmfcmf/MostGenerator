@@ -24,19 +24,19 @@ class CountrySelector {
     }
 
     def private formCountrySelectorBaseImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Form\Plugin\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Form\Plugin\Base;
 
             use Zikula_Form_Plugin_DropdownList;
             use Zikula_Form_View;
             use ZLanguage;
 
-        «ENDIF»
+        ENDIF
         /**
          * This plugin creates a country dropdown list.
          * It understands an optional argument to limit the select options to a given set of allowed countries.
          */
-        class «IF targets('1.3.5')»«appName»_Form_Plugin_Base_«ENDIF»CountrySelector extends Zikula_Form_Plugin_DropdownList
+        class IF targets('1.3.5')appName_Form_Plugin_Base_ENDIFCountrySelector extends Zikula_Form_Plugin_DropdownList
         {
             /**
              * Optional filter for displaying only certain countries in the list.
@@ -93,21 +93,21 @@ class CountrySelector {
     '''
 
     def private formCountrySelectorImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Form\Plugin;
+        IF !targets('1.3.5')
+            namespace appNamespace\Form\Plugin;
 
-            use «appNamespace»\Form\Plugin\Base\CountrySelector as BaseCountrySelector;
+            use appNamespace\Form\Plugin\Base\CountrySelector as BaseCountrySelector;
 
-        «ENDIF»
+        ENDIF
         /**
          * This plugin creates a country dropdown list.
          * It understands an optional argument to limit the select options to a given set of allowed countries.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Form_Plugin_CountrySelector extends «appName»_Form_Plugin_Base_CountrySelector
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Form_Plugin_CountrySelector extends appName_Form_Plugin_Base_CountrySelector
+        ELSE
         class CountrySelector extends BaseCountrySelector
-        «ENDIF»
+        ENDIF
         {
             // feel free to add your customisation here
         }
@@ -115,7 +115,7 @@ class CountrySelector {
 
     def private formCountrySelectorPluginImpl(Application it) '''
         /**
-         * The «appName.formatForDB»CountrySelector plugin creates a country dropdown list.
+         * The appName.formatForDBCountrySelector plugin creates a country dropdown list.
          * It understands an optional argument to limit the select options to a given set of allowed countries.
          *
          * @param array            $params All attributes passed to this function from the template.
@@ -123,9 +123,9 @@ class CountrySelector {
          *
          * @return string The output of the plugin.
          */
-        function smarty_function_«appName.formatForDB»CountrySelector($params, $view)
+        function smarty_function_appName.formatForDBCountrySelector($params, $view)
         {
-            return $view->registerPlugin('«IF targets('1.3.5')»«appName»_Form_Plugin_CountrySelector«ELSE»\\«vendor.formatForCodeCapital»\\«name.formatForCodeCapital»Module\\Form\\Plugin\\CountrySelector«ENDIF»', $params);
+            return $view->registerPlugin('IF targets('1.3.5')appName_Form_Plugin_CountrySelectorELSE\\vendor.formatForCodeCapital\\name.formatForCodeCapitalModule\\Form\\Plugin\\CountrySelectorENDIF', $params);
         }
     '''
 }

@@ -110,155 +110,155 @@ class ControllerLayer {
     }
 
     def private controllerBaseImpl(Controller it) '''
-        «val isAjaxController = (it instanceof AjaxController)»
-        «controllerBaseImports»
+        val isAjaxController = (it instanceof AjaxController)
+        controllerBaseImports
         /**
-         * «name» controller class.
+         * name controller class.
          */
-        class «IF app.targets('1.3.5')»«app.appName»_Controller_Base_«name.formatForCodeCapital»«ELSE»«name.formatForCodeCapital»Controller«ENDIF» extends Zikula_«IF !isAjaxController»AbstractController«ELSE»Controller_AbstractAjax«ENDIF»
+        class IF app.targets('1.3.5')app.appName_Controller_Base_name.formatForCodeCapitalELSEname.formatForCodeCapitalControllerENDIF extends Zikula_IF !isAjaxControllerAbstractControllerELSEController_AbstractAjaxENDIF
         {
-            «IF isAjaxController»
+            IF isAjaxController
 
-            «ELSE»
-                «val isUserController = (it instanceof UserController)»
-                «new ControllerHelper().controllerPostInitialize(it, isUserController, '')»
-            «ENDIF»
+            ELSE
+                val isUserController = (it instanceof UserController)
+                new ControllerHelper().controllerPostInitialize(it, isUserController, '')
+            ENDIF
 
-            «val actionHelper = new ControllerAction(app)»
-            «FOR action : actions»«actionHelper.generate(action, true)»«ENDFOR»
-            «IF hasActions('edit')»
+            val actionHelper = new ControllerAction(app)
+            FOR action : actionsactionHelper.generate(action, true)ENDFOR
+            IF hasActions('edit')
 
-                «handleInlineRedirect(true)»
-            «ENDIF»
-            «IF app.needsConfig && isConfigController»
+                handleInlineRedirect(true)
+            ENDIF
+            IF app.needsConfig && isConfigController
 
-                «configAction(true)»
-            «ENDIF»
-            «IF isAjaxController»
-                «new Ajax().additionalAjaxFunctionsBase(it, app)»
-            «ENDIF»
+                configAction(true)
+            ENDIF
+            IF isAjaxController
+                new Ajax().additionalAjaxFunctionsBase(it, app)
+            ENDIF
         }
     '''
 
     def private entityControllerBaseImpl(Entity it) '''
-        «entityControllerBaseImports»
+        entityControllerBaseImports
         /**
-         * «name.formatForDisplayCapital» controller base class.
+         * name.formatForDisplayCapital controller base class.
          */
-        class «IF app.targets('1.3.5')»«app.appName»_Controller_Base_«name.formatForCodeCapital»«ELSE»«name.formatForCodeCapital»Controller«ENDIF» extends Zikula_AbstractController
+        class IF app.targets('1.3.5')app.appName_Controller_Base_name.formatForCodeCapitalELSEname.formatForCodeCapitalControllerENDIF extends Zikula_AbstractController
         {
-            «new ControllerHelper().controllerPostInitialize(it, false, '')»
+            new ControllerHelper().controllerPostInitialize(it, false, '')
 
-            «val actionHelper = new ControllerAction(app)»
-            «FOR action : app.getActionsOfAdminAndUserControllers»«actionHelper.generate(it, action, true)»«ENDFOR»
-            «IF hasActions('view') && app.hasAdminController»
+            val actionHelper = new ControllerAction(app)
+            FOR action : app.getActionsOfAdminAndUserControllersactionHelper.generate(it, action, true)ENDFOR
+            IF hasActions('view') && app.hasAdminController
 
-                «handleSelectedObjects(true)»
-            «ENDIF»
-            «IF hasActions('edit')»
+                handleSelectedObjects(true)
+            ENDIF
+            IF hasActions('edit')
 
-                «handleInlineRedirect(true)»
-            «ENDIF»
+                handleInlineRedirect(true)
+            ENDIF
         }
     '''
 
     def private controllerBaseImports(Controller it) '''
-        «val isAdminController = (it instanceof AdminController)»
-        «val isAjaxController = (it instanceof AjaxController)»
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Controller\Base;
+        val isAdminController = (it instanceof AdminController)
+        val isAjaxController = (it instanceof AjaxController)
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Controller\Base;
 
-            «IF app.needsConfig && isConfigController»
-                use «app.appNamespace»\Form\Handler\«app.configController.formatForDB.toFirstUpper»\ConfigHandler;
+            IF app.needsConfig && isConfigController
+                use app.appNamespace\Form\Handler\app.configController.formatForDB.toFirstUpper\ConfigHandler;
 
-            «ENDIF»
+            ENDIF
             use Symfony\Component\HttpFoundation\Request;
             use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-            «IF hasActions('display') || hasActions('edit') || hasActions('delete')»
+            IF hasActions('display') || hasActions('edit') || hasActions('delete')
                 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-            «ENDIF»
-            «IF hasActions('main') || hasActions('view') || hasActions('delete')»
+            ENDIF
+            IF hasActions('main') || hasActions('view') || hasActions('delete')
                 use Symfony\Component\HttpFoundation\RedirectResponse;
-            «ENDIF»
-            «IF isAjaxController»
-                «IF !app.getAllUserFields.empty»
+            ENDIF
+            IF isAjaxController
+                IF !app.getAllUserFields.empty
                     use Doctrine\ORM\AbstractQuery;
-                «ENDIF»
+                ENDIF
                 use DataUtil;
-            «ENDIF»
-            «IF hasActions('edit')»
+            ENDIF
+            IF hasActions('edit')
                 use JCSSUtil;
-            «ENDIF»
+            ENDIF
             use ModUtil;
             use SecurityUtil;
-            «IF (hasActions('view') && isAdminController) || hasActions('main') || hasActions('delete')»
+            IF (hasActions('view') && isAdminController) || hasActions('main') || hasActions('delete')
                 use System;
-            «ENDIF»
+            ENDIF
             use UserUtil;
-            use Zikula_«IF !isAjaxController»AbstractController«ELSE»Controller_AbstractAjax«ENDIF»;
+            use Zikula_IF !isAjaxControllerAbstractControllerELSEController_AbstractAjaxENDIF;
             use Zikula_View;
             use ZLanguage;
-            «IF (hasActions('view') && isAdminController) || hasActions('delete')»
+            IF (hasActions('view') && isAdminController) || hasActions('delete')
                 use Zikula\Core\Hook\ProcessHook;
                 use Zikula\Core\Hook\ValidationHook;
                 use Zikula\Core\Hook\ValidationProviders;
-            «ENDIF»
+            ENDIF
             use Zikula\Core\ModUrl;
-            «controllerBaseImportsResponse»
+            controllerBaseImportsResponse
 
-        «ENDIF»
+        ENDIF
     '''
 
     def private entityControllerBaseImports(Entity it) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Controller\Base;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Controller\Base;
 
-            use «entityClassName('', false)»;
+            use entityClassName('', false);
             use Symfony\Component\HttpFoundation\Request;
             use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-            «IF hasActions('display') || hasActions('edit') || hasActions('delete')»
+            IF hasActions('display') || hasActions('edit') || hasActions('delete')
                 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-            «ENDIF»
-            «IF hasActions('main') || hasActions('view') || hasActions('delete')»
+            ENDIF
+            IF hasActions('main') || hasActions('view') || hasActions('delete')
                 use Symfony\Component\HttpFoundation\RedirectResponse;
-            «ENDIF»
+            ENDIF
             use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
-            «IF hasActions('display') || hasActions('delete')»
+            IF hasActions('display') || hasActions('delete')
                 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-            «ENDIF»
+            ENDIF
             use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
             use FormUtil;
-            «IF hasActions('edit')»
+            IF hasActions('edit')
                 use JCSSUtil;
-            «ENDIF»
+            ENDIF
             use ModUtil;
             use SecurityUtil;
-            «IF (hasActions('view') && app.hasAdminController) || hasActions('main') || hasActions('delete')»
+            IF (hasActions('view') && app.hasAdminController) || hasActions('main') || hasActions('delete')
                 use System;
-            «ENDIF»
+            ENDIF
             use UserUtil;
             use Zikula_AbstractController;
             use Zikula_View;
             use ZLanguage;
-            «IF (hasActions('view') && app.hasAdminController) || hasActions('delete')»
+            IF (hasActions('view') && app.hasAdminController) || hasActions('delete')
                 use Zikula\Core\Hook\ProcessHook;
                 use Zikula\Core\Hook\ValidationHook;
                 use Zikula\Core\Hook\ValidationProviders;
-            «ENDIF»
+            ENDIF
             use Zikula\Core\ModUrl;
-            «entityControllerBaseImportsResponse»
+            entityControllerBaseImportsResponse
 
-        «ENDIF»
+        ENDIF
     '''
 
     def private controllerBaseImportsResponse(Controller it) '''
-        «IF it instanceof AjaxController»
+        IF it instanceof AjaxController
             use Zikula\Core\Response\Ajax\AjaxResponse;
             use Zikula\Core\Response\Ajax\BadDataResponse;
             use Zikula\Core\Response\Ajax\FatalResponse;
             use Zikula\Core\Response\Ajax\NotFoundResponse;
             use Symfony\Component\HttpFoundation\JsonResponse;
-        «ENDIF»
+        ENDIF
         use Zikula\Core\Response\PlainResponse;
     '''
 
@@ -267,14 +267,14 @@ class ControllerLayer {
     '''
 
     def private handleSelectedObjects(Entity it, Boolean isBase) '''
-        «handleSelectedObjectsDocBlock(isBase)»
-        public function handleSelectedEntries«IF app.targets('1.3.5')»()«ELSE»Action(Request $request)«ENDIF»
+        handleSelectedObjectsDocBlock(isBase)
+        public function handleSelectedEntriesIF app.targets('1.3.5')()ELSEAction(Request $request)ENDIF
         {
-            «IF isBase»
-                «handleSelectedObjectsBaseImpl»
-            «ELSE»
+            IF isBase
+                handleSelectedObjectsBaseImpl
+            ELSE
                 return parent::handleSelectedEntriesAction($request);
-            «ENDIF»
+            ENDIF
         }
     '''
 
@@ -284,47 +284,47 @@ class ControllerLayer {
          *
          * This function processes the items selected in the admin view page.
          * Multiple items may have their state changed or be deleted.
-         «IF !app.targets('1.3.5') && !isBase»
+         IF !app.targets('1.3.5') && !isBase
          *
-         * @Route("/%«app.appName.formatForDB».routing.«name.formatForCode».plural%/handleSelectedEntries",
-         *        name = "«app.appName.formatForDB»_«name.formatForCode»_handleSelectedEntries",
+         * @Route("/%app.appName.formatForDB.routing.name.formatForCode.plural%/handleSelectedEntries",
+         *        name = "app.appName.formatForDB_name.formatForCode_handleSelectedEntries",
          *        methods = {"POST"}
          * )
-         «ENDIF»
+         ENDIF
          *
          * @param string $action The action to be executed.
          * @param array  $items  Identifier list of the items to be processed.
          *
          * @return bool true on sucess, false on failure.
-         «IF !app.targets('1.3.5')»
+         IF !app.targets('1.3.5')
          *
          * @throws RuntimeException Thrown if executing the workflow action fails
-         «ENDIF»
+         ENDIF
          */
     '''
 
     def private handleSelectedObjectsBaseImpl(Entity it) '''
         $this->checkCsrfToken();
 
-        «IF app.targets('1.3.5')»
-            $redirectUrl = ModUtil::url($this->name, 'admin', 'main', array('ot' => '«name.formatForCode»'));
-        «ELSE»
-            $redirectUrl = $this->serviceManager->get('router')->generate('«app.appName.formatForDB»_«name.formatForCode»_index', array('lct' => 'admin'));
-        «ENDIF»
+        IF app.targets('1.3.5')
+            $redirectUrl = ModUtil::url($this->name, 'admin', 'main', array('ot' => 'name.formatForCode'));
+        ELSE
+            $redirectUrl = $this->serviceManager->get('router')->generate('app.appName.formatForDB_name.formatForCode_index', array('lct' => 'admin'));
+        ENDIF
 
-        $objectType = '«name.formatForCode»';
+        $objectType = 'name.formatForCode';
 
         // Get parameters
-        $action = $«IF app.targets('1.3.5')»this->«ENDIF»request->request->get('action', null);
-        $items = $«IF app.targets('1.3.5')»this->«ENDIF»request->request->get('items', null);
+        $action = $IF app.targets('1.3.5')this->ENDIFrequest->request->get('action', null);
+        $items = $IF app.targets('1.3.5')this->ENDIFrequest->request->get('items', null);
 
         $action = strtolower($action);
 
-        «IF app.targets('1.3.5')»
-            $workflowHelper = new «app.appName»_Util_Workflow($this->serviceManager);
-        «ELSE»
-            $workflowHelper = $this->serviceManager->get('«app.appName.formatForDB».workflow_helper');
-        «ENDIF»
+        IF app.targets('1.3.5')
+            $workflowHelper = new app.appName_Util_Workflow($this->serviceManager);
+        ELSE
+            $workflowHelper = $this->serviceManager->get('app.appName.formatForDB.workflow_helper');
+        ENDIF
 
         // process each item
         foreach ($items as $itemid) {
@@ -348,13 +348,13 @@ class ControllerLayer {
 
             // Let any hooks perform additional validation actions
             $hookType = $action == 'delete' ? 'validate_delete' : 'validate_edit';
-            «IF app.targets('1.3.5')»
+            IF app.targets('1.3.5')
                 $hook = new Zikula_ValidationHook($hookAreaPrefix . '.' . $hookType, new Zikula_Hook_ValidationProviders());
                 $validators = $this->notifyHooks($hook)->getValidators();
-            «ELSE»
+            ELSE
                 $hook = new ValidationHook(new ValidationProviders());
                 $validators = $this->dispatchHooks($hookAreaPrefix . '.' . $hookType, $hook)->getValidators();
-            «ENDIF»
+            ENDIF
             if ($validators->hasErrors()) {
                 continue;
             }
@@ -364,13 +364,13 @@ class ControllerLayer {
                 // execute the workflow action
                 $success = $workflowHelper->executeAction($entity, $action);
             } catch(\Exception $e) {
-                «IF app.targets('1.3.5')»
+                IF app.targets('1.3.5')
                     LogUtil::registerError($this->__f('Sorry, but an unknown error occured during the %s action. Please apply the changes again!', array($action)));
-                «ELSE»
+                ELSE
                     $this->request->getSession()->getFlashBag()->add('error', $this->__f('Sorry, but an unknown error occured during the %s action. Please apply the changes again!', array($action)));
                     $logger = $this->serviceManager->get('logger');
-                    $logger->error('{app}: User {user} tried to execute the {action} workflow action for the {entity} with id {id}, but failed. Error details: {errorMessage}.', array('app' => '«app.appName»', 'user' => UserUtil::getVar('uname'), 'action' => $action, 'entity' => '«name.formatForDisplay»', 'id' => $itemid, 'errorMessage' => $e->getMessage()));
-                «ENDIF»
+                    $logger->error('{app}: User {user} tried to execute the {action} workflow action for the {entity} with id {id}, but failed. Error details: {errorMessage}.', array('app' => 'app.appName', 'user' => UserUtil::getVar('uname'), 'action' => $action, 'entity' => 'name.formatForDisplay', 'id' => $itemid, 'errorMessage' => $e->getMessage()));
+                ENDIF
             }
 
             if (!$success) {
@@ -378,21 +378,21 @@ class ControllerLayer {
             }
 
             if ($action == 'delete') {
-                «IF app.targets('1.3.5')»
+                IF app.targets('1.3.5')
                     LogUtil::registerStatus($this->__('Done! Item deleted.'));
-                «ELSE»
+                ELSE
                     $this->request->getSession()->getFlashBag()->add('status', $this->__('Done! Item deleted.'));
                     $logger = $this->serviceManager->get('logger');
-                    $logger->notice('{app}: User {user} deleted the {entity} with id {id}.', array('app' => '«app.appName»', 'user' => UserUtil::getVar('uname'), 'entity' => '«name.formatForDisplay»', 'id' => $itemid));
-                «ENDIF»
+                    $logger->notice('{app}: User {user} deleted the {entity} with id {id}.', array('app' => 'app.appName', 'user' => UserUtil::getVar('uname'), 'entity' => 'name.formatForDisplay', 'id' => $itemid));
+                ENDIF
             } else {
-                «IF app.targets('1.3.5')»
+                IF app.targets('1.3.5')
                     LogUtil::registerStatus($this->__('Done! Item updated.'));
-                «ELSE»
+                ELSE
                     $this->request->getSession()->getFlashBag()->add('status', $this->__('Done! Item updated.'));
                     $logger = $this->serviceManager->get('logger');
-                    $logger->notice('{app}: User {user} executed the {action} workflow action for the {entity} with id {id}.', array('app' => '«app.appName»', 'user' => UserUtil::getVar('uname'), 'action' => $action, 'entity' => '«name.formatForDisplay»', 'id' => $itemid));
-                «ENDIF»
+                    $logger->notice('{app}: User {user} executed the {action} workflow action for the {entity} with id {id}.', array('app' => 'app.appName', 'user' => UserUtil::getVar('uname'), 'action' => $action, 'entity' => 'name.formatForDisplay', 'id' => $itemid));
+                ENDIF
             }
 
             // Let any hooks know that we have updated or deleted an item
@@ -400,15 +400,15 @@ class ControllerLayer {
             $url = null;
             if ($action != 'delete') {
                 $urlArgs = $entity->createUrlArgs();
-                $url = new «IF app.targets('1.3.5')»Zikula_«ENDIF»ModUrl($this->name, '«name.formatForCode»', 'display', ZLanguage::getLanguageCode(), $urlArgs);
+                $url = new IF app.targets('1.3.5')Zikula_ENDIFModUrl($this->name, 'name.formatForCode', 'display', ZLanguage::getLanguageCode(), $urlArgs);
             }
-            «IF app.targets('1.3.5')»
+            IF app.targets('1.3.5')
                 $hook = new Zikula_ProcessHook($hookAreaPrefix . '.' . $hookType, $entity->createCompositeIdentifier(), $url);
                 $this->notifyHooks($hook);
-            «ELSE»
+            ELSE
                 $hook = new ProcessHook($entity->createCompositeIdentifier(), $url);
                 $this->dispatchHooks($hookAreaPrefix . '.' . $hookType, $hook);
-            «ENDIF»
+            ENDIF
 
             // An item was updated or deleted, so we clear all cached pages for this item.
             $cacheArgs = array('ot' => $objectType, 'item' => $entity);
@@ -418,37 +418,37 @@ class ControllerLayer {
         // clear view cache to reflect our changes
         $this->view->clear_cache();
 
-        «IF app.targets('1.3.5')»
+        IF app.targets('1.3.5')
             return $this->redirect($redirectUrl);
-        «ELSE»
+        ELSE
             return new RedirectResponse(System::normalizeUrl($redirectUrl));
-        «ENDIF»
+        ENDIF
     '''
 
     def private handleInlineRedirect(NamedObject it, Boolean isBase) '''
-        «handleInlineRedirectDocBlock(isBase)»
-        public function handleInlineRedirect«IF app.targets('1.3.5')»()«ELSE»Action($idPrefix, $commandName, $id = 0)«ENDIF»
+        handleInlineRedirectDocBlock(isBase)
+        public function handleInlineRedirectIF app.targets('1.3.5')()ELSEAction($idPrefix, $commandName, $id = 0)ENDIF
         {
-            «IF isBase»
-                «handleInlineRedirectBaseImpl»
-            «ELSE»
+            IF isBase
+                handleInlineRedirectBaseImpl
+            ELSE
                 return parent::handleInlineRedirectAction($idPrefix, $commandName, $id);
-            «ENDIF»
+            ENDIF
         }
     '''
 
     def private handleInlineRedirectDocBlock(NamedObject it, Boolean isBase) '''
         /**
          * This method cares for a redirect within an inline frame.
-         «IF it instanceof Entity && !app.targets('1.3.5') && !isBase»
+         IF it instanceof Entity && !app.targets('1.3.5') && !isBase
          *
-         * @Route("/%«app.appName.formatForDB».routing.«name.formatForCode».singular%/handleInlineRedirect/{idPrefix}/{commandName}/{id}",
-         *        name = "«app.appName.formatForDB»_«name.formatForCode»_handleInlineRedirect",
+         * @Route("/%app.appName.formatForDB.routing.name.formatForCode.singular%/handleInlineRedirect/{idPrefix}/{commandName}/{id}",
+         *        name = "app.appName.formatForDB_name.formatForCode_handleInlineRedirect",
          *        requirements = {"id" = "\d+"},
          *        defaults = {"commandName" = "", "id" = 0},
          *        methods = {"GET"}
          * )
-         «ENDIF»
+         ENDIF
          *
          * @param string  $idPrefix    Prefix for inline window element identifier.
          * @param string  $commandName Name of action to be performed (create or edit).
@@ -459,11 +459,11 @@ class ControllerLayer {
     '''
 
     def private handleInlineRedirectBaseImpl(NamedObject it) '''
-        «IF app.targets('1.3.5') || it instanceof Controller»
+        IF app.targets('1.3.5') || it instanceof Controller
             $id = (int) $this->request->query->filter('id', 0, FILTER_VALIDATE_INT);
             $idPrefix = $this->request->query->filter('idPrefix', '', FILTER_SANITIZE_STRING);
             $commandName = $this->request->query->filter('commandName', '', FILTER_SANITIZE_STRING);
-        «ENDIF»
+        ENDIF
         if (empty($idPrefix)) {
             return false;
         }
@@ -473,242 +473,242 @@ class ControllerLayer {
                    ->assign('commandName', $commandName)
                    ->assign('jcssConfig', JCSSUtil::getJSConfig());
 
-        «var typeName = ''»
-        «IF it instanceof Controller»
-            «{typeName = it.formattedName; ''}»
-        «ELSEIF it instanceof Entity»
-            «{typeName = it.name.formatForCode; ''}»
-        «ENDIF»
-        «IF app.targets('1.3.5')»
-            $this->view->display('«typeName»/inlineRedirectHandler.tpl');
+        var typeName = ''
+        IF it instanceof Controller
+            {typeName = it.formattedName; ''}
+        ELSEIF it instanceof Entity
+            {typeName = it.name.formatForCode; ''}
+        ENDIF
+        IF app.targets('1.3.5')
+            $this->view->display('typeName/inlineRedirectHandler.tpl');
 
             return true;
-        «ELSE»
-            return new PlainResponse($this->view->display('«typeName.toFirstUpper»/inlineRedirectHandler.tpl'));
-        «ENDIF»
+        ELSE
+            return new PlainResponse($this->view->display('typeName.toFirstUpper/inlineRedirectHandler.tpl'));
+        ENDIF
     '''
 
     def private configAction(Controller it, Boolean isBase) '''
-        «configDocBlock(isBase)»
-        public function config«IF !app.targets('1.3.5')»Action«ENDIF»()
+        configDocBlock(isBase)
+        public function configIF !app.targets('1.3.5')ActionENDIF()
         {
-            «IF isBase»
-                «configBaseImpl»
-            «ELSE»
+            IF isBase
+                configBaseImpl
+            ELSE
                 return parent::configAction();
-            «ENDIF»
+            ENDIF
         }
     '''
 
     def private configDocBlock(Controller it, Boolean isBase) '''
         /**
          * This method takes care of the application configuration.
-         «IF !app.targets('1.3.5') && !isBase»
+         IF !app.targets('1.3.5') && !isBase
          *
          * @Route("/config",
-         *        name = "«app.appName.formatForDB»_«formattedName»_config",
+         *        name = "app.appName.formatForDB_formattedName_config",
          *        methods = {"GET", "POST"}
          * )
-         «ENDIF»
+         ENDIF
          *
          * @return string Output
-         «IF !app.targets('1.3.5')»
+         IF !app.targets('1.3.5')
          *
          * @throws AccessDeniedException Thrown if the user doesn't have required permissions
-         «ENDIF»
+         ENDIF
          */
     '''
 
     def private configBaseImpl(Controller it) '''
-        «IF app.targets('1.3.5')»
+        IF app.targets('1.3.5')
             $this->throwForbiddenUnless(SecurityUtil::checkPermission($this->name . '::', '::', ACCESS_ADMIN));
-        «ELSE»
+        ELSE
             if (!SecurityUtil::checkPermission($this->name . '::', '::', ACCESS_ADMIN)) {
                 throw new AccessDeniedException();
             }
-        «ENDIF»
+        ENDIF
 
         // Create new Form reference
         $view = FormUtil::newForm($this->name, $this);
 
-        $templateName = '«IF app.targets('1.3.5')»«app.configController.formatForDB»«ELSE»«app.configController.formatForCodeCapital»«ENDIF»/config.tpl';
+        $templateName = 'IF app.targets('1.3.5')app.configController.formatForDBELSEapp.configController.formatForCodeCapitalENDIF/config.tpl';
 
         // Execute form using supplied template and page event handler
-        return «IF !app.targets('1.3.5')»$this->response(«ENDIF»$view->execute($templateName, new «IF app.targets('1.3.5')»«app.appName»_Form_Handler_«app.configController.formatForDB.toFirstUpper»_Config«ELSE»ConfigHandler«ENDIF»())«IF !app.targets('1.3.5')»)«ENDIF»;
+        return IF !app.targets('1.3.5')$this->response(ENDIF$view->execute($templateName, new IF app.targets('1.3.5')app.appName_Form_Handler_app.configController.formatForDB.toFirstUpper_ConfigELSEConfigHandlerENDIF())IF !app.targets('1.3.5'))ENDIF;
     '''
 
     def private controllerImpl(Controller it) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Controller;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Controller;
 
-            use «app.appNamespace»\Controller\Base\«name.formatForCodeCapital»Controller as Base«name.formatForCodeCapital»Controller;
+            use app.appNamespace\Controller\Base\name.formatForCodeCapitalController as Basename.formatForCodeCapitalController;
 
-        «ENDIF»
+        ENDIF
         /**
-         * «name» controller class providing navigation and interaction functionality.
-        «IF !app.targets('1.3.5') && it instanceof AjaxController»
-         «' '»*
-         «' '»* @Route("/%«app.appName.formatForDB».routing.ajax%")
-        «ENDIF»
+         * name controller class providing navigation and interaction functionality.
+        IF !app.targets('1.3.5') && it instanceof AjaxController
+         ' '*
+         ' '* @Route("/%app.appName.formatForDB.routing.ajax%")
+        ENDIF
          */
-        «IF app.targets('1.3.5')»
-        class «app.appName»_Controller_«name.formatForCodeCapital» extends «app.appName»_Controller_Base_«name.formatForCodeCapital»
-        «ELSE»
-        class «name.formatForCodeCapital»Controller extends Base«name.formatForCodeCapital»Controller
-        «ENDIF»
+        IF app.targets('1.3.5')
+        class app.appName_Controller_name.formatForCodeCapital extends app.appName_Controller_Base_name.formatForCodeCapital
+        ELSE
+        class name.formatForCodeCapitalController extends Basename.formatForCodeCapitalController
+        ENDIF
         {
-            «IF !app.targets('1.3.5')»
-                «val actionHelper = new ControllerAction(app)»
-                «FOR action : actions»«actionHelper.generate(action, false)»«ENDFOR»
-                «IF hasActions('edit')»
+            IF !app.targets('1.3.5')
+                val actionHelper = new ControllerAction(app)
+                FOR action : actionsactionHelper.generate(action, false)ENDFOR
+                IF hasActions('edit')
 
-                    «handleInlineRedirect(false)»
-                «ENDIF»
-                «IF app.needsConfig && isConfigController»
+                    handleInlineRedirect(false)
+                ENDIF
+                IF app.needsConfig && isConfigController
 
-                    «configAction(false)»
-                «ENDIF»
-                «IF it instanceof AjaxController»
-                    «new Ajax().additionalAjaxFunctions(it, app)»
-                «ENDIF»
-            «ENDIF»
+                    configAction(false)
+                ENDIF
+                IF it instanceof AjaxController
+                    new Ajax().additionalAjaxFunctions(it, app)
+                ENDIF
+            ENDIF
             // feel free to add your own controller methods here
         }
     '''
 
     def private entityControllerImpl(Entity it) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Controller;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Controller;
 
-            use «app.appNamespace»\Controller\Base\«name.formatForCodeCapital»Controller as Base«name.formatForCodeCapital»Controller;
+            use app.appNamespace\Controller\Base\name.formatForCodeCapitalController as Basename.formatForCodeCapitalController;
 
             use RuntimeException;
             use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-            «IF hasActions('display') || hasActions('edit') || hasActions('delete')»
+            IF hasActions('display') || hasActions('edit') || hasActions('delete')
                 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-            «ENDIF»
+            ENDIF
             use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-            use «app.appNamespace»\Entity\«name.formatForCodeCapital»Entity;
+            use app.appNamespace\Entity\name.formatForCodeCapitalEntity;
 
-        «ENDIF»
+        ENDIF
         /**
-         * «name.formatForDisplayCapital» controller class providing navigation and interaction functionality.
+         * name.formatForDisplayCapital controller class providing navigation and interaction functionality.
          */
-        «IF app.targets('1.3.5')»
-        class «app.appName»_Controller_«name.formatForCodeCapital» extends «app.appName»_Controller_Base_«name.formatForCodeCapital»
-        «ELSE»
-        class «name.formatForCodeCapital»Controller extends Base«name.formatForCodeCapital»Controller
-        «ENDIF»
+        IF app.targets('1.3.5')
+        class app.appName_Controller_name.formatForCodeCapital extends app.appName_Controller_Base_name.formatForCodeCapital
+        ELSE
+        class name.formatForCodeCapitalController extends Basename.formatForCodeCapitalController
+        ENDIF
         {
-            «IF !app.targets('1.3.5')»
-                «val actionHelper = new ControllerAction(app)»
-                «FOR action : app.getActionsOfAdminAndUserControllers»«actionHelper.generate(it, action, false)»«ENDFOR»
-                «IF hasActions('view') && app.hasAdminController»
+            IF !app.targets('1.3.5')
+                val actionHelper = new ControllerAction(app)
+                FOR action : app.getActionsOfAdminAndUserControllersactionHelper.generate(it, action, false)ENDFOR
+                IF hasActions('view') && app.hasAdminController
 
-                    «handleSelectedObjects(false)»
-                «ENDIF»
-                «IF hasActions('edit')»
+                    handleSelectedObjects(false)
+                ENDIF
+                IF hasActions('edit')
 
-                    «handleInlineRedirect(false)»
-                «ENDIF»
+                    handleInlineRedirect(false)
+                ENDIF
 
-            «ENDIF»
+            ENDIF
             // feel free to add your own controller methods here
         }
     '''
 
 
     def private apiBaseImpl(Controller it) '''
-        «val isUserController = (it instanceof UserController)»
-        «val isAjaxController = (it instanceof AjaxController)»
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Api\Base;
+        val isUserController = (it instanceof UserController)
+        val isAjaxController = (it instanceof AjaxController)
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Api\Base;
 
             use ModUtil;
             use SecurityUtil;
-            «IF isUserController»
+            IF isUserController
                 use System;
-            «ENDIF»
+            ENDIF
             use Zikula_AbstractApi;
 
-        «ENDIF»
+        ENDIF
         /**
-         * This is the «name» api helper class.
+         * This is the name api helper class.
          */
-        class «IF app.targets('1.3.5')»«app.appName»_Api_Base_«name.formatForCodeCapital»«ELSE»«name.formatForCodeCapital»Api«ENDIF» extends Zikula_AbstractApi
+        class IF app.targets('1.3.5')app.appName_Api_Base_name.formatForCodeCapitalELSEname.formatForCodeCapitalApiENDIF extends Zikula_AbstractApi
         {
-            «IF !isAjaxController»
+            IF !isAjaxController
             /**
-             * Returns available «name.formatForDB» panel links.
+             * Returns available name.formatForDB panel links.
              *
-             * @return array Array of «name.formatForDB» links.
+             * @return array Array of name.formatForDB links.
              */
             public function getLinks()
             {
                 $links = array();
 
-                «menuLinksBetweenControllers»
+                menuLinksBetweenControllers
 
-                «IF app.targets('1.3.5')»
-                    $controllerHelper = new «app.appName»_Util_Controller($this->serviceManager);
-                «ELSE»
-                    $controllerHelper = $this->serviceManager->get('«app.appName.formatForDB».controller_helper');
-                «ENDIF»
-                $utilArgs = array('api' => '«it.formattedName»', 'action' => 'getLinks');
+                IF app.targets('1.3.5')
+                    $controllerHelper = new app.appName_Util_Controller($this->serviceManager);
+                ELSE
+                    $controllerHelper = $this->serviceManager->get('app.appName.formatForDB.controller_helper');
+                ENDIF
+                $utilArgs = array('api' => 'it.formattedName', 'action' => 'getLinks');
                 $allowedObjectTypes = $controllerHelper->getObjectTypes('api', $utilArgs);
 
-                «IF hasActions('view')»
-                    «FOR entity : app.getAllEntities»
-                        if (in_array('«entity.name.formatForCode»', $allowedObjectTypes)
-                            && SecurityUtil::checkPermission($this->name . ':«entity.name.formatForCodeCapital»:', '::', ACCESS_«menuLinksPermissionLevel»)) {
-                            «IF app.targets('1.3.5')»
-                                $links[] = array('url' => ModUtil::url($this->name, '«formattedName»', 'view', array('ot' => '«entity.name.formatForCode»'«IF entity.tree != EntityTreeType.NONE», 'tpl' => 'tree'«ENDIF»)),
-                            «ELSE»
-                                $links[] = array('url' => $this->serviceManager->get('router')->generate('«app.appName.formatForDB»_«entity.name.formatForCode»_view', array('lct' => '«formattedName»'«IF entity.tree != EntityTreeType.NONE», 'tpl' => 'tree'«ENDIF»)),
-                            «ENDIF»
-                                             'text' => $this->__('«entity.nameMultiple.formatForDisplayCapital»'),
-                                             'title' => $this->__('«entity.name.formatForDisplayCapital» list'));
+                IF hasActions('view')
+                    FOR entity : app.getAllEntities
+                        if (in_array('entity.name.formatForCode', $allowedObjectTypes)
+                            && SecurityUtil::checkPermission($this->name . ':entity.name.formatForCodeCapital:', '::', ACCESS_menuLinksPermissionLevel)) {
+                            IF app.targets('1.3.5')
+                                $links[] = array('url' => ModUtil::url($this->name, 'formattedName', 'view', array('ot' => 'entity.name.formatForCode'IF entity.tree != EntityTreeType.NONE, 'tpl' => 'tree'ENDIF)),
+                            ELSE
+                                $links[] = array('url' => $this->serviceManager->get('router')->generate('app.appName.formatForDB_entity.name.formatForCode_view', array('lct' => 'formattedName'IF entity.tree != EntityTreeType.NONE, 'tpl' => 'tree'ENDIF)),
+                            ENDIF
+                                             'text' => $this->__('entity.nameMultiple.formatForDisplayCapital'),
+                                             'title' => $this->__('entity.name.formatForDisplayCapital list'));
                         }
-                    «ENDFOR»
-                «ENDIF»
-                «IF app.needsConfig && isConfigController»
+                    ENDFOR
+                ENDIF
+                IF app.needsConfig && isConfigController
                     if (SecurityUtil::checkPermission($this->name . '::', '::', ACCESS_ADMIN)) {
-                        «IF app.targets('1.3.5')»
-                            $links[] = array('url' => ModUtil::url($this->name, '«app.configController.formatForDB»', 'config'),
-                        «ELSE»
-                            $links[] = array('url' => $this->serviceManager->get('router')->generate('«app.appName.formatForDB»_«app.configController.formatForDB»_config'),
-                        «ENDIF»
+                        IF app.targets('1.3.5')
+                            $links[] = array('url' => ModUtil::url($this->name, 'app.configController.formatForDB', 'config'),
+                        ELSE
+                            $links[] = array('url' => $this->serviceManager->get('router')->generate('app.appName.formatForDB_app.configController.formatForDB_config'),
+                        ENDIF
                                          'text' => $this->__('Configuration'),
-                                         'title' => $this->__('Manage settings for this application')«IF !app.targets('1.3.5')»,
-                                         'icon' => 'wrench'«ENDIF»);
+                                         'title' => $this->__('Manage settings for this application')IF !app.targets('1.3.5'),
+                                         'icon' => 'wrench'ENDIF);
                     }
-                «ENDIF»
+                ENDIF
 
                 return $links;
             }
-            «ENDIF»
-            «additionalApiMethods»
+            ENDIF
+            additionalApiMethods
         }
     '''
 
     def private menuLinksBetweenControllers(Controller it) {
         switch it {
             AdminController case !container.getUserControllers.empty: '''
-                    «val userController = container.getUserControllers.head»
+                    val userController = container.getUserControllers.head
                     if (SecurityUtil::checkPermission($this->name . '::', '::', ACCESS_READ)) {
-                        $links[] = array('url' => ModUtil::url($this->name, '«userController.formattedName»', «userController.indexUrlDetails»),
+                        $links[] = array('url' => ModUtil::url($this->name, 'userController.formattedName', userController.indexUrlDetails),
                                          'text' => $this->__('Frontend'),
                                          'title' => $this->__('Switch to user area.'),
-                                         «IF container.application.targets('1.3.5')»'class' => 'z-icon-es-home'«ELSE»'icon' => 'home'«ENDIF»);
+                                         IF container.application.targets('1.3.5')'class' => 'z-icon-es-home'ELSE'icon' => 'home'ENDIF);
                     }
                     '''
             UserController case !container.getAdminControllers.empty: '''
-                    «val adminController = container.getAdminControllers.head»
+                    val adminController = container.getAdminControllers.head
                     if (SecurityUtil::checkPermission($this->name . '::', '::', ACCESS_ADMIN)) {
-                        $links[] = array('url' => ModUtil::url($this->name, '«adminController.formattedName»', «adminController.indexUrlDetails»),
+                        $links[] = array('url' => ModUtil::url($this->name, 'adminController.formattedName', adminController.indexUrlDetails),
                                          'text' => $this->__('Backend'),
                                          'title' => $this->__('Switch to administration area.'),
-                                         «IF container.application.targets('1.3.5')»'class' => 'z-icon-es-options'«ELSE»'icon' => 'wrench'«ENDIF»);
+                                         IF container.application.targets('1.3.5')'class' => 'z-icon-es-options'ELSE'icon' => 'wrench'ENDIF);
                     }
                     '''
         }
@@ -729,20 +729,20 @@ class ControllerLayer {
     }
 
     def private apiImpl(Controller it) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Api;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Api;
 
-            use «app.appNamespace»\Api\Base\«name.formatForCodeCapital»Api as Base«name.formatForCodeCapital»Api;
+            use app.appNamespace\Api\Base\name.formatForCodeCapitalApi as Basename.formatForCodeCapitalApi;
 
-        «ENDIF»
+        ENDIF
         /**
-         * This is the «name» api helper class.
+         * This is the name api helper class.
          */
-        «IF app.targets('1.3.5')»
-        class «app.appName»_Api_«name.formatForCodeCapital» extends «app.appName»_Api_Base_«name.formatForCodeCapital»
-        «ELSE»
-        class «name.formatForCodeCapital»Api extends Base«name.formatForCodeCapital»Api
-        «ENDIF»
+        IF app.targets('1.3.5')
+        class app.appName_Api_name.formatForCodeCapital extends app.appName_Api_Base_name.formatForCodeCapital
+        ELSE
+        class name.formatForCodeCapitalApi extends Basename.formatForCodeCapitalApi
+        ENDIF
         {
             // feel free to add own api methods here
         }

@@ -44,183 +44,183 @@ class Events {
     }
 
     def private eventDefinitionsBaseClass(Application it) '''
-        namespace «appNamespace»\Base;
+        namespace appNamespace\Base;
 
         /**
          * Events definition base class.
          */
-        class «name.formatForCodeCapital»Events
+        class name.formatForCodeCapitalEvents
         {
-            «FOR entity : getAllEntities»
-                «entity.eventDefinitions»
-            «ENDFOR»
+            FOR entity : getAllEntities
+                entity.eventDefinitions
+            ENDFOR
         }
     '''
 
     def private eventDefinitions(Entity it) '''
-        «val constPrefix = name.formatForDB.toUpperCase»
-        «val entityEventPrefix = app.appName.formatForDB + '.' + name.formatForDB»
+        val constPrefix = name.formatForDB.toUpperCase
+        val entityEventPrefix = app.appName.formatForDB + '.' + name.formatForDB
         /**
-         * The «entityEventPrefix»_post_load event is thrown when «nameMultiple.formatForDisplay»
+         * The entityEventPrefix_post_load event is thrown when nameMultiple.formatForDisplay
          * are loaded from the database.
          *
          * The event listener receives an
-         * «container.application.appNamespace»\Event\Filter«name.formatForCodeCapital»Event instance.
+         * container.application.appNamespace\Event\Filtername.formatForCodeCapitalEvent instance.
          *
-         * @see «entityClassName('', false)»::postLoadCallback()
+         * @see entityClassName('', false)::postLoadCallback()
          * @var string
          */
-        const «constPrefix»_POST_LOAD = '«entityEventPrefix»_post_load';
+        const constPrefix_POST_LOAD = 'entityEventPrefix_post_load';
 
         /**
-         * The «entityEventPrefix»_pre_persist event is thrown before a new «name.formatForDisplay»
+         * The entityEventPrefix_pre_persist event is thrown before a new name.formatForDisplay
          * is created in the system.
          *
          * The event listener receives an
-         * «container.application.appNamespace»\Event\Filter«name.formatForCodeCapital»Event instance.
+         * container.application.appNamespace\Event\Filtername.formatForCodeCapitalEvent instance.
          *
-         * @see «entityClassName('', false)»::prePersistCallback()
+         * @see entityClassName('', false)::prePersistCallback()
          * @var string
          */
-        const «constPrefix»_PRE_PERSIST = '«entityEventPrefix»_pre_persist';
+        const constPrefix_PRE_PERSIST = 'entityEventPrefix_pre_persist';
 
         /**
-         * The «entityEventPrefix»_post_persist event is thrown after a new «name.formatForDisplay»
+         * The entityEventPrefix_post_persist event is thrown after a new name.formatForDisplay
          * has been created in the system.
          *
          * The event listener receives an
-         * «container.application.appNamespace»\Event\Filter«name.formatForCodeCapital»Event instance.
+         * container.application.appNamespace\Event\Filtername.formatForCodeCapitalEvent instance.
          *
-         * @see «entityClassName('', false)»::postPersistCallback()
+         * @see entityClassName('', false)::postPersistCallback()
          * @var string
          */
-        const «constPrefix»_POST_PERSIST = '«entityEventPrefix»_post_persist';
+        const constPrefix_POST_PERSIST = 'entityEventPrefix_post_persist';
 
         /**
-         * The «entityEventPrefix»_pre_remove event is thrown before an existing «name.formatForDisplay»
+         * The entityEventPrefix_pre_remove event is thrown before an existing name.formatForDisplay
          * is removed from the system.
          *
          * The event listener receives an
-         * «container.application.appNamespace»\Event\Filter«name.formatForCodeCapital»Event instance.
+         * container.application.appNamespace\Event\Filtername.formatForCodeCapitalEvent instance.
          *
-         * @see «entityClassName('', false)»::preRemoveCallback()
+         * @see entityClassName('', false)::preRemoveCallback()
          * @var string
          */
-        const «constPrefix»_PRE_REMOVE = '«entityEventPrefix»_pre_remove';
+        const constPrefix_PRE_REMOVE = 'entityEventPrefix_pre_remove';
 
         /**
-         * The «entityEventPrefix»_post_remove event is thrown after an existing «name.formatForDisplay»
+         * The entityEventPrefix_post_remove event is thrown after an existing name.formatForDisplay
          * has been removed from the system.
          *
          * The event listener receives an
-         * «container.application.appNamespace»\Event\Filter«name.formatForCodeCapital»Event instance.
+         * container.application.appNamespace\Event\Filtername.formatForCodeCapitalEvent instance.
          *
-         * @see «entityClassName('', false)»::postRemoveCallback()
+         * @see entityClassName('', false)::postRemoveCallback()
          * @var string
          */
-        const «constPrefix»_POST_REMOVE = '«entityEventPrefix»_post_remove';
+        const constPrefix_POST_REMOVE = 'entityEventPrefix_post_remove';
 
         /**
-         * The «entityEventPrefix»_pre_update event is thrown before an existing «name.formatForDisplay»
+         * The entityEventPrefix_pre_update event is thrown before an existing name.formatForDisplay
          * is updated in the system.
          *
          * The event listener receives an
-         * «container.application.appNamespace»\Event\Filter«name.formatForCodeCapital»Event instance.
+         * container.application.appNamespace\Event\Filtername.formatForCodeCapitalEvent instance.
          *
-         * @see «entityClassName('', false)»::preUpdateCallback()
+         * @see entityClassName('', false)::preUpdateCallback()
          * @var string
          */
-        const «constPrefix»_PRE_UPDATE = '«entityEventPrefix»_pre_update';
+        const constPrefix_PRE_UPDATE = 'entityEventPrefix_pre_update';
 
         /**
-         * The «entityEventPrefix»_post_update event is thrown after an existing new «name.formatForDisplay»
+         * The entityEventPrefix_post_update event is thrown after an existing new name.formatForDisplay
          * has been updated in the system.
          *
          * The event listener receives an
-         * «container.application.appNamespace»\Event\Filter«name.formatForCodeCapital»Event instance.
+         * container.application.appNamespace\Event\Filtername.formatForCodeCapitalEvent instance.
          *
-         * @see «entityClassName('', false)»::postUpdateCallback()
+         * @see entityClassName('', false)::postUpdateCallback()
          * @var string
          */
-        const «constPrefix»_POST_UPDATE = '«entityEventPrefix»_post_update';
+        const constPrefix_POST_UPDATE = 'entityEventPrefix_post_update';
 
         /**
-         * The «entityEventPrefix»_pre_save event is thrown before a new «name.formatForDisplay»
-         * is created or an existing «name.formatForDisplay» is updated in the system.
+         * The entityEventPrefix_pre_save event is thrown before a new name.formatForDisplay
+         * is created or an existing name.formatForDisplay is updated in the system.
          *
          * The event listener receives an
-         * «container.application.appNamespace»\Event\Filter«name.formatForCodeCapital»Event instance.
+         * container.application.appNamespace\Event\Filtername.formatForCodeCapitalEvent instance.
          *
-         * @see «entityClassName('', false)»::preSaveCallback()
+         * @see entityClassName('', false)::preSaveCallback()
          * @var string
          */
-        const «constPrefix»_PRE_SAVE = '«entityEventPrefix»_pre_save';
+        const constPrefix_PRE_SAVE = 'entityEventPrefix_pre_save';
 
         /**
-         * The «entityEventPrefix»_post_save event is thrown after a new «name.formatForDisplay»
-         * has been created or an existing «name.formatForDisplay» has been updated in the system.
+         * The entityEventPrefix_post_save event is thrown after a new name.formatForDisplay
+         * has been created or an existing name.formatForDisplay has been updated in the system.
          *
          * The event listener receives an
-         * «container.application.appNamespace»\Event\Filter«name.formatForCodeCapital»Event instance.
+         * container.application.appNamespace\Event\Filtername.formatForCodeCapitalEvent instance.
          *
-         * @see «entityClassName('', false)»::postSaveCallback()
+         * @see entityClassName('', false)::postSaveCallback()
          * @var string
          */
-        const «constPrefix»_POST_SAVE = '«entityEventPrefix»_post_save';
+        const constPrefix_POST_SAVE = 'entityEventPrefix_post_save';
 
     '''
 
     def private eventDefinitionsImpl(Application it) '''
-        namespace «appNamespace»;
+        namespace appNamespace;
 
-        use «appNamespace»\Base\«name.formatForCodeCapital»Events as Base«name.formatForCodeCapital»Events;
+        use appNamespace\Base\name.formatForCodeCapitalEvents as Basename.formatForCodeCapitalEvents;
 
         /**
          * Events definition implementation class.
          */
-        class «name.formatForCodeCapital»Events extends Base«name.formatForCodeCapital»Events
+        class name.formatForCodeCapitalEvents extends Basename.formatForCodeCapitalEvents
         {
             // feel free to extend the events definition here
         }
     '''
 
     def private filterEventBaseClass(Entity it) '''
-        namespace «app.appNamespace»\Event\Base;
+        namespace app.appNamespace\Event\Base;
 
         use Symfony\Component\EventDispatcher\Event;
-        use «app.appNamespace»\Entity\«name.formatForCodeCapital»Entity;
+        use app.appNamespace\Entity\name.formatForCodeCapitalEntity;
 
         /**
-         * Event base class for filtering «name.formatForDisplay» processing.
+         * Event base class for filtering name.formatForDisplay processing.
          */
-        class Filter«name.formatForCodeCapital»Event extends Event
+        class Filtername.formatForCodeCapitalEvent extends Event
         {
             /**
-             * @var «name.formatForCodeCapital»Entity Reference to treated entity instance.
+             * @var name.formatForCodeCapitalEntity Reference to treated entity instance.
              */
-            protected $«name.formatForCode»;
+            protected $name.formatForCode;
 
-            public function __construct(«name.formatForCodeCapital»Entity $«name.formatForCode»)
+            public function __construct(name.formatForCodeCapitalEntity $name.formatForCode)
             {
-                $this->«name.formatForCode» = $«name.formatForCode»;
+                $this->name.formatForCode = $name.formatForCode;
             }
 
-            public function get«name.formatForCodeCapital»()
+            public function getname.formatForCodeCapital()
             {
-                return $this->«name.formatForCode»;
+                return $this->name.formatForCode;
             }
         }
     '''
 
     def private filterEventImpl(Entity it) '''
-        namespace «app.appNamespace»\Event;
+        namespace app.appNamespace\Event;
 
-        use «app.appNamespace»\Event\Base\Filter«name.formatForCodeCapital»Event as BaseFilter«name.formatForCodeCapital»Event;
+        use app.appNamespace\Event\Base\Filtername.formatForCodeCapitalEvent as BaseFiltername.formatForCodeCapitalEvent;
 
         /**
-         * Event implementation class for filtering «name.formatForDisplay» processing.
+         * Event implementation class for filtering name.formatForDisplay processing.
          */
-        class Filter«name.formatForCodeCapital»Event extends BaseFilter«name.formatForCodeCapital»Event
+        class Filtername.formatForCodeCapitalEvent extends BaseFiltername.formatForCodeCapitalEvent
         {
             // feel free to extend the event class here
         }

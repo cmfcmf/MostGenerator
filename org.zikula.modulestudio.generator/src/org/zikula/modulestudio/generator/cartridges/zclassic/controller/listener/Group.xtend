@@ -9,13 +9,13 @@ class Group {
     CommonExample commonExample = new CommonExample()
 
     def generate(Application it, Boolean isBase) '''
-        «IF !targets('1.3.5')»
+        IF !targets('1.3.5')
             /**
              * Makes our handlers known to the event system.
              */
             public static function getSubscribedEvents()
             {
-                «IF isBase»
+                IF isBase
                     return array(
                         'group.create'     => array('create', 5),
                         'group.update'     => array('update', 5),
@@ -23,12 +23,12 @@ class Group {
                         'group.adduser'    => array('addUser', 5),
                         'group.removeuser' => array('removeUser', 5)
                     );
-                «ELSE»
+                ELSE
                     return parent::getSubscribedEvents();
-                «ENDIF»
+                ENDIF
             }
 
-        «ENDIF»
+        ENDIF
 
         /**
          * Listener for the `group.create` event.
@@ -36,15 +36,15 @@ class Group {
          * Occurs after a group is created. All handlers are notified.
          * The full group record created is available as the subject.
          *
-         * @param «IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event The event instance.
+         * @param IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event The event instance.
          */
-        public «IF targets('1.3.5')»static «ENDIF»function create(«IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event)
+        public IF targets('1.3.5')static ENDIFfunction create(IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::create($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
 
         /**
@@ -53,15 +53,15 @@ class Group {
          * Occurs after a group is updated. All handlers are notified.
          * The full updated group record is available as the subject.
          *
-         * @param «IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event The event instance.
+         * @param IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event The event instance.
          */
-        public «IF targets('1.3.5')»static «ENDIF»function update(«IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event)
+        public IF targets('1.3.5')static ENDIFfunction update(IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::update($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
 
         /**
@@ -71,15 +71,15 @@ class Group {
          * All handlers are notified.
          * The full group record deleted is available as the subject.
          *
-         * @param «IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event The event instance.
+         * @param IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event The event instance.
          */
-        public «IF targets('1.3.5')»static «ENDIF»function delete(«IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event)
+        public IF targets('1.3.5')static ENDIFfunction delete(IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::delete($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
 
         /**
@@ -90,15 +90,15 @@ class Group {
          * It does not apply to pending membership requests.
          * The uid and gid are available as the subject.
          *
-         * @param «IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event The event instance.
+         * @param IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event The event instance.
          */
-        public «IF targets('1.3.5')»static «ENDIF»function addUser(«IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event)
+        public IF targets('1.3.5')static ENDIFfunction addUser(IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::addUser($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
 
         /**
@@ -108,15 +108,15 @@ class Group {
          * All handlers are notified.
          * The uid and gid are available as the subject.
          *
-         * @param «IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event The event instance.
+         * @param IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event The event instance.
          */
-        public «IF targets('1.3.5')»static «ENDIF»function removeUser(«IF targets('1.3.5')»Zikula_Event«ELSE»GenericEvent«ENDIF» $event)
+        public IF targets('1.3.5')static ENDIFfunction removeUser(IF targets('1.3.5')Zikula_EventELSEGenericEventENDIF $event)
         {
-            «IF !isBase»
+            IF !isBase
                 parent::removeUser($event);
 
-                «commonExample.generalEventProperties(it)»
-            «ENDIF»
+                commonExample.generalEventProperties(it)
+            ENDIF
         }
     '''
 }

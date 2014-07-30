@@ -26,43 +26,43 @@ class RelationPresets {
     '''
 
     def initPresets(Entity it) '''
-        «val owningAssociations = getOwningAssociations(it.container.application)»
-        «IF !owningAssociations.empty»
+        val owningAssociations = getOwningAssociations(it.container.application)
+        IF !owningAssociations.empty
 
             // assign identifiers of predefined incoming relationships
-            «FOR relation : owningAssociations»
-                «IF !relation.isEditable(false)»
+            FOR relation : owningAssociations
+                IF !relation.isEditable(false)
                     // non-editable relation, we store the id and assign it in handleCommand
-                «ELSE»
+                ELSE
                     // editable relation, we store the id and assign it now to show it in UI
-                «ENDIF»
-                «relation.initSinglePreset(false)»
-                «IF relation.isEditable(false)»
-                    «relation.saveSinglePreset(false)»
-                «ENDIF»
-            «ENDFOR»
-        «ENDIF»
-        «val ownedMMAssociations = getOwnedMMAssociations(it.container.application)»
-        «IF !ownedMMAssociations.empty»
+                ENDIF
+                relation.initSinglePreset(false)
+                IF relation.isEditable(false)
+                    relation.saveSinglePreset(false)
+                ENDIF
+            ENDFOR
+        ENDIF
+        val ownedMMAssociations = getOwnedMMAssociations(it.container.application)
+        IF !ownedMMAssociations.empty
 
             // assign identifiers of predefined outgoing many to many relationships
-            «FOR relation : ownedMMAssociations»
-                «IF !relation.isEditable(true)»
+            FOR relation : ownedMMAssociations
+                IF !relation.isEditable(true)
                     // non-editable relation, we store the id and assign it in handleCommand
-                «ELSE»
+                ELSE
                     // editable relation, we store the id and assign it now to show it in UI
-                «ENDIF»
-                «relation.initSinglePreset(true)»
-                «IF relation.isEditable(true)»
-                    «relation.saveSinglePreset(true)»
-                «ENDIF»
-            «ENDFOR»
-        «ENDIF»
+                ENDIF
+                relation.initSinglePreset(true)
+                IF relation.isEditable(true)
+                    relation.saveSinglePreset(true)
+                ENDIF
+            ENDFOR
+        ENDIF
     '''
 
     def private initSinglePreset(JoinRelationship it, Boolean useTarget) '''
-        «val alias = getRelationAliasName(useTarget)»
-        $this->relationPresets['«alias»'] = FormUtil::getPassedValue('«alias»', '', 'GET');
+        val alias = getRelationAliasName(useTarget)
+        $this->relationPresets['alias'] = FormUtil::getPassedValue('alias', '', 'GET');
     '''
 
     def private getOwningAssociations(Entity it, Application refApp) {
@@ -81,40 +81,40 @@ class RelationPresets {
     }
 
     def saveNonEditablePresets(Entity it, Application app) '''
-        «val owningAssociationsNonEditable = getOwningAssociations(app).filter[!isEditable(false)]»
-        «val ownedMMAssociationsNonEditable = getOwnedMMAssociations(app).filter[!isEditable(true)]»
-        «IF !owningAssociationsNonEditable.empty || !ownedMMAssociationsNonEditable.empty»
+        val owningAssociationsNonEditable = getOwningAssociations(app).filter[!isEditable(false)]
+        val ownedMMAssociationsNonEditable = getOwnedMMAssociations(app).filter[!isEditable(true)]
+        IF !owningAssociationsNonEditable.empty || !ownedMMAssociationsNonEditable.empty
 
             if ($args['commandName'] == 'create') {
-                «IF !owningAssociationsNonEditable.empty»
+                IF !owningAssociationsNonEditable.empty
                 // save predefined incoming relationship from parent entity
-                «FOR relation : owningAssociationsNonEditable»
-                    «relation.saveSinglePreset(false)»
-                «ENDFOR»
-                «ENDIF»
-                «IF !ownedMMAssociationsNonEditable.empty»
+                FOR relation : owningAssociationsNonEditable
+                    relation.saveSinglePreset(false)
+                ENDFOR
+                ENDIF
+                IF !ownedMMAssociationsNonEditable.empty
                 // save predefined outgoing relationship to child entity
-                «FOR relation : ownedMMAssociationsNonEditable»
-                    «relation.saveSinglePreset(true)»
-                «ENDFOR»
-                «ENDIF»
+                FOR relation : ownedMMAssociationsNonEditable
+                    relation.saveSinglePreset(true)
+                ENDFOR
+                ENDIF
                 $this->entityManager->flush();
             }
-        «ENDIF»
+        ENDIF
     '''
 
     def private saveSinglePreset(JoinRelationship it, Boolean useTarget) '''
-        «val alias = getRelationAliasName(useTarget)»
-        «val aliasInverse = getRelationAliasName(!useTarget)»
-        «val otherObjectType = (if (useTarget) target else source).name.formatForCode»
-        if (!empty($this->relationPresets['«alias»'])) {
-            $relObj = ModUtil::apiFunc($this->name, 'selection', 'getEntity', array('ot' => '«otherObjectType»', 'id' => $this->relationPresets['«alias»']));
+        val alias = getRelationAliasName(useTarget)
+        val aliasInverse = getRelationAliasName(!useTarget)
+        val otherObjectType = (if (useTarget) target else source).name.formatForCode
+        if (!empty($this->relationPresets['alias'])) {
+            $relObj = ModUtil::apiFunc($this->name, 'selection', 'getEntity', array('ot' => 'otherObjectType', 'id' => $this->relationPresets['alias']));
             if ($relObj != null) {
-                «IF !useTarget && it instanceof ManyToManyRelationship»
-                    $entity->«IF isManySide(useTarget)»add«ELSE»set«ENDIF»«alias.toFirstUpper»($relObj);
-                «ELSE»
-                    $relObj->«IF isManySide(!useTarget)»add«ELSE»set«ENDIF»«aliasInverse.toFirstUpper»($entity);
-                «ENDIF»
+                IF !useTarget && it instanceof ManyToManyRelationship
+                    $entity->IF isManySide(useTarget)addELSEsetENDIFalias.toFirstUpper($relObj);
+                ELSE
+                    $relObj->IF isManySide(!useTarget)addELSEsetENDIFaliasInverse.toFirstUpper($entity);
+                ENDIF
             }
         }
     '''

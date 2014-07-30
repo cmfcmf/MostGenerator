@@ -55,19 +55,19 @@ class Uploads {
     }
 
     def private htAccess(UploadField it) '''
-        # generated at «timestamp» by ModuleStudio «msVersion» («msUrl»)
+        # generated at timestamp by ModuleStudio msVersion (msUrl)
         # ----------------------------------------------------------------------
         # Purpose of file: give access to upload files treated in this directory
         # ----------------------------------------------------------------------
         deny from all
-        <FilesMatch "\.(«allowedExtensions.replace(", ", "|")»)$">
+        <FilesMatch "\.(allowedExtensions.replace(", ", "|"))$">
             order allow,deny
             allow from all
         </filesmatch>
     '''
 
     def private htAccessTemplate(Application it) '''
-        # generated at «timestamp» by ModuleStudio «msVersion» («msUrl»)
+        # generated at timestamp by ModuleStudio msVersion (msUrl)
         # ----------------------------------------------------------------------
         # Purpose of file: give access to upload files treated in this directory
         # ----------------------------------------------------------------------
@@ -79,8 +79,8 @@ class Uploads {
     '''
 
     def private uploadHandlerBaseImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Base;
 
             use DataUtil;
             use FileUtil;
@@ -89,15 +89,15 @@ class Uploads {
             use UserUtil;
             use ZLanguage;
 
-        «ENDIF»
+        ENDIF
         /**
          * Upload handler base class.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Base_UploadHandler
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Base_UploadHandler
+        ELSE
         class UploadHandler
-        «ENDIF»
+        ENDIF
         {
             /**
              * @var array List of object types with upload fields.
@@ -124,25 +124,25 @@ class Uploads {
              */
             public function __construct()
             {
-                $this->allowedObjectTypes = array(«FOR entity : getUploadEntities SEPARATOR ', '»'«entity.name.formatForCode»'«ENDFOR»);
+                $this->allowedObjectTypes = array(FOR entity : getUploadEntities SEPARATOR ', ''entity.name.formatForCode'ENDFOR);
                 $this->imageFileTypes = array('gif', 'jpeg', 'jpg', 'png', 'swf');
                 $this->forbiddenFileTypes = array('cgi', 'pl', 'asp', 'phtml', 'php', 'php3', 'php4', 'php5', 'exe', 'com', 'bat', 'jsp', 'cfm', 'shtml');
-                $this->allowedFileSizes = array(«FOR entity : getUploadEntities SEPARATOR ', '»'«entity.name.formatForCode»' => array(«FOR field : entity.getUploadFieldsEntity SEPARATOR ', '»'«field.name.formatForCode»' => «field.allowedFileSize»«ENDFOR»)«ENDFOR»);
+                $this->allowedFileSizes = array(FOR entity : getUploadEntities SEPARATOR ', ''entity.name.formatForCode' => array(FOR field : entity.getUploadFieldsEntity SEPARATOR ', ''field.name.formatForCode' => field.allowedFileSizeENDFOR)ENDFOR);
             }
 
-            «performFileUpload»
+            performFileUpload
 
-            «validateFileUpload»
+            validateFileUpload
 
-            «readMetaDataForFile»
+            readMetaDataForFile
 
-            «isAllowedFileExtension»
+            isAllowedFileExtension
 
-            «determineFileName»
+            determineFileName
 
-            «handleError»
+            handleError
 
-            «deleteUploadFile»
+            deleteUploadFile
         }
     '''
 
@@ -155,14 +155,14 @@ class Uploads {
          * @param string $fieldName  Name of upload field.
          *
          * @return array Resulting file name and collected meta data.
-         «IF !targets('1.3.5')»
+         IF !targets('1.3.5')
          *
          * @throws RuntimeException Thrown if upload file base path retrieval fails or the file can not be moved to it's destination folder
-         «ENDIF»
+         ENDIF
          */
         public function performFileUpload($objectType, $fileData, $fieldName)
         {
-            $dom = ZLanguage::getModuleDomain('«appName»');
+            $dom = ZLanguage::getModuleDomain('appName');
 
             $result = array('fileName' => '',
                             'metaData' => array());
@@ -173,13 +173,13 @@ class Uploads {
             }
 
             // perform validation
-            «IF targets('1.3.5')»
+            IF targets('1.3.5')
             if (!$this->validateFileUpload($objectType, $fileData[$fieldName], $fieldName)) {
-            «ELSE»
+            ELSE
             try {
                 $this->validateFileUpload($objectType, $fileData[$fieldName], $fieldName);
             } catch (\Exception $e) {
-            «ENDIF»
+            ENDIF
                 // skip this upload field
                 return $result;
             }
@@ -193,38 +193,38 @@ class Uploads {
             $fileName = implode('.', $fileNameParts);
 
             $serviceManager = ServiceUtil::getManager();
-            «IF targets('1.3.5')»
-                $controllerHelper = new «appName»_Util_Controller($serviceManager);
-            «ELSE»
-                $controllerHelper = $serviceManager->get('«appName.formatForDB».controller_helper');
-            «ENDIF»
+            IF targets('1.3.5')
+                $controllerHelper = new appName_Util_Controller($serviceManager);
+            ELSE
+                $controllerHelper = $serviceManager->get('appName.formatForDB.controller_helper');
+            ENDIF
 
             // retrieve the final file name
             try {
                 $basePath = $controllerHelper->getFileBaseFolder($objectType, $fieldName);
             } catch (\Exception $e) {
-                «IF targets('1.3.5')»
+                IF targets('1.3.5')
                     return LogUtil::registerError($e->getMessage());
-                «ELSE»
+                ELSE
                     $session = $serviceManager->get('session');
                     $session->getFlashBag()->add('error', $e->getMessage());
                     $logger = $serviceManager->get('logger');
-                    $logger->error('{app}: User {user} could not detect upload destination path for entity {entity} and field {field}.', array('app' => '«appName»', 'user' => UserUtil::getVar('uname'), 'entity' => $objectType, 'field' => $fieldName));
+                    $logger->error('{app}: User {user} could not detect upload destination path for entity {entity} and field {field}.', array('app' => 'appName', 'user' => UserUtil::getVar('uname'), 'entity' => $objectType, 'field' => $fieldName));
                     return false;
-                «ENDIF»
+                ENDIF
             }
             $fileName = $this->determineFileName($objectType, $fieldName, $basePath, $fileName, $extension);
 
             if (!move_uploaded_file($fileData[$fieldName]['tmp_name'], $basePath . $fileName)) {
-                «IF targets('1.3.5')»
+                IF targets('1.3.5')
                     return LogUtil::registerError(__('Error! Could not move your file to the destination folder.', $dom));
-                «ELSE»
+                ELSE
                     $session = $serviceManager->get('session');
                     $session->getFlashBag()->add('error', __('Error! Could not move your file to the destination folder.', $dom));
                     $logger = $serviceManager->get('logger');
-                    $logger->error('{app}: User {user} could not upload a file ("{sourcePath}") to destination folder ("{destinationPath}").', array('app' => '«appName»', 'user' => UserUtil::getVar('uname'), 'sourcePath' => $fileData[$fieldName]['tmp_name'], 'destinationPath' => $basePath . $fileName));
+                    $logger->error('{app}: User {user} could not upload a file ("{sourcePath}") to destination folder ("{destinationPath}").', array('app' => 'appName', 'user' => UserUtil::getVar('uname'), 'sourcePath' => $fileData[$fieldName]['tmp_name'], 'destinationPath' => $basePath . $fileName));
                     return false;
-                «ENDIF»
+                ENDIF
             }
 
             // collect data to return
@@ -244,14 +244,14 @@ class Uploads {
          * @param string $fieldName  Name of upload field.
          *
          * @return boolean true if file is valid else false
-         «IF !targets('1.3.5')»
+         IF !targets('1.3.5')
          *
          * @throws RuntimeException Thrown if validating the upload file fails
-         «ENDIF»
+         ENDIF
          */
         protected function validateFileUpload($objectType, $file, $fieldName)
         {
-            $dom = ZLanguage::getModuleDomain('«appName»');
+            $dom = ZLanguage::getModuleDomain('appName');
 
             $serviceManager = ServiceUtil::getManager();
 
@@ -260,15 +260,15 @@ class Uploads {
                 if (is_array($file)) {
                     return $this->handleError($file);
                 }
-                «IF targets('1.3.5')»
+                IF targets('1.3.5')
                     return LogUtil::registerError(__('Error! No file found.', $dom));
-                «ELSE»
+                ELSE
                     $session = $serviceManager->get('session');
                     $session->getFlashBag()->add('error', __('Error! No file found.', $dom));
                     $logger = $serviceManager->get('logger');
-                    $logger->error('{app}: User {user} tried to upload a file which could not be found.', array('app' => '«appName»', 'user' => UserUtil::getVar('uname')));
+                    $logger->error('{app}: User {user} tried to upload a file which could not be found.', array('app' => 'appName', 'user' => UserUtil::getVar('uname')));
                     return false;
-                «ENDIF»
+                ENDIF
             }
 
             // extract file extension
@@ -280,15 +280,15 @@ class Uploads {
             // validate extension
             $isValidExtension = $this->isAllowedFileExtension($objectType, $fieldName, $extension);
             if ($isValidExtension === false) {
-                «IF targets('1.3.5')»
+                IF targets('1.3.5')
                     return LogUtil::registerError(__('Error! This file type is not allowed. Please choose another file format.', $dom));
-                «ELSE»
+                ELSE
                     $session = $serviceManager->get('session');
                     $session->getFlashBag()->add('error', __('Error! This file type is not allowed. Please choose another file format.', $dom));
                     $logger = $serviceManager->get('logger');
-                    $logger->error('{app}: User {user} tried to upload a file with a forbidden extension ("{extension}").', array('app' => '«appName»', 'user' => UserUtil::getVar('uname'), 'extension' => $extension));
+                    $logger->error('{app}: User {user} tried to upload a file with a forbidden extension ("{extension}").', array('app' => 'appName', 'user' => UserUtil::getVar('uname'), 'extension' => $extension));
                     return false;
-                «ENDIF»
+                ENDIF
             }
 
             // validate file size
@@ -299,27 +299,27 @@ class Uploads {
                     $maxSizeKB = $maxSize / 1024;
                     if ($maxSizeKB < 1024) {
                         $maxSizeKB = DataUtil::formatNumber($maxSizeKB); 
-                        «IF targets('1.3.5')»
+                        IF targets('1.3.5')
                             return LogUtil::registerError(__f('Error! Your file is too big. Please keep it smaller than %s kilobytes.', array($maxSizeKB), $dom));
-                        «ELSE»
+                        ELSE
                             $session = $serviceManager->get('session');
                             $session->getFlashBag()->add('error', __f('Error! Your file is too big. Please keep it smaller than %s kilobytes.', array($maxSizeKB), $dom));
                             $logger = $serviceManager->get('logger');
-                            $logger->error('{app}: User {user} tried to upload a file with a size greater than "{size} KB".', array('app' => '«appName»', 'user' => UserUtil::getVar('uname'), 'size' => $maxSizeKB));
+                            $logger->error('{app}: User {user} tried to upload a file with a size greater than "{size} KB".', array('app' => 'appName', 'user' => UserUtil::getVar('uname'), 'size' => $maxSizeKB));
                             return false;
-                        «ENDIF»
+                        ENDIF
                     }
                     $maxSizeMB = $maxSizeKB / 1024;
                     $maxSizeMB = DataUtil::formatNumber($maxSizeMB); 
-                    «IF targets('1.3.5')»
+                    IF targets('1.3.5')
                         return LogUtil::registerError(__f('Error! Your file is too big. Please keep it smaller than %s megabytes.', array($maxSizeMB), $dom));
-                    «ELSE»
+                    ELSE
                         $session = $serviceManager->get('session');
                         $session->getFlashBag()->add('error', __f('Error! Your file is too big. Please keep it smaller than %s megabytes.', array($maxSizeMB), $dom));
                         $logger = $serviceManager->get('logger');
-                        $logger->error('{app}: User {user} tried to upload a file with a size greater than "{size} MB".', array('app' => '«appName»', 'user' => UserUtil::getVar('uname'), 'size' => $maxSizeMB));
+                        $logger->error('{app}: User {user} tried to upload a file with a size greater than "{size} MB".', array('app' => 'appName', 'user' => UserUtil::getVar('uname'), 'size' => $maxSizeMB));
                         return false;
-                    «ENDIF»
+                    ENDIF
                 }
             }
 
@@ -328,15 +328,15 @@ class Uploads {
             if ($isImage) {
                 $imgInfo = getimagesize($file['tmp_name']);
                 if (!is_array($imgInfo) || !$imgInfo[0] || !$imgInfo[1]) {
-                    «IF targets('1.3.5')»
+                    IF targets('1.3.5')
                         return LogUtil::registerError(__('Error! This file type seems not to be a valid image.', $dom));
-                    «ELSE»
+                    ELSE
                         $session = $serviceManager->get('session');
                         $session->getFlashBag()->add('error', __('Error! This file type seems not to be a valid image.', $dom));
                         $logger = $serviceManager->get('logger');
-                        $logger->error('{app}: User {user} tried to upload a file which is seems not to be a valid image.', array('app' => '«appName»', 'user' => UserUtil::getVar('uname')));
+                        $logger->error('{app}: User {user} tried to upload a file which is seems not to be a valid image.', array('app' => 'appName', 'user' => UserUtil::getVar('uname')));
                         return false;
-                    «ENDIF»
+                    ENDIF
                 }
             }
 
@@ -409,7 +409,7 @@ class Uploads {
             // determine the allowed extensions
             $allowedExtensions = array();
             switch ($objectType) {
-                «FOR entity : getUploadEntities»«entity.isAllowedFileExtensionEntityCase»«ENDFOR»
+                FOR entity : getUploadEntitiesentity.isAllowedFileExtensionEntityCaseENDFOR
             }
 
             if (count($allowedExtensions) > 0) {
@@ -427,21 +427,21 @@ class Uploads {
     '''
 
     def private isAllowedFileExtensionEntityCase(Entity it) '''
-        «val uploadFields = getUploadFieldsEntity»
-        case '«name.formatForCode»':
-            «IF uploadFields.size > 1»
+        val uploadFields = getUploadFieldsEntity
+        case 'name.formatForCode':
+            IF uploadFields.size > 1
                 switch ($fieldName) {
-                    «FOR uploadField : uploadFields»«uploadField.isAllowedFileExtensionFieldCase»«ENDFOR»
+                    FOR uploadField : uploadFieldsuploadField.isAllowedFileExtensionFieldCaseENDFOR
                 }
-            «ELSE»
-                $allowedExtensions = array('«uploadFields.head.allowedExtensions.replace(', ', "', '")»');
-            «ENDIF»
+            ELSE
+                $allowedExtensions = array('uploadFields.head.allowedExtensions.replace(', ', "', '")');
+            ENDIF
                 break;
     '''
 
     def private isAllowedFileExtensionFieldCase(UploadField it) '''
-        case '«name.formatForCode»':
-            $allowedExtensions = array('«allowedExtensions.replace(', ', "', '")»');
+        case 'name.formatForCode':
+            $allowedExtensions = array('allowedExtensions.replace(', ', "', '")');
             break;
     '''
 
@@ -466,7 +466,7 @@ class Uploads {
             $namingScheme = 0;
 
             switch ($objectType) {
-                «FOR entity : getUploadEntities»«entity.determineFileNameEntityCase»«ENDFOR»
+                FOR entity : getUploadEntitiesentity.determineFileNameEntityCaseENDFOR
             }
 
 
@@ -507,21 +507,21 @@ class Uploads {
     '''
 
     def private determineFileNameEntityCase(Entity it) '''
-        «val uploadFields = getUploadFieldsEntity»
-        case '«name.formatForCode»':
-            «IF uploadFields.size > 1»
+        val uploadFields = getUploadFieldsEntity
+        case 'name.formatForCode':
+            IF uploadFields.size > 1
                 switch ($fieldName) {
-                    «FOR uploadField : uploadFields»«uploadField.determineFileNameFieldCase»«ENDFOR»
+                    FOR uploadField : uploadFieldsuploadField.determineFileNameFieldCaseENDFOR
                 }
-            «ELSE»
-                $namingScheme = «uploadFields.head.namingScheme.value»;
-            «ENDIF»
+            ELSE
+                $namingScheme = uploadFields.head.namingScheme.value;
+            ENDIF
                 break;
     '''
 
     def private determineFileNameFieldCase(UploadField it) '''
-        case '«name.formatForCode»':
-            $namingScheme = «it.namingScheme.value»;
+        case 'name.formatForCode':
+            $namingScheme = it.namingScheme.value;
             break;
     '''
 
@@ -532,14 +532,14 @@ class Uploads {
          * @param array $file File array from $_FILES.
          *
          * @return boolean false
-         «IF !targets('1.3.5')»
+         IF !targets('1.3.5')
          *
          * @throws RuntimeException Thrown if an unknown error occurs
-         «ENDIF»
+         ENDIF
          */
         private function handleError($file)
         {
-            $dom = ZLanguage::getModuleDomain('«appName»');
+            $dom = ZLanguage::getModuleDomain('appName');
             $errorMessage = '';
             switch ($file['error']) {
                 case UPLOAD_ERR_OK: //no error; possible file attack!
@@ -565,16 +565,16 @@ class Uploads {
                     break;
             }
 
-            «IF targets('1.3.5')»
+            IF targets('1.3.5')
                 return LogUtil::registerError(__('Error with upload: ', $dom) . $errorMessage);
-            «ELSE»
+            ELSE
                 $serviceManager = ServiceUtil::getManager();
                 $session = $serviceManager->get('session');
                 $session->getFlashBag()->add('error', __('Error with upload: ', $dom) . $errorMessage);
                 $logger = $serviceManager->get('logger');
-                $logger->error('{app}: User {user} received an upload error: "{errorMessage}".', array('app' => '«appName»', 'user' => UserUtil::getVar('uname'), 'errorMessage' => $errorMessage));
+                $logger->error('{app}: User {user} received an upload error: "{errorMessage}".', array('app' => 'appName', 'user' => UserUtil::getVar('uname'), 'errorMessage' => $errorMessage));
                 return false;
-            «ENDIF»
+            ENDIF
         }
     '''
 
@@ -601,22 +601,22 @@ class Uploads {
             }
 
             $serviceManager = ServiceUtil::getManager();
-            «IF targets('1.3.5')»
-                $controllerHelper = new «appName»_Util_Controller($serviceManager);
-            «ELSE»
-                $controllerHelper = $serviceManager->get('«appName.formatForDB».controller_helper');
-            «ENDIF»
+            IF targets('1.3.5')
+                $controllerHelper = new appName_Util_Controller($serviceManager);
+            ELSE
+                $controllerHelper = $serviceManager->get('appName.formatForDB.controller_helper');
+            ENDIF
 
             // determine file system information
             try {
                 $basePath = $controllerHelper->getFileBaseFolder($objectType, $fieldName);
             } catch (\Exception $e) {
-                «IF targets('1.3.5')»
+                IF targets('1.3.5')
                     LogUtil::registerError($e->getMessage());
-                «ELSE»
+                ELSE
                     $logger = $serviceManager->get('logger');
-                    $logger->error('{app}: User {user} could not detect upload destination path for entity {entity} and field {field}.', array('app' => '«appName»', 'user' => UserUtil::getVar('uname'), 'entity' => $objectType, 'field' => $fieldName));
-                «ENDIF»
+                    $logger->error('{app}: User {user} could not detect upload destination path for entity {entity} and field {field}.', array('app' => 'appName', 'user' => UserUtil::getVar('uname'), 'entity' => $objectType, 'field' => $fieldName));
+                ENDIF
             }
             $fileName = $objectData[$fieldName];
 
@@ -627,8 +627,8 @@ class Uploads {
             $fileExtension = FileUtil::getExtension($fileName, false);
             if (in_array($fileExtension, $this->imageFileTypes) && $fileExtension != 'swf') {
                 // remove thumbnail images as well
-                $manager = ServiceUtil::getManager()->get«IF targets('1.3.5')»Service«ENDIF»('systemplugin.imagine.manager');
-                $manager->setModule('«appName»');
+                $manager = ServiceUtil::getManager()->getIF targets('1.3.5')ServiceENDIF('systemplugin.imagine.manager');
+                $manager->setModule('appName');
                 $fullObjectId = $objectType . '-' . $objectId;
                 $manager->removeImageThumbs($filePath, $fullObjectId);
             }
@@ -645,20 +645,20 @@ class Uploads {
     '''
 
     def private uploadHandlerImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»;
+        IF !targets('1.3.5')
+            namespace appNamespace;
 
-            use «appNamespace»\Base\UploadHandler as BaseUploadHandler;
+            use appNamespace\Base\UploadHandler as BaseUploadHandler;
 
-        «ENDIF»
+        ENDIF
         /**
          * Upload handler implementation class.
          */
-        «IF targets('1.3.5')»
-        class «appName»_UploadHandler extends «appName»_Base_UploadHandler
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_UploadHandler extends appName_Base_UploadHandler
+        ELSE
         class UploadHandler extends BaseUploadHandler
-        «ENDIF»
+        ENDIF
         {
             // feel free to add your upload handler enhancements here
         }

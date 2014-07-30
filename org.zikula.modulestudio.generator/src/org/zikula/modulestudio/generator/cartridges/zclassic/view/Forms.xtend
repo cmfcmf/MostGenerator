@@ -68,92 +68,92 @@ class Forms {
         if (!app.shouldBeSkipped(templatePath)) {
             println('Generating edit form templates for entity "' + name.formatForDisplay + '"')
             fsa.generateFile(templatePath, '''
-                «formTemplateHeader(app, actionName)»
-                «formTemplateBody(app, actionName, fsa)»
+                formTemplateHeader(app, actionName)
+                formTemplateBody(app, actionName, fsa)
             ''')
         }
         relationHelper.generateInclusionTemplate(it, app, fsa)
     }
 
     def private formTemplateHeader(Entity it, Application app, String actionName) '''
-        {* purpose of this template: build the Form to «actionName.formatForDisplay» an instance of «name.formatForDisplay» *}
+        {* purpose of this template: build the Form to actionName.formatForDisplay an instance of name.formatForDisplay *}
         {assign var='lct' value='user'}
         {if isset($smarty.get.lct) && $smarty.get.lct eq 'admin'}
             {assign var='lct' value='admin'}
         {/if}
-        «IF app.targets('1.3.5')»
+        IF app.targets('1.3.5')
             {include file="`$lct`/header.tpl"}
-        «ELSE»
+        ELSE
             {assign var='lctUc' value=$lct|ucfirst}
             {include file="`$lctUc`/header.tpl"}
-        «ENDIF»
-        {pageaddvar name='javascript' value='«app.rootFolder»/«app.appName»/«IF app.targets('1.3.5')»javascript/«ELSE»«app.getAppJsPath»«ENDIF»«app.appName»«IF app.targets('1.3.5')»_e«ELSE».E«ENDIF»ditFunctions.js'}
-        {pageaddvar name='javascript' value='«app.rootFolder»/«app.appName»/«IF app.targets('1.3.5')»javascript/«ELSE»«app.getAppJsPath»«ENDIF»«app.appName»«IF app.targets('1.3.5')»_v«ELSE».V«ENDIF»alidation.js'}
-        «IF !app.targets('1.3.5') && (hasUserFieldsEntity || !getOutgoingJoinRelations.empty || !getIncomingJoinRelations.empty)»
+        ENDIF
+        {pageaddvar name='javascript' value='app.rootFolder/app.appName/IF app.targets('1.3.5')javascript/ELSEapp.getAppJsPathENDIFapp.appNameIF app.targets('1.3.5')_eELSE.EENDIFditFunctions.js'}
+        {pageaddvar name='javascript' value='app.rootFolder/app.appName/IF app.targets('1.3.5')javascript/ELSEapp.getAppJsPathENDIFapp.appNameIF app.targets('1.3.5')_vELSE.VENDIFalidation.js'}
+        IF !app.targets('1.3.5') && (hasUserFieldsEntity || !getOutgoingJoinRelations.empty || !getIncomingJoinRelations.empty)
             {pageaddvar name='javascript' value='web/bootstrap3-typeahead/bootstrap3-typeahead.min.js'}
-        «ENDIF»
+        ENDIF
 
         {if $mode eq 'edit'}
-            {gt text='Edit «name.formatForDisplay»' assign='templateTitle'}
-            «pageIcon(if (app.targets('1.3.5')) 'edit' else 'pencil-square-o')»
+            {gt text='Edit name.formatForDisplay' assign='templateTitle'}
+            pageIcon(if (app.targets('1.3.5')) 'edit' else 'pencil-square-o')
         {elseif $mode eq 'create'}
-            {gt text='Create «name.formatForDisplay»' assign='templateTitle'}
-            «pageIcon(if (app.targets('1.3.5')) 'new' else 'plus')»
+            {gt text='Create name.formatForDisplay' assign='templateTitle'}
+            pageIcon(if (app.targets('1.3.5')) 'new' else 'plus')
         {else}
-            {gt text='Edit «name.formatForDisplay»' assign='templateTitle'}
-            «pageIcon(if (app.targets('1.3.5')) 'edit' else 'pencil-square-o')»
+            {gt text='Edit name.formatForDisplay' assign='templateTitle'}
+            pageIcon(if (app.targets('1.3.5')) 'edit' else 'pencil-square-o')
         {/if}
-        <div class="«app.appName.toLowerCase»-«name.formatForDB» «app.appName.toLowerCase»-edit">
+        <div class="app.appName.toLowerCase-name.formatForDB app.appName.toLowerCase-edit">
             {pagesetvar name='title' value=$templateTitle}
-            «templateHeader»
+            templateHeader
     '''
 
     def private pageIcon(Entity it, String iconName) '''
         {if $lct eq 'admin'}
-            {assign var='adminPageIcon' value='«iconName»'}
+            {assign var='adminPageIcon' value='iconName'}
         {/if}
     '''
 
     def private templateHeader(Entity it) '''
         {if $lct eq 'admin'}
-            «IF container.application.targets('1.3.5')»
+            IF container.application.targets('1.3.5')
                 <div class="z-admin-content-pagetitle">
                     {icon type=$adminPageIcon size='small' alt=$templateTitle}
                     <h3>{$templateTitle}</h3>
                 </div>
-            «ELSE»
+            ELSE
                 <h3>
                     <span class="icon icon-{$adminPageIcon}"></span>
                     {$templateTitle}
                 </h3>
-            «ENDIF»
+            ENDIF
         {else}
             <h2>{$templateTitle}</h2>
         {/if}
     '''
 
     def private formTemplateBody(Entity it, Application app, String actionName, IFileSystemAccess fsa) '''
-        {form «IF hasUploadFieldsEntity»enctype='multipart/form-data' «ENDIF»cssClass='«IF app.targets('1.3.5')»z-form«ELSE»form-horizontal«ENDIF»'«IF !app.targets('1.3.5')» role='form'«ENDIF»}
+        {form IF hasUploadFieldsEntityenctype='multipart/form-data' ENDIFcssClass='IF app.targets('1.3.5')z-formELSEform-horizontalENDIF'IF !app.targets('1.3.5') role='form'ENDIF}
             {* add validation summary and a <div> element for styling the form *}
-            {«app.appName.formatForDB»FormFrame}
-            «IF !getEditableFields.empty»
-                «IF (getEditableFields.head) instanceof ListField && !(getEditableFields.head as ListField).useChecks»
-                    {formsetinitialfocus inputId='«(getEditableFields.head).name.formatForCode»' doSelect=true}
-                «ELSE»
-                    {formsetinitialfocus inputId='«(getEditableFields.head).name.formatForCode»'}
-                «ENDIF»
-            «ENDIF»
+            {app.appName.formatForDBFormFrame}
+            IF !getEditableFields.empty
+                IF (getEditableFields.head) instanceof ListField && !(getEditableFields.head as ListField).useChecks
+                    {formsetinitialfocus inputId='(getEditableFields.head).name.formatForCode' doSelect=true}
+                ELSE
+                    {formsetinitialfocus inputId='(getEditableFields.head).name.formatForCode'}
+                ENDIF
+            ENDIF
 
-            «IF useGroupingPanels('edit')»
-                «IF app.targets('1.3.5')»
-                    <div id="«app.appName.toFirstLower»Panel" class="z-panels">
-                        <h3 id="z-panel-header-fields" class="z-panel-header z-panel-indicator «IF app.targets('1.3.5')»z«ELSE»cursor«ENDIF»-pointer">{gt text='Fields'}</h3>
+            IF useGroupingPanels('edit')
+                IF app.targets('1.3.5')
+                    <div id="app.appName.toFirstLowerPanel" class="z-panels">
+                        <h3 id="z-panel-header-fields" class="z-panel-header z-panel-indicator IF app.targets('1.3.5')zELSEcursorENDIF-pointer">{gt text='Fields'}</h3>
                         <div class="z-panel-content z-panel-active" style="overflow: visible">
-                            «fieldDetails(app)»
+                            fieldDetails(app)
                         </div>
-                        «new Section().generate(it, app, fsa)»
+                        new Section().generate(it, app, fsa)
                     </div>
-                «ELSE»
+                ELSE
                     <div class="panel-group" id="accordion">
                         <div class="panel panel-default">
                             <div class="panel-heading">
@@ -161,40 +161,40 @@ class Forms {
                             </div>
                             <div id="collapseFields" class="panel-collapse collapse in">
                                 <div class="panel-body">
-                                    «fieldDetails(app)»
+                                    fieldDetails(app)
                                 </div>
                             </div>
                         </div>
-                        «new Section().generate(it, app, fsa)»
+                        new Section().generate(it, app, fsa)
                     </div>
-                «ENDIF»
-            «ELSE»
-                «fieldDetails(app)»
-                «new Section().generate(it, app, fsa)»
-            «ENDIF»
-            {/«app.appName.formatForDB»FormFrame}
+                ENDIF
+            ELSE
+                fieldDetails(app)
+                new Section().generate(it, app, fsa)
+            ENDIF
+            {/app.appName.formatForDBFormFrame}
         {/form}
         </div>
-        «IF app.targets('1.3.5')»
+        IF app.targets('1.3.5')
             {include file="`$lct`/footer.tpl"}
-        «ELSE»
+        ELSE
             {include file="`$lctUc`/footer.tpl"}
-        «ENDIF»
+        ENDIF
 
-        «formTemplateJS(app, actionName)»
+        formTemplateJS(app, actionName)
     '''
 
     def private fieldDetails(Entity it, Application app) '''
-        «translatableFieldDetails»
-        «IF !hasTranslatableFields
+        translatableFieldDetails
+        IF !hasTranslatableFields
           || (hasTranslatableFields && (!getEditableNonTranslatableFields.empty || (hasSluggableFields && !hasTranslatableSlug)))
-          || geographical»
-            «fieldDetailsFurtherOptions(app)»
-        «ENDIF»
+          || geographical
+            fieldDetailsFurtherOptions(app)
+        ENDIF
     '''
 
     def private translatableFieldDetails(Entity it) '''
-        «IF hasTranslatableFields»
+        IF hasTranslatableFields
             {formvolatile}
                 {assign var='useOnlyCurrentLocale' value=true}
                 {if $modvars.ZConfig.multilingual}
@@ -204,12 +204,12 @@ class Forms {
                         {lang assign='currentLanguage'}
                         {foreach item='locale' from=$supportedLocales}
                             {if $locale eq $currentLanguage}
-                                «translatableFieldSet('', '')»
+                                translatableFieldSet('', '')
                             {/if}
                         {/foreach}
                         {foreach item='locale' from=$supportedLocales}
                             {if $locale ne $currentLanguage}
-                                «translatableFieldSet('$locale', '$locale')»
+                                translatableFieldSet('$locale', '$locale')
                             {/if}
                         {/foreach}
                         {/nocache}
@@ -217,83 +217,83 @@ class Forms {
                 {/if}
                 {if $useOnlyCurrentLocale eq true}
                     {lang assign='locale'}
-                    «translatableFieldSet('', '')»
+                    translatableFieldSet('', '')
                 {/if}
             {/formvolatile}
-        «ENDIF»
+        ENDIF
     '''
 
     def private translatableFieldSet(Entity it, String groupSuffix, String idSuffix) '''
         <fieldset>
             <legend>{$locale|getlanguagename|safehtml}</legend>
-            «FOR field : getEditableTranslatableFields»«field.fieldWrapper(groupSuffix, idSuffix)»«ENDFOR»
-            «IF hasTranslatableSlug»
-                «slugField(groupSuffix, idSuffix)»
-            «ENDIF»
+            FOR field : getEditableTranslatableFieldsfield.fieldWrapper(groupSuffix, idSuffix)ENDFOR
+            IF hasTranslatableSlug
+                slugField(groupSuffix, idSuffix)
+            ENDIF
         </fieldset>
     '''
 
     def private fieldDetailsFurtherOptions(Entity it, Application app) '''
         <fieldset>
-            <legend>{gt text='«IF hasTranslatableFields»Further properties«ELSE»Content«ENDIF»'}</legend>
-            «IF hasTranslatableFields»
-                «FOR field : getEditableNonTranslatableFields»«field.fieldWrapper('', '')»«ENDFOR»
-            «ELSE»
-                «FOR field : getEditableFields»«field.fieldWrapper('', '')»«ENDFOR»
-            «ENDIF»
-            «IF !hasTranslatableFields || (hasSluggableFields && !hasTranslatableSlug)»
-                «slugField('', '')»
-            «ENDIF»
-            «IF geographical»
-                «FOR geoFieldName : newArrayList('latitude', 'longitude')»
-                    <div class="«IF app.targets('1.3.5')»z-formrow«ELSE»form-group«ENDIF»">
-                        {formlabel for='«geoFieldName»' __text='«geoFieldName.toFirstUpper»'«IF !app.targets('1.3.5')» cssClass='col-lg-3 control-label'«ENDIF»}
-                        «IF !app.targets('1.3.5')»
+            <legend>{gt text='IF hasTranslatableFieldsFurther propertiesELSEContentENDIF'}</legend>
+            IF hasTranslatableFields
+                FOR field : getEditableNonTranslatableFieldsfield.fieldWrapper('', '')ENDFOR
+            ELSE
+                FOR field : getEditableFieldsfield.fieldWrapper('', '')ENDFOR
+            ENDIF
+            IF !hasTranslatableFields || (hasSluggableFields && !hasTranslatableSlug)
+                slugField('', '')
+            ENDIF
+            IF geographical
+                FOR geoFieldName : newArrayList('latitude', 'longitude')
+                    <div class="IF app.targets('1.3.5')z-formrowELSEform-groupENDIF">
+                        {formlabel for='geoFieldName' __text='geoFieldName.toFirstUpper'IF !app.targets('1.3.5') cssClass='col-lg-3 control-label'ENDIF}
+                        IF !app.targets('1.3.5')
                             <div class="col-lg-9">
-                        «ENDIF»
-                            {«app.appName.formatForDB»GeoInput group='«name.formatForDB»' id='«geoFieldName»' mandatory=false __title='Enter the «geoFieldName» of the «name.formatForDisplay»' cssClass='validate-number«IF !app.targets('1.3.5')» form-control«ENDIF»'}
-                            «IF app.targets('1.3.5')»
-                                {«app.appName.formatForDB»ValidationError id='«geoFieldName»' class='validate-number'}
-                            «ENDIF»
-                        «IF !app.targets('1.3.5')»
+                        ENDIF
+                            {app.appName.formatForDBGeoInput group='name.formatForDB' id='geoFieldName' mandatory=false __title='Enter the geoFieldName of the name.formatForDisplay' cssClass='validate-numberIF !app.targets('1.3.5') form-controlENDIF'}
+                            IF app.targets('1.3.5')
+                                {app.appName.formatForDBValidationError id='geoFieldName' class='validate-number'}
+                            ENDIF
+                        IF !app.targets('1.3.5')
                             </div>
-                        «ENDIF»
+                        ENDIF
                     </div>
-                «ENDFOR»
-            «ENDIF»
+                ENDFOR
+            ENDIF
         </fieldset>
     '''
 
     def private slugField(Entity it, String groupSuffix, String idSuffix) '''
-        «IF hasSluggableFields && slugUpdatable && !container.application.targets('1.3.5')»
-            <div class="«IF container.application.targets('1.3.5')»z-formrow«ELSE»form-group«ENDIF»">
-                {formlabel for=«templateIdWithSuffix('slug', idSuffix)» __text='Permalink'«/*IF slugUnique» mandatorysym='1'«ENDIF*/»«IF !container.application.targets('1.3.5')» cssClass='col-lg-3 control-label'«ENDIF»}
-                «IF !container.application.targets('1.3.5')»
+        IF hasSluggableFields && slugUpdatable && !container.application.targets('1.3.5')
+            <div class="IF container.application.targets('1.3.5')z-formrowELSEform-groupENDIF">
+                {formlabel for=templateIdWithSuffix('slug', idSuffix) __text='Permalink'/*IF slugUnique mandatorysym='1'ENDIF*/IF !container.application.targets('1.3.5') cssClass='col-lg-3 control-label'ENDIF}
+                IF !container.application.targets('1.3.5')
                     <div class="col-lg-9">
-                «ENDIF»
-                    {formtextinput group=«templateIdWithSuffix(name.formatForDB, groupSuffix)» id=«templateIdWithSuffix('slug', idSuffix)» mandatory=false«/*slugUnique.displayBool*/» readOnly=false __title='You can input a custom permalink for the «name.formatForDisplay»«IF !slugUnique» or let this field free to create one automatically«ENDIF»' textMode='singleline' maxLength=255 cssClass='«IF slugUnique»«/*required */»validate-unique«ENDIF»«IF !container.application.targets('1.3.5')»«IF slugUnique» «ENDIF»form-control«ENDIF»'}
-                    <span class="«IF container.application.targets('1.3.5')»z-sub z-formnote«ELSE»help-block«ENDIF»">{gt text='You can input a custom permalink for the «name.formatForDisplay»«IF !slugUnique» or let this field free to create one automatically«ENDIF»'}</span>
-                «IF slugUnique && container.application.targets('1.3.5')»
-                    «/*{«container.application.appName.formatForDB»ValidationError id=«templateIdWithSuffix('slug', idSuffix)» class='required'}*/»
-                    {«container.application.appName.formatForDB»ValidationError id=«templateIdWithSuffix('slug', idSuffix)» class='validate-unique'}
-                «ENDIF»
-                «IF !container.application.targets('1.3.5')»
+                ENDIF
+                    {formtextinput group=templateIdWithSuffix(name.formatForDB, groupSuffix) id=templateIdWithSuffix('slug', idSuffix) mandatory=false/*slugUnique.displayBool*/ readOnly=false __title='You can input a custom permalink for the name.formatForDisplayIF !slugUnique or let this field free to create one automaticallyENDIF' textMode='singleline' maxLength=255 cssClass='IF slugUnique/*required */validate-uniqueENDIFIF !container.application.targets('1.3.5')IF slugUnique ENDIFform-controlENDIF'}
+                    <span class="IF container.application.targets('1.3.5')z-sub z-formnoteELSEhelp-blockENDIF">{gt text='You can input a custom permalink for the name.formatForDisplayIF !slugUnique or let this field free to create one automaticallyENDIF'}</span>
+                IF slugUnique && container.application.targets('1.3.5')
+                    /*{container.application.appName.formatForDBValidationError id=templateIdWithSuffix('slug', idSuffix) class='required'}*/
+                    {container.application.appName.formatForDBValidationError id=templateIdWithSuffix('slug', idSuffix) class='validate-unique'}
+                ENDIF
+                IF !container.application.targets('1.3.5')
                     </div>
-                «ENDIF»
+                ENDIF
         </div>
-        «ENDIF»
+        ENDIF
     '''
 
     def private formTemplateJS(Entity it, Application app, String actionName) '''
-        «IF app.targets('1.3.5')»
+        IF app.targets('1.3.5')
             {icon type='edit' size='extrasmall' assign='editImageArray'}
             {icon type='delete' size='extrasmall' assign='removeImageArray'}
-        «ELSE»
+        ELSE
             {assign var='editImage' value='<span class="fa fa-pencil-square-o"></span>'}
             {assign var='deleteImage' value='<span class="fa fa-trash-o"></span>'}
-        «ENDIF»
+        ENDIF
 
-        «IF geographical»
+        IF geographical
             {pageaddvarblock name='header'}
                 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
                 <script type="text/javascript" src="{$baseurl}plugins/Mapstraction/lib/vendor/mxn/mxn.js?(googlev3)"></script>
@@ -303,36 +303,36 @@ class Forms {
                     var mapstraction;
                     var marker;
 
-                    «IF app.targets('1.3.5')»
-                        «newCoordinatesEventHandler»
+                    IF app.targets('1.3.5')
+                        newCoordinatesEventHandler
 
                         Event.observe(window, 'load', function() {
-                            «initGeographical(app)»
+                            initGeographical(app)
                         });
-                    «ELSE»
+                    ELSE
                         ( function($) {
                             $(document).ready(function() {
-                                «newCoordinatesEventHandler»
+                                newCoordinatesEventHandler
 
-                                «initGeographical(app)»
+                                initGeographical(app)
                             });
                         })(jQuery);
-                    «ENDIF»
+                    ENDIF
                 /* ]]> */
                 </script>
             {/pageaddvarblock}
-        «ENDIF»
+        ENDIF
 
         <script type="text/javascript">
         /* <![CDATA[ */
-            «jsInitImpl(app)»
+            jsInitImpl(app)
         /* ]]> */
         </script>
     '''
 
     def private jsInitImpl(Entity it, Application app) '''
-        «IF app.targets('1.3.5')»
-            «relationHelper.initJs(it, app, false)»
+        IF app.targets('1.3.5')
+            relationHelper.initJs(it, app, false)
 
             var formButtons, formValidator;
 
@@ -352,17 +352,17 @@ class Forms {
             }
 
             document.observe('dom:loaded', function() {
-                «val userFields = getUserFieldsEntity»
-                «IF !userFields.empty»
+                val userFields = getUserFieldsEntity
+                IF !userFields.empty
                     // initialise auto completion for user fields
-                    «FOR userField : userFields»
-                        «val realName = userField.name.formatForCode»
-                        «app.prefix()»InitUserField('«realName»', 'get«name.formatForCodeCapital»«realName.formatForCodeCapital»Users');
-                    «ENDFOR»
-                «ENDIF»
-                «relationHelper.initJs(it, app, true)»
+                    FOR userField : userFields
+                        val realName = userField.name.formatForCode
+                        app.prefix()InitUserField('realName', 'getname.formatForCodeCapitalrealName.formatForCodeCapitalUsers');
+                    ENDFOR
+                ENDIF
+                relationHelper.initJs(it, app, true)
 
-                «container.application.prefix()»AddCommonValidationRules('«name.formatForCode»', '{{if $mode ne 'create'}}«FOR pkField : getPrimaryKeyFields SEPARATOR '_'»{{$«name.formatForDB».«pkField.name.formatForCode»}}«ENDFOR»{{/if}}');
+                container.application.prefix()AddCommonValidationRules('name.formatForCode', '{{if $mode ne 'create'}}FOR pkField : getPrimaryKeyFields SEPARATOR '_'{{$name.formatForDB.pkField.name.formatForCode}}ENDFOR{{/if}}');
                 {{* observe validation on button events instead of form submit to exclude the cancel command *}}
                 formValidator = new Validation('{{$__formid}}', {onSubmit: false, immediate: true, focusOnError: false});
                 {{if $mode ne 'create'}}
@@ -376,26 +376,26 @@ class Forms {
                         elem.observe('click', handleFormButton);
                     }
                 });
-                «IF useGroupingPanels('edit')»
+                IF useGroupingPanels('edit')
 
-                    var panel = new Zikula.UI.Panels('«app.appName.toFirstLower»Panel', {
+                    var panel = new Zikula.UI.Panels('app.appName.toFirstLowerPanel', {
                         headerSelector: 'h3',
                         headerClassName: 'z-panel-header z-panel-indicator',
                         contentClassName: 'z-panel-content',
                         active: $('z-panel-header-fields')
                     });
-                «ENDIF»
+                ENDIF
 
-                Zikula.UI.Tooltips($$('.«app.appName.toLowerCase»-form-tooltips'));
-                «FOR field : getDerivedFields»«field.additionalInitScript»«ENDFOR»
+                Zikula.UI.Tooltips($$('.app.appName.toLowerCase-form-tooltips'));
+                FOR field : getDerivedFieldsfield.additionalInitScriptENDFOR
             });
-        «ELSE»
-            «relationHelper.initJs(it, app, false)»
+        ELSE
+            relationHelper.initJs(it, app, false)
 
             var formButtons;
 
             function handleFormButton (event) {
-                «container.application.prefix()»PerformCustomValidationRules('«name.formatForCode»', '{{if $mode ne 'create'}}«FOR pkField : getPrimaryKeyFields SEPARATOR '_'»{{$«name.formatForDB».«pkField.name.formatForCode»}}«ENDFOR»{{/if}}');
+                container.application.prefix()PerformCustomValidationRules('name.formatForCode', '{{if $mode ne 'create'}}FOR pkField : getPrimaryKeyFields SEPARATOR '_'{{$name.formatForDB.pkField.name.formatForCode}}ENDFOR{{/if}}');
                 var result = document.getElementById('{{$__formid}}').checkValidity();
                 if (!result) {
                     // validation error, abort form submit
@@ -412,15 +412,15 @@ class Forms {
 
             ( function($) {
                 $(document).ready(function() {
-                    «val userFields = getUserFieldsEntity»
-                    «IF !userFields.empty»
+                    val userFields = getUserFieldsEntity
+                    IF !userFields.empty
                         // initialise auto completion for user fields
-                        «FOR userField : userFields»
-                            «val realName = userField.name.formatForCode»
-                            «app.prefix()»InitUserField('«realName»', 'get«name.formatForCodeCapital»«realName.formatForCodeCapital»Users');
-                        «ENDFOR»
-                    «ENDIF»
-                    «relationHelper.initJs(it, app, true)»
+                        FOR userField : userFields
+                            val realName = userField.name.formatForCode
+                            app.prefix()InitUserField('realName', 'getname.formatForCodeCapitalrealName.formatForCodeCapitalUsers');
+                        ENDFOR
+                    ENDIF
+                    relationHelper.initJs(it, app, true)
     
                     {{* observe validation on button events instead of form submit to exclude the cancel command *}}
                     {{if $mode ne 'create'}}
@@ -437,20 +437,20 @@ class Forms {
                         }
                     });
 
-                    $('.«app.appName.toLowerCase»-form-tooltips').tooltip();
-                    «FOR field : getDerivedFields»«field.additionalInitScript»«ENDFOR»
+                    $('.app.appName.toLowerCase-form-tooltips').tooltip();
+                    FOR field : getDerivedFieldsfield.additionalInitScriptENDFOR
                 });
             })(jQuery);
-        «ENDIF»
+        ENDIF
     '''
 
     def private newCoordinatesEventHandler(Entity it) '''
         function newCoordinatesEventHandler() {
-            «IF container.application.targets('1.3.5')»
+            IF container.application.targets('1.3.5')
                 var location = new mxn.LatLonPoint($F('latitude'), $F('longitude'));
-            «ELSE»
+            ELSE
                 var location = new mxn.LatLonPoint($('#latitude').val(), $('#longitude').val());
-            «ENDIF»
+            ENDIF
             marker.hide();
             mapstraction.removeMarker(marker);
             marker = new mxn.Marker(location);
@@ -467,7 +467,7 @@ class Forms {
             map_type: true
         });
 
-        var latlon = new mxn.LatLonPoint({{$«name.formatForDB».latitude|«app.appName.formatForDB»FormatGeoData}}, {{$«name.formatForDB».longitude|«app.appName.formatForDB»FormatGeoData}});
+        var latlon = new mxn.LatLonPoint({{$name.formatForDB.latitude|app.appName.formatForDBFormatGeoData}}, {{$name.formatForDB.longitude|app.appName.formatForDBFormatGeoData}});
 
         mapstraction.setMapType(mxn.Mapstraction.SATELLITE);
         mapstraction.setCenterAndZoom(latlon, 16);
@@ -478,30 +478,30 @@ class Forms {
         mapstraction.addMarker(marker, true);
 
         // init event handler
-        «IF container.application.targets('1.3.5')»
+        IF container.application.targets('1.3.5')
             $('latitude').observe('change', newCoordinatesEventHandler);
             $('longitude').observe('change', newCoordinatesEventHandler);
-        «ELSE»
+        ELSE
             $('#latitude').change(newCoordinatesEventHandler);
             $('#longitude').change(newCoordinatesEventHandler);
-        «ENDIF»
-        «IF !container.application.targets('1.3.5')»
+        ENDIF
+        IF !container.application.targets('1.3.5')
 
             $('#collapseMap').on('hidden.bs.collapse', function () {
                 // redraw the map after it's panel has been opened (see also #340)
                 mapstraction.resizeTo($('#mapContainer').width(), $('#mapContainer').height());
             })
-        «ENDIF»
+        ENDIF
 
         mapstraction.click.addHandler(function(event_name, event_source, event_args) {
             var coords = event_args.location;
-            «IF container.application.targets('1.3.5')»
+            IF container.application.targets('1.3.5')
                 Form.Element.setValue('latitude', coords.lat.toFixed(7));
                 Form.Element.setValue('longitude', coords.lng.toFixed(7));
-            «ELSE»
+            ELSE
                 $('#latitude').val(coords.lat.toFixed(7));
                 $('#longitude').val(coords.lng.toFixed(7));
-            «ENDIF»
+            ENDIF
             newCoordinatesEventHandler();
         });
 
@@ -513,22 +513,22 @@ class Forms {
         {{/if}}
 
         function setDefaultCoordinates(position) {
-            «IF app.targets('1.3.5')»
+            IF app.targets('1.3.5')
                 $('latitude').value = position.coords.latitude.toFixed(7);
                 $('longitude').value = position.coords.longitude.toFixed(7);
-            «ELSE»
+            ELSE
                 $('#latitude').val(position.coords.latitude.toFixed(7));
                 $('#longitude').val(position.coords.longitude.toFixed(7));
-            «ENDIF»
+            ENDIF
             newCoordinatesEventHandler();
         }
 
         function handlePositionError(evt) {
-            «IF app.targets('1.3.5')»
-                Zikula.UI.Alert(evt.message, Zikula.__('Error during geolocation', 'module_«app.appName.formatForDB»_js'));
-            «ELSE»
-                «app.prefix()»SimpleAlert($('#mapContainer'), Zikula.__('Error during geolocation', 'module_«app.appName.formatForDB»_js'), evt.message, 'geoLocationAlert', 'danger');
-            «ENDIF»
+            IF app.targets('1.3.5')
+                Zikula.UI.Alert(evt.message, Zikula.__('Error during geolocation', 'module_app.appName.formatForDB_js'));
+            ELSE
+                app.prefix()SimpleAlert($('#mapContainer'), Zikula.__('Error during geolocation', 'module_app.appName.formatForDB_js'), evt.message, 'geoLocationAlert', 'danger');
+            ENDIF
         }
 
         {{*
@@ -540,27 +540,27 @@ class Forms {
 
             var determineAddressForGeoCoding = function () {
                 var address = {
-                    «IF app.targets('1.3.5')»
+                    IF app.targets('1.3.5')
                         address : $F('street') + ' ' + $F('houseNumber') + ' ' + $F('zipcode') + ' ' + $F('city') + ' ' + $F('country')
-                    «ELSE»
+                    ELSE
                         address : $('#street').val() + ' ' + $('#houseNumber').val() + ' ' + $('#zipcode').val() + ' ' + $('#city').val() + ' ' + $('#country').val()
-                    «ENDIF»
+                    ENDIF
                 };
 
                 return address;
             }
 
-            «app.prefix()»InitGeoCoding(determineAddressForGeoCoding);
+            app.prefix()InitGeoCoding(determineAddressForGeoCoding);
         *}}
     '''
 
     def private fieldWrapper(DerivedField it, String groupSuffix, String idSuffix) '''
-        «/*No input fields for foreign keys, relations are processed further down*/»
-        «IF entity.getIncomingJoinRelations.filter[e|e.getSourceFields.head == name.formatForDB].empty»
-            <div class="«IF entity.container.application.targets('1.3.5')»z-formrow«ELSE»form-group«ENDIF»">
-                «fieldHelper.formRow(it, groupSuffix, idSuffix)»
+        /*No input fields for foreign keys, relations are processed further down*/
+        IF entity.getIncomingJoinRelations.filter[e|e.getSourceFields.head == name.formatForDB].empty
+            <div class="IF entity.container.application.targets('1.3.5')z-formrowELSEform-groupENDIF">
+                fieldHelper.formRow(it, groupSuffix, idSuffix)
             </div>
-        «ENDIF»
+        ENDIF
     '''
 
     def private additionalInitScript(DerivedField it) {
@@ -572,13 +572,13 @@ class Forms {
     }
 
     def private additionalInitScriptUpload(UploadField it) '''
-        «entity.container.application.prefix()»InitUploadField('«name.formatForCode»');
+        entity.container.application.prefix()InitUploadField('name.formatForCode');
     '''
 
     def private additionalInitScriptCalendar(AbstractDateField it) '''
-        «IF !mandatory && nullable»
-            «entity.container.application.prefix()»InitDateField('«name.formatForCode»');
-        «ENDIF»
+        IF !mandatory && nullable
+            entity.container.application.prefix()InitDateField('name.formatForCode');
+        ENDIF
     '''
 
     def private entityInlineRedirectHandlerFile(Entity it, Application app, IFileSystemAccess fsa) {
@@ -610,35 +610,35 @@ class Forms {
             <head>
                 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
                 {$jcssConfig}
-                «IF targets('1.3.5')»
+                IF targets('1.3.5')
                     <script type="text/javascript" src="{$baseurl}javascript/ajax/proto_scriptaculous.combined.min.js"></script>
                     <script type="text/javascript" src="{$baseurl}javascript/helpers/Zikula.js"></script>
                     <script type="text/javascript" src="{$baseurl}javascript/livepipe/livepipe.combined.min.js"></script>
                     <script type="text/javascript" src="{$baseurl}javascript/helpers/Zikula.UI.js"></script>
-                «ELSE»
+                ELSE
                     <link rel="stylesheet" href="web/bootstrap/css/bootstrap.min.css" type="text/css" />
                     <link rel="stylesheet" href="web/bootstrap/css/bootstrap-theme.css" type="text/css" />
                     <script type="text/javascript" src="web/jquery/jquery.min.js"></script>
                     <script type="text/javascript" src="web/bootstrap/js/bootstrap.min.js"></script>
-                    <script type="text/javascript" src="{$baseurl}javascript/helpers/Zikula.js"></script>«/* still required for Gettext */»
-                «ENDIF»
-                <script type="text/javascript" src="{$baseurl}«rootFolder»/«appName»/«IF targets('1.3.5')»javascript/«ELSE»«getAppJsPath»«ENDIF»«appName»«IF targets('1.3.5')»_e«ELSE».E«ENDIF»ditFunctions.js"></script>
+                    <script type="text/javascript" src="{$baseurl}javascript/helpers/Zikula.js"></script>/* still required for Gettext */
+                ENDIF
+                <script type="text/javascript" src="{$baseurl}rootFolder/appName/IF targets('1.3.5')javascript/ELSEgetAppJsPathENDIFappNameIF targets('1.3.5')_eELSE.EENDIFditFunctions.js"></script>
             </head>
             <body>
                 <script type="text/javascript">
                 /* <![CDATA[ */
                     // close window from parent document
-                    «IF targets('1.3.5')»
+                    IF targets('1.3.5')
                         document.observe('dom:loaded', function() {
-                            «prefix()»CloseWindowFromInside('{{$idPrefix}}', {{if $commandName eq 'create'}}{{$itemId}}{{else}}0{{/if}});«/*value > 0 causes the auto completion being activated*/»
+                            prefix()CloseWindowFromInside('{{$idPrefix}}', {{if $commandName eq 'create'}}{{$itemId}}{{else}}0{{/if}});/*value > 0 causes the auto completion being activated*/
                         });
-                    «ELSE»
+                    ELSE
                         ( function($) {
                             $(document).ready(function() {
-                                «prefix()»CloseWindowFromInside('{{$idPrefix}}', {{if $commandName eq 'create'}}{{$itemId}}{{else}}0{{/if}});«/*value > 0 causes the auto completion being activated*/»
+                                prefix()CloseWindowFromInside('{{$idPrefix}}', {{if $commandName eq 'create'}}{{$itemId}}{{else}}0{{/if}});/*value > 0 causes the auto completion being activated*/
                             });
                         })(jQuery);
-                    «ENDIF»
+                    ENDIF
                 /* ]]> */
                 </script>
             </body>

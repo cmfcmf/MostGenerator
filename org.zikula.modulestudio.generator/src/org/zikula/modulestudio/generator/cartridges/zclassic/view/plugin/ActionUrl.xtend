@@ -21,7 +21,7 @@ class ActionUrl {
 
     def private actionUrlImpl(Application it) '''
         /**
-         * The «appName.formatForDB»ActionUrl modifier creates the URL for a given action.
+         * The appName.formatForDBActionUrl modifier creates the URL for a given action.
          *
          * @param string $urlType      The url type (admin, user, etc.)
          * @param string $urlFunc      The url func (view, display, edit, etc.)
@@ -29,9 +29,9 @@ class ActionUrl {
          *
          * @return string Desired url in encoded form.
          */
-        function smarty_modifier_«appName.formatForDB»ActionUrl($urlType, $urlFunc, $urlArguments)
+        function smarty_modifier_appName.formatForDBActionUrl($urlType, $urlFunc, $urlArguments)
         {
-            return DataUtil::formatForDisplay(ModUtil::url('«appName»', $urlType, $urlFunc, $urlArguments));
+            return DataUtil::formatForDisplay(ModUtil::url('appName', $urlType, $urlFunc, $urlArguments));
         }
     '''
 }

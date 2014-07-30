@@ -86,35 +86,35 @@ class Repository {
     }
 
     def private modelRepositoryBaseImpl(Entity it) '''
-        «imports»
+        imports
         /**
          * Repository class used to implement own convenience methods for performing certain DQL queries.
          *
-         * This is the base repository class for «name.formatForDisplay» entities.
+         * This is the base repository class for name.formatForDisplay entities.
          */
-        «IF app.targets('1.3.5')»
-        class «app.appName»_Entity_Repository_Base_«name.formatForCodeCapital» extends «IF tree != EntityTreeType::NONE»«tree.literal.toLowerCase.toFirstUpper»TreeRepository«ELSEIF hasSortableFields»SortableRepository«ELSE»EntityRepository«ENDIF»
-        «ELSE»
-        class «name.formatForCodeCapital» extends «IF tree != EntityTreeType::NONE»«tree.literal.toLowerCase.toFirstUpper»TreeRepository«ELSEIF hasSortableFields»SortableRepository«ELSE»EntityRepository«ENDIF»
-        «ENDIF»
+        IF app.targets('1.3.5')
+        class app.appName_Entity_Repository_Base_name.formatForCodeCapital extends IF tree != EntityTreeType::NONEtree.literal.toLowerCase.toFirstUpperTreeRepositoryELSEIF hasSortableFieldsSortableRepositoryELSEEntityRepositoryENDIF
+        ELSE
+        class name.formatForCodeCapital extends IF tree != EntityTreeType::NONEtree.literal.toLowerCase.toFirstUpperTreeRepositoryELSEIF hasSortableFieldsSortableRepositoryELSEEntityRepositoryENDIF
+        ENDIF
         {
-            «val stringFields = fields.filter(StringField).filter[!password]»
+            val stringFields = fields.filter(StringField).filter[!password]
             /**
              * @var string The default sorting field/expression.
              */
-            protected $defaultSortingField = '«(if (hasSortableFields) getSortableFields.head else if (!stringFields.empty) stringFields.head else getDerivedFields.head).name.formatForCode»';
+            protected $defaultSortingField = '(if (hasSortableFields) getSortableFields.head else if (!stringFields.empty) stringFields.head else getDerivedFields.head).name.formatForCode';
 
-            «IF app.targets('1.3.5')»
+            IF app.targets('1.3.5')
                 /**
                  * @var array Additional arguments given by the calling controller.
                  */
                 protected $controllerArguments = array();
-            «ELSE»
+            ELSE
                 /**
                  * @var Request The request object given by the calling controller.
                  */
                 protected $request;
-            «ENDIF»
+            ENDIF
 
             /**
              * Retrieves an array with all fields which can be used for sorting instances.
@@ -124,123 +124,123 @@ class Repository {
             public function getAllowedSortingFields()
             {
                 return array(
-                    «FOR field : fields»«field.singleSortingField»«ENDFOR»
-                    «extensionSortingFields»
+                    FOR field : fieldsfield.singleSortingFieldENDFOR
+                    extensionSortingFields
                 );
             }
 
-            «fh.getterAndSetterMethods(it, 'defaultSortingField', 'string', false, false, '', '')»
-            «IF app.targets('1.3.5')»
-                «fh.getterAndSetterMethods(it, 'controllerArguments', 'array', false, true, 'Array()', '')»
-            «ELSE»
-                «fh.getterAndSetterMethods(it, 'request', 'Request', false, false, '', '')»
-            «ENDIF»
+            fh.getterAndSetterMethods(it, 'defaultSortingField', 'string', false, false, '', '')
+            IF app.targets('1.3.5')
+                fh.getterAndSetterMethods(it, 'controllerArguments', 'array', false, true, 'Array()', '')
+            ELSE
+                fh.getterAndSetterMethods(it, 'request', 'Request', false, false, '', '')
+            ENDIF
 
-            «fieldNameHelpers(stringFields)»
+            fieldNameHelpers(stringFields)
 
-            «getAdditionalTemplateParameters»
-            «getViewQuickNavParameters»
+            getAdditionalTemplateParameters
+            getViewQuickNavParameters
 
-            «truncateTable»
-            «new UserDeletion().generate(it)»
+            truncateTable
+            new UserDeletion().generate(it)
 
-            «selectById»
-            «IF hasSluggableFields && slugUnique»
+            selectById
+            IF hasSluggableFields && slugUnique
 
-                «selectBySlug»
-            «ENDIF»
+                selectBySlug
+            ENDIF
 
-            «addExclusion»
+            addExclusion
 
-            «selectWhere»
+            selectWhere
 
-            «selectWherePaginated»
+            selectWherePaginated
 
-            «selectSearch»
+            selectSearch
 
-            «retrieveCollectionResult»
+            retrieveCollectionResult
 
-            «selectCount»
+            selectCount
 
-            «new Tree().generate(it, app)»
+            new Tree().generate(it, app)
 
-            «detectUniqueState»
+            detectUniqueState
 
-            «genericBaseQuery»
+            genericBaseQuery
 
-            «genericBaseQueryWhere»
+            genericBaseQueryWhere
 
-            «genericBaseQueryOrderBy»
+            genericBaseQueryOrderBy
 
-            «intGetQueryFromBuilder»
+            intGetQueryFromBuilder
 
-            «new Joins().generate(it, app)»
-            «IF hasArchive && getEndDateField !== null»
+            new Joins().generate(it, app)
+            IF hasArchive && getEndDateField !== null
 
-                «archiveObjects(it)»
-            «ENDIF»
+                archiveObjects(it)
+            ENDIF
         }
     '''
 
     def private imports(Entity it) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Entity\Repository\Base;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Entity\Repository\Base;
 
-        «ENDIF»
-        «IF tree != EntityTreeType::NONE»
-            use Gedmo\Tree\Entity\Repository\«tree.literal.toLowerCase.toFirstUpper»TreeRepository;
-        «ELSEIF hasSortableFields»
+        ENDIF
+        IF tree != EntityTreeType::NONE
+            use Gedmo\Tree\Entity\Repository\tree.literal.toLowerCase.toFirstUpperTreeRepository;
+        ELSEIF hasSortableFields
             use Gedmo\Sortable\Entity\Repository\SortableRepository;
-        «ELSE»
+        ELSE
             use Doctrine\ORM\EntityRepository;
-        «ENDIF»
+        ENDIF
         use Doctrine\ORM\Query;
         use Doctrine\ORM\QueryBuilder;
-        «IF hasOptimisticLock || hasPessimisticReadLock || hasPessimisticWriteLock»
+        IF hasOptimisticLock || hasPessimisticReadLock || hasPessimisticWriteLock
             use Doctrine\DBAL\LockMode;
-        «ENDIF»
+        ENDIF
 
-        «IF app.targets('1.3.5')»
+        IF app.targets('1.3.5')
         use DoctrineExtensions\Paginate\Paginate;
-        «ELSE»
+        ELSE
         use Doctrine\ORM\Tools\Pagination\Paginator;
-        «ENDIF»
+        ENDIF
 
-        «IF !app.targets('1.3.5')»
+        IF !app.targets('1.3.5')
             use Symfony\Component\HttpFoundation\Request;
             use Zikula\Component\FilterUtil\FilterUtil;
             use Zikula\Component\FilterUtil\Config as FilterConfig;
             use Zikula\Component\FilterUtil\PluginManager as FilterPluginManager;
-            «IF categorisable»
+            IF categorisable
                 use Zikula\Core\FilterUtil\CategoryPlugin as CategoryFilter;
-            «ENDIF»
-            «IF !fields.filter(AbstractDateField).empty»
+            ENDIF
+            IF !fields.filter(AbstractDateField).empty
                 use Zikula\Component\FilterUtil\Plugin\DatePlugin as DateFilter;
-            «ENDIF»
+            ENDIF
             use FormUtil;
             use ModUtil;
             use ServiceUtil;
             use System;
             use UserUtil;
-            «IF hasArchive && getEndDateField !== null»
+            IF hasArchive && getEndDateField !== null
                 use ZLanguage;
                 use Zikula\Core\ModUrl;
                 use Zikula\Core\Hook\ProcessHook;
                 use Zikula\Core\Hook\ValidationHook;
                 use Zikula\Core\Hook\ValidationProviders;
-            «ENDIF»
+            ENDIF
 
-        «ENDIF»
+        ENDIF
     '''
 
     def private fieldNameHelpers(Entity it, Iterable<StringField> stringFields) '''
-        «getTitleFieldName(stringFields)»
+        getTitleFieldName(stringFields)
 
-        «getDescriptionFieldName(stringFields)»
+        getDescriptionFieldName(stringFields)
 
-        «getPreviewFieldName»
+        getPreviewFieldName
 
-        «getStartDateFieldName»
+        getStartDateFieldName
     '''
 
     def private getTitleFieldName(Entity it, Iterable<StringField> stringFields) '''
@@ -251,11 +251,11 @@ class Repository {
          */
         public function getTitleFieldName()
         {
-            «IF !stringFields.empty»
-                $fieldName = '«stringFields.head.name.formatForCode»';
-            «ELSE»
+            IF !stringFields.empty
+                $fieldName = 'stringFields.head.name.formatForCode';
+            ELSE
                 $fieldName = '';
-            «ENDIF»
+            ENDIF
 
             return $fieldName;
         }
@@ -269,18 +269,18 @@ class Repository {
          */
         public function getDescriptionFieldName()
         {
-            «val textFields = fields.filter(TextField)»
-            «IF !textFields.empty»
-                $fieldName = '«textFields.head.name.formatForCode»';
-            «ELSEIF !stringFields.empty»
-                «IF stringFields.size > 1»
-                    $fieldName = '«stringFields.get(1).name.formatForCode»';
-                «ELSE»
-                    $fieldName = '«stringFields.head.name.formatForCode»';
-                «ENDIF»
-            «ELSE»
+            val textFields = fields.filter(TextField)
+            IF !textFields.empty
+                $fieldName = 'textFields.head.name.formatForCode';
+            ELSEIF !stringFields.empty
+                IF stringFields.size > 1
+                    $fieldName = 'stringFields.get(1).name.formatForCode';
+                ELSE
+                    $fieldName = 'stringFields.head.name.formatForCode';
+                ENDIF
+            ELSE
                 $fieldName = '';
-            «ENDIF»
+            ENDIF
 
             return $fieldName;
         }
@@ -294,7 +294,7 @@ class Repository {
          */
         public function getPreviewFieldName()
         {
-            $fieldName = '«IF hasImageFieldsEntity»«getImageFieldsEntity.head.name.formatForCode»«ENDIF»';
+            $fieldName = 'IF hasImageFieldsEntitygetImageFieldsEntity.head.name.formatForCodeENDIF';
 
             return $fieldName;
         }
@@ -309,7 +309,7 @@ class Repository {
          */
         public function getStartDateFieldName()
         {
-            $fieldName = '«IF getStartDateField !== null»«getStartDateField.name.formatForCode»«ELSEIF standardFields»createdDate«ENDIF»';
+            $fieldName = 'IF getStartDateField !== nullgetStartDateField.name.formatForCodeELSEIF standardFieldscreatedDateENDIF';
 
             return $fieldName;
         }
@@ -333,56 +333,56 @@ class Repository {
             $templateParameters = array();
 
             if ($context == 'controllerAction') {
-                «IF app.hasUploads || (hasListFieldsEntity && !app.targets('1.3.5'))»
+                IF app.hasUploads || (hasListFieldsEntity && !app.targets('1.3.5'))
                     $serviceManager = ServiceUtil::getManager();
-                «ENDIF»
+                ENDIF
                 if (!isset($args['action'])) {
-                    $args['action'] = FormUtil::getPassedValue('func', '«IF app.targets('1.3.5')»main«ELSE»index«ENDIF»', 'GETPOST');
+                    $args['action'] = FormUtil::getPassedValue('func', 'IF app.targets('1.3.5')mainELSEindexENDIF', 'GETPOST');
                 }
-                if (in_array($args['action'], array('«IF app.targets('1.3.5')»main«ELSE»index«ENDIF»', 'view'))) {
+                if (in_array($args['action'], array('IF app.targets('1.3.5')mainELSEindexENDIF', 'view'))) {
                     $templateParameters = $this->getViewQuickNavParameters($context, $args);
-                    «IF hasListFieldsEntity»
-                        «IF app.targets('1.3.5')»
-                            $listHelper = new «app.appName»_Util_ListEntries(ServiceUtil::getManager());
-                        «ELSE»
-                            $listHelper = $serviceManager->get('«app.appName.formatForDB».listentries_helper');
-                        «ENDIF»
-                        «FOR field : getListFieldsEntity»
-                            «var fieldName = field.name.formatForCode»
-                            $templateParameters['«fieldName»Items'] = $listHelper->getEntries('«name.formatForCode»', '«fieldName»');
-                        «ENDFOR»
-                    «ENDIF»
-                    «IF hasBooleanFieldsEntity»
+                    IF hasListFieldsEntity
+                        IF app.targets('1.3.5')
+                            $listHelper = new app.appName_Util_ListEntries(ServiceUtil::getManager());
+                        ELSE
+                            $listHelper = $serviceManager->get('app.appName.formatForDB.listentries_helper');
+                        ENDIF
+                        FOR field : getListFieldsEntity
+                            var fieldName = field.name.formatForCode
+                            $templateParameters['fieldNameItems'] = $listHelper->getEntries('name.formatForCode', 'fieldName');
+                        ENDFOR
+                    ENDIF
+                    IF hasBooleanFieldsEntity
                         $booleanSelectorItems = array(
                             array('value' => 'no', 'text' => __('No')),
                             array('value' => 'yes', 'text' => __('Yes'))
                         );
-                        «FOR field : getBooleanFieldsEntity»
-                            «val fieldName = field.name.formatForCode»
-                            $templateParameters['«fieldName»Items'] = $booleanSelectorItems;
-                        «ENDFOR»
-                    «ENDIF»
+                        FOR field : getBooleanFieldsEntity
+                            val fieldName = field.name.formatForCode
+                            $templateParameters['fieldNameItems'] = $booleanSelectorItems;
+                        ENDFOR
+                    ENDIF
                 }
 
-                «IF app.hasUploads»
+                IF app.hasUploads
                     // initialise Imagine preset instances
-                    «IF app.targets('1.3.5')»
-                        $imageHelper = new «app.appName»_Util_Image($serviceManager);
-                    «ELSE»
-                        $imageHelper = $serviceManager->get('«app.appName.formatForDB».image_helper');
-                    «ENDIF»
-                    «IF hasUploadFieldsEntity»
+                    IF app.targets('1.3.5')
+                        $imageHelper = new app.appName_Util_Image($serviceManager);
+                    ELSE
+                        $imageHelper = $serviceManager->get('app.appName.formatForDB.image_helper');
+                    ENDIF
+                    IF hasUploadFieldsEntity
 
-                        $objectType = '«name.formatForCode»';
-                        «FOR uploadField : getUploadFieldsEntity»
-                            $templateParameters[$objectType . 'ThumbPreset«uploadField.name.formatForCodeCapital»'] = $imageHelper->getPreset($objectType, '«uploadField.name.formatForCode»', $context, $args);
-                        «ENDFOR»
-                    «ENDIF»
+                        $objectType = 'name.formatForCode';
+                        FOR uploadField : getUploadFieldsEntity
+                            $templateParameters[$objectType . 'ThumbPresetuploadField.name.formatForCodeCapital'] = $imageHelper->getPreset($objectType, 'uploadField.name.formatForCode', $context, $args);
+                        ENDFOR
+                    ENDIF
                     if (in_array($args['action'], array('display', 'view'))) {
                         // use separate preset for images in related items
-                        $templateParameters['relationThumbPreset'] = $imageHelper->getCustomPreset('', '', '«app.appName»_relateditem', $context, $args);
+                        $templateParameters['relationThumbPreset'] = $imageHelper->getCustomPreset('', '', 'app.appName_relateditem', $context, $args);
                     }
-                «ENDIF»
+                ENDIF
             }
 
             // in the concrete child class you could do something like
@@ -410,88 +410,88 @@ class Repository {
             }
 
             $parameters = array();
-            «IF categorisable»
-                $parameters['catIdList'] = ModUtil::apiFunc('«app.appName»', 'category', 'retrieveCategoriesFromRequest', array('ot' => '«name.formatForCode»', 'source' => 'GET'));
-            «ENDIF»
-            «IF !getBidirectionalIncomingJoinRelationsWithOneSource.empty»
-                «FOR relation: getBidirectionalIncomingJoinRelationsWithOneSource»
-                    «val sourceAliasName = relation.getRelationAliasName(false)»
-                    «IF app.targets('1.3.5')»
-                        $parameters['«sourceAliasName»'] = isset($this->controllerArguments['«sourceAliasName»']) ? $this->controllerArguments['«sourceAliasName»'] : FormUtil::getPassedValue('«sourceAliasName»', 0, 'GET');
-                    «ELSE»
-                        $parameters['«sourceAliasName»'] = $this->request->query->get('«sourceAliasName»', 0);
-                    «ENDIF»
-                «ENDFOR»
-            «ENDIF»
-            «IF hasListFieldsEntity»
-                «FOR field : getListFieldsEntity»
-                    «val fieldName = field.name.formatForCode»
-                    «IF app.targets('1.3.5')»
-                        $parameters['«fieldName»'] = isset($this->controllerArguments['«fieldName»']) ? $this->controllerArguments['«fieldName»'] : FormUtil::getPassedValue('«fieldName»', '', 'GET');
-                    «ELSE»
-                        $parameters['«fieldName»'] = $this->request->query->get('«fieldName»', '');
-                    «ENDIF»
-                «ENDFOR»
-            «ENDIF»
-            «IF hasUserFieldsEntity»
-                «FOR field : getUserFieldsEntity»
-                    «val fieldName = field.name.formatForCode»
-                    «IF app.targets('1.3.5')»
-                        $parameters['«fieldName»'] = isset($this->controllerArguments['«fieldName»']) ? $this->controllerArguments['«fieldName»'] : (int) FormUtil::getPassedValue('«fieldName»', 0, 'GET');
-                    «ELSE»
-                        $parameters['«fieldName»'] = (int) $this->request->query->get('«fieldName»', 0);
-                    «ENDIF»
-                «ENDFOR»
-            «ENDIF»
-            «IF hasCountryFieldsEntity»
-                «FOR field : getCountryFieldsEntity»
-                    «val fieldName = field.name.formatForCode»
-                    «IF app.targets('1.3.5')»
-                        $parameters['«fieldName»'] = isset($this->controllerArguments['«fieldName»']) ? $this->controllerArguments['«fieldName»'] : FormUtil::getPassedValue('«fieldName»', '', 'GET');
-                    «ELSE»
-                        $parameters['«fieldName»'] = $this->request->query->get('«fieldName»', '');
-                    «ENDIF»
-                «ENDFOR»
-            «ENDIF»
-            «IF hasLanguageFieldsEntity»
-                «FOR field : getLanguageFieldsEntity»
-                    «val fieldName = field.name.formatForCode»
-                    «IF app.targets('1.3.5')»
-                        $parameters['«fieldName»'] = isset($this->controllerArguments['«fieldName»']) ? $this->controllerArguments['«fieldName»'] : FormUtil::getPassedValue('«fieldName»', '', 'GET');
-                    «ELSE»
-                        $parameters['«fieldName»'] = $this->request->query->get('«fieldName»', '');
-                    «ENDIF»
-                «ENDFOR»
-            «ENDIF»
-            «IF hasLocaleFieldsEntity»
-                «FOR field : getLocaleFieldsEntity»
-                    «val fieldName = field.name.formatForCode»
-                    «IF app.targets('1.3.5')»
-                        $parameters['«fieldName»'] = isset($this->controllerArguments['«fieldName»']) ? $this->controllerArguments['«fieldName»'] : FormUtil::getPassedValue('«fieldName»', '', 'GET');
-                    «ELSE»
-                        $parameters['«fieldName»'] = $this->request->query->get('«fieldName»', '');
-                    «ENDIF»
-                «ENDFOR»
-            «ENDIF»
-            «IF hasAbstractStringFieldsEntity»
-                «IF app.targets('1.3.5')»
+            IF categorisable
+                $parameters['catIdList'] = ModUtil::apiFunc('app.appName', 'category', 'retrieveCategoriesFromRequest', array('ot' => 'name.formatForCode', 'source' => 'GET'));
+            ENDIF
+            IF !getBidirectionalIncomingJoinRelationsWithOneSource.empty
+                FOR relation: getBidirectionalIncomingJoinRelationsWithOneSource
+                    val sourceAliasName = relation.getRelationAliasName(false)
+                    IF app.targets('1.3.5')
+                        $parameters['sourceAliasName'] = isset($this->controllerArguments['sourceAliasName']) ? $this->controllerArguments['sourceAliasName'] : FormUtil::getPassedValue('sourceAliasName', 0, 'GET');
+                    ELSE
+                        $parameters['sourceAliasName'] = $this->request->query->get('sourceAliasName', 0);
+                    ENDIF
+                ENDFOR
+            ENDIF
+            IF hasListFieldsEntity
+                FOR field : getListFieldsEntity
+                    val fieldName = field.name.formatForCode
+                    IF app.targets('1.3.5')
+                        $parameters['fieldName'] = isset($this->controllerArguments['fieldName']) ? $this->controllerArguments['fieldName'] : FormUtil::getPassedValue('fieldName', '', 'GET');
+                    ELSE
+                        $parameters['fieldName'] = $this->request->query->get('fieldName', '');
+                    ENDIF
+                ENDFOR
+            ENDIF
+            IF hasUserFieldsEntity
+                FOR field : getUserFieldsEntity
+                    val fieldName = field.name.formatForCode
+                    IF app.targets('1.3.5')
+                        $parameters['fieldName'] = isset($this->controllerArguments['fieldName']) ? $this->controllerArguments['fieldName'] : (int) FormUtil::getPassedValue('fieldName', 0, 'GET');
+                    ELSE
+                        $parameters['fieldName'] = (int) $this->request->query->get('fieldName', 0);
+                    ENDIF
+                ENDFOR
+            ENDIF
+            IF hasCountryFieldsEntity
+                FOR field : getCountryFieldsEntity
+                    val fieldName = field.name.formatForCode
+                    IF app.targets('1.3.5')
+                        $parameters['fieldName'] = isset($this->controllerArguments['fieldName']) ? $this->controllerArguments['fieldName'] : FormUtil::getPassedValue('fieldName', '', 'GET');
+                    ELSE
+                        $parameters['fieldName'] = $this->request->query->get('fieldName', '');
+                    ENDIF
+                ENDFOR
+            ENDIF
+            IF hasLanguageFieldsEntity
+                FOR field : getLanguageFieldsEntity
+                    val fieldName = field.name.formatForCode
+                    IF app.targets('1.3.5')
+                        $parameters['fieldName'] = isset($this->controllerArguments['fieldName']) ? $this->controllerArguments['fieldName'] : FormUtil::getPassedValue('fieldName', '', 'GET');
+                    ELSE
+                        $parameters['fieldName'] = $this->request->query->get('fieldName', '');
+                    ENDIF
+                ENDFOR
+            ENDIF
+            IF hasLocaleFieldsEntity
+                FOR field : getLocaleFieldsEntity
+                    val fieldName = field.name.formatForCode
+                    IF app.targets('1.3.5')
+                        $parameters['fieldName'] = isset($this->controllerArguments['fieldName']) ? $this->controllerArguments['fieldName'] : FormUtil::getPassedValue('fieldName', '', 'GET');
+                    ELSE
+                        $parameters['fieldName'] = $this->request->query->get('fieldName', '');
+                    ENDIF
+                ENDFOR
+            ENDIF
+            IF hasAbstractStringFieldsEntity
+                IF app.targets('1.3.5')
                     $parameters['searchterm'] = isset($this->controllerArguments['searchterm']) ? $this->controllerArguments['searchterm'] : FormUtil::getPassedValue('searchterm', '', 'GET');
-                «ELSE»
+                ELSE
                     $parameters['searchterm'] = $this->request->query->get('searchterm', '');
-                «ENDIF»
-            «ENDIF»
-            «/* not needed as already handled in the controller $pageSize = ModUtil::getVar('«app.appName»', 'pageSize', 10);
-            $parameters['pageSize'] = (int) $this->request->query->get('pageSize', $pageSize);*/»
-            «IF hasBooleanFieldsEntity»
-                «FOR field : getBooleanFieldsEntity»
-                    «val fieldName = field.name.formatForCode»
-                    «IF app.targets('1.3.5')»
-                        $parameters['«fieldName»'] = isset($this->controllerArguments['«fieldName»']) ? $this->controllerArguments['«fieldName»'] : FormUtil::getPassedValue('«fieldName»', '', 'GET');
-                    «ELSE»
-                        $parameters['«fieldName»'] = $this->request->query->get('«fieldName»', '');
-                    «ENDIF»
-                «ENDFOR»
-            «ENDIF»
+                ENDIF
+            ENDIF
+            /* not needed as already handled in the controller $pageSize = ModUtil::getVar('app.appName', 'pageSize', 10);
+            $parameters['pageSize'] = (int) $this->request->query->get('pageSize', $pageSize);*/
+            IF hasBooleanFieldsEntity
+                FOR field : getBooleanFieldsEntity
+                    val fieldName = field.name.formatForCode
+                    IF app.targets('1.3.5')
+                        $parameters['fieldName'] = isset($this->controllerArguments['fieldName']) ? $this->controllerArguments['fieldName'] : FormUtil::getPassedValue('fieldName', '', 'GET');
+                    ELSE
+                        $parameters['fieldName'] = $this->request->query->get('fieldName', '');
+                    ENDIF
+                ENDFOR
+            ENDIF
 
             // in the concrete child class you could do something like
             // $parameters = parent::getViewQuickNavParameters($context, $args);
@@ -512,28 +512,28 @@ class Repository {
         public function truncateTable()
         {
             $qb = $this->getEntityManager()->createQueryBuilder();
-            $qb->delete('«entityClassName('', false)»', 'tbl');
+            $qb->delete('entityClassName('', false)', 'tbl');
             $query = $qb->getQuery();
-            «IF softDeleteable»
+            IF softDeleteable
 
                 // set the softdeletable query hint
                 $query->setHint(
                     Query::HINT_CUSTOM_OUTPUT_WALKER,
                     'Gedmo\\SoftDeleteable\\Query\\TreeWalker\\SoftDeleteableWalker'
                 );
-            «ENDIF»
-            «IF hasPessimisticWriteLock»
+            ENDIF
+            IF hasPessimisticWriteLock
 
-                $query->setLockMode(LockMode::«lockType.lockTypeAsConstant»);
-            «ENDIF»
+                $query->setLockMode(LockMode::lockType.lockTypeAsConstant);
+            ENDIF
 
             $query->execute();
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
 
                 $serviceManager = ServiceUtil::getManager();
                 $logger = $serviceManager->get('logger');
-                $logger->debug('{app}: User {user} truncated the {entity} entity table.', array('app' => '«container.application.appName»', 'user' => UserUtil::getVar('uname'), 'entity' => '«name.formatForDisplay»'));
-            «ENDIF»
+                $logger->debug('{app}: User {user} truncated the {entity} entity table.', array('app' => 'container.application.appName', 'user' => UserUtil::getVar('uname'), 'entity' => 'name.formatForDisplay'));
+            ENDIF
         }
     '''
 
@@ -576,7 +576,7 @@ class Repository {
                     }
                     $orX->add($andX);
                 } else {
-                    $orX->add($qb->expr()->eq('tbl.«getFirstPrimaryKey.name.formatForCode»', $id));
+                    $orX->add($qb->expr()->eq('tbl.getFirstPrimaryKey.name.formatForCode', $id));
                 }
                 
             }
@@ -593,7 +593,7 @@ class Repository {
          * @param boolean $useJoins Whether to include joining related objects (optional) (default=true).
          * @param boolean $slimMode If activated only some basic fields are selected without using any joins (optional) (default=false).
          *
-         * @return array|«entityClassName('', false)» retrieved data array or «entityClassName('', false)» instance
+         * @return array|entityClassName('', false) retrieved data array or entityClassName('', false) instance
          *
          * @throws InvalidArgumentException Thrown if invalid parameters are received
          */
@@ -611,7 +611,7 @@ class Repository {
          * @param boolean $useJoins Whether to include joining related objects (optional) (default=true).
          * @param boolean $slimMode If activated only some basic fields are selected without using any joins (optional) (default=false).
          *
-         * @return ArrayCollection collection containing retrieved «entityClassName('', false)» instances
+         * @return ArrayCollection collection containing retrieved entityClassName('', false) instances
          *
          * @throws InvalidArgumentException Thrown if invalid parameters are received
          */
@@ -637,7 +637,7 @@ class Repository {
          * @param boolean $slimMode If activated only some basic fields are selected without using any joins (optional) (default=false).
          * @param integer $excludeId Optional id to be excluded (used for unique validation).
          *
-         * @return «entityClassName('', false)» retrieved instance of «entityClassName('', false)»
+         * @return entityClassName('', false) retrieved instance of entityClassName('', false)
          *
          * @throws InvalidArgumentException Thrown if invalid parameters are received
          */
@@ -668,22 +668,22 @@ class Repository {
          * Adds where clauses excluding desired identifiers from selection.
          *
          * @param Doctrine\ORM\QueryBuilder $qb        Query builder to be enhanced.
-         * @param «IF hasCompositeKeys»mixed  «ELSE»integer«ENDIF»                   $excludeId The id (or array of ids) to be excluded from selection.
+         * @param IF hasCompositeKeysmixed  ELSEintegerENDIF                   $excludeId The id (or array of ids) to be excluded from selection.
          *
          * @return Doctrine\ORM\QueryBuilder Enriched query builder instance.
          */
         protected function addExclusion(QueryBuilder $qb, $excludeId)
         {
-            «IF hasCompositeKeys»
+            IF hasCompositeKeys
                 if (is_array($excludeId)) {
                     foreach ($id as $fieldName => $fieldValue) {
                         $qb->andWhere('tbl.' . $fieldName . ' != :' . $fieldName)
                            ->setParameter($fieldName, $fieldValue);
                     }
                 } elseif ($excludeId > 0) {
-            «ELSE»
+            ELSE
                 if ($excludeId > 0) {
-            «ENDIF»
+            ENDIF
                 $qb->andWhere('tbl.id != :excludeId')
                    ->setParameter('excludeId', $excludeId);
             }
@@ -701,7 +701,7 @@ class Repository {
          * @param boolean $useJoins Whether to include joining related objects (optional) (default=true).
          * @param boolean $slimMode If activated only some basic fields are selected without using any joins (optional) (default=false).
          *
-         * @return ArrayCollection collection containing retrieved «entityClassName('', false)» instances
+         * @return ArrayCollection collection containing retrieved entityClassName('', false) instances
          */
         public function selectWhere($where = '', $orderBy = '', $useJoins = true, $slimMode = false)
         {
@@ -733,23 +733,23 @@ class Repository {
             $query = $this->getQueryFromBuilder($qb);
             $offset = ($currentPage-1) * $resultsPerPage;
 
-            «IF app.targets('1.3.5')»
+            IF app.targets('1.3.5')
                 // count the total number of affected items
                 $count = Paginate::getTotalQueryResults($query);
 
-                «IF !(outgoing.filter(JoinRelationship).empty && incoming.filter(JoinRelationship).empty)»
+                IF !(outgoing.filter(JoinRelationship).empty && incoming.filter(JoinRelationship).empty)
                     // prefetch unique relationship ids for given pagination frame
                     $query = Paginate::getPaginateQuery($query, $offset, $resultsPerPage);
-                «ELSE»
+                ELSE
                     $query->setFirstResult($offset)
                           ->setMaxResults($resultsPerPage);
-                «ENDIF»
-            «ELSE»
+                ENDIF
+            ELSE
                 $query->setFirstResult($offset)
                       ->setMaxResults($resultsPerPage);
                 $count = 0; // will be set at a later stage (in calling method)
-                «/* TODO remove $count from this method together with 1.3.5 support #260 */»
-            «ENDIF»
+                /* TODO remove $count from this method together with 1.3.5 support #260 */
+            ENDIF
 
             return array($query, $count);
         }
@@ -782,44 +782,44 @@ class Repository {
                 }
             }
 
-            «val sessionVar = app.appName + nameMultiple.formatForCodeCapital + 'CurrentPage'»
+            val sessionVar = app.appName + nameMultiple.formatForCodeCapital + 'CurrentPage'
             if (!$hasFilters) {
-                «IF !app.targets('1.3.5')»
+                IF !app.targets('1.3.5')
                     $serviceManager = ServiceUtil::getManager();
                     $session = $serviceManager->get('session');
-                «ENDIF»
+                ENDIF
                 if ($page > 1 || isset($_GET['pos'])) {
                     // store current page in session
-                    «IF app.targets('1.3.5')»
-                        SessionUtil::setVar('«sessionVar»', $page);
-                    «ELSE»
-                        $session->set('«sessionVar»', $page);
-                    «ENDIF»
+                    IF app.targets('1.3.5')
+                        SessionUtil::setVar('sessionVar', $page);
+                    ELSE
+                        $session->set('sessionVar', $page);
+                    ENDIF
                 } else {
                     // restore current page from session
-                    «IF app.targets('1.3.5')»
-                        $page = SessionUtil::getVar('«sessionVar»', 1);
-                    «ELSE»
-                        $page = $session->get('«sessionVar»', 1);
-                    «ENDIF»
+                    IF app.targets('1.3.5')
+                        $page = SessionUtil::getVar('sessionVar', 1);
+                    ELSE
+                        $page = $session->get('sessionVar', 1);
+                    ENDIF
                     System::queryStringSetVar('pos', $page);
-                    «IF !app.targets('1.3.5')»
+                    IF !app.targets('1.3.5')
                         if ($this->getRequest() !== null) {
                             $this->getRequest()->query->set('pos', $page);
                         }
-                    «ENDIF»
+                    ENDIF
                 }
             }
 
             list($query, $count) = $this->getSelectWherePaginatedQuery($qb, $page, $resultsPerPage);
 
-            «IF app.targets('1.3.5')»
+            IF app.targets('1.3.5')
                 $result = $this->retrieveCollectionResult($query, $orderBy, true);
 
                 return array($result, $count);
-            «ELSE»
+            ELSE
                 return $this->retrieveCollectionResult($query, $orderBy, true);
-            «ENDIF»
+            ENDIF
         }
 
         /**
@@ -831,18 +831,18 @@ class Repository {
          */
         public function addCommonViewFilters(QueryBuilder $qb)
         {
-            $currentFunc = FormUtil::getPassedValue('func', '«IF app.targets('1.3.5')»main«ELSE»index«ENDIF»', 'GETPOST');
-            if ($currentFunc == 'edit') {«/* fix for #547 */»
+            $currentFunc = FormUtil::getPassedValue('func', 'IF app.targets('1.3.5')mainELSEindexENDIF', 'GETPOST');
+            if ($currentFunc == 'edit') {/* fix for #547 */
                 return $qb;
             }
 
-            «IF !app.targets('1.3.5')»
+            IF !app.targets('1.3.5')
                 if ($this->getRequest() === null) {
                     // if no request is set we return (#433)
                     return $qb;
                 }
 
-            «ENDIF»
+            ENDIF
             $parameters = $this->getViewQuickNavParameters('', array());
             foreach ($parameters as $k => $v) {
                 if ($k == 'catId') {
@@ -857,21 +857,21 @@ class Repository {
                     $qb->andWhere('tblCategories.category IN (:categories)')
                        ->setParameter('categories', $v);
                      */
-                    $qb = ModUtil::apiFunc('«app.appName»', 'category', 'buildFilterClauses', array('qb' => $qb, 'ot' => '«name.formatForCode»', 'catids' => $v));
+                    $qb = ModUtil::apiFunc('app.appName', 'category', 'buildFilterClauses', array('qb' => $qb, 'ot' => 'name.formatForCode', 'catids' => $v));
                 } elseif ($k == 'searchterm') {
                     // quick search
                     if (!empty($v)) {
                         $qb = $this->addSearchFilter($qb, $v);
                     }
-                «IF hasBooleanFieldsEntity»
-                } elseif (in_array($k, array(«FOR field : getBooleanFieldsEntity SEPARATOR ', '»'«field.name.formatForCode»'«ENDFOR»))) {
+                IF hasBooleanFieldsEntity
+                } elseif (in_array($k, array(FOR field : getBooleanFieldsEntity SEPARATOR ', ''field.name.formatForCode'ENDFOR))) {
                     // boolean filter
                     if ($v == 'no') {
                         $qb->andWhere('tbl.' . $k . ' = 0');
                     } elseif ($v == 'yes' || $v == '1') {
                         $qb->andWhere('tbl.' . $k . ' = 1');
                     }
-                «ENDIF»
+                ENDIF
                 } else {
                     // field filter
                     if ((!is_numeric($v) && $v != '') || (is_numeric($v) && $v > 0)) {
@@ -906,42 +906,42 @@ class Repository {
         {
             $currentModule = ModUtil::getName();//FormUtil::getPassedValue('module', '', 'GETPOST');
             $currentLegacyControllerType = FormUtil::getPassedValue('lct', 'user', 'GETPOST');
-            if ($currentLegacyControllerType == 'admin' && $currentModule == '«app.appName»') {
+            if ($currentLegacyControllerType == 'admin' && $currentModule == 'app.appName') {
                 return $qb;
             }
 
             if (!in_array('workflowState', array_keys($parameters)) || empty($parameters['workflowState'])) {
-                // per default we show approved «nameMultiple.formatForDisplay» only
+                // per default we show approved nameMultiple.formatForDisplay only
                 $onlineStates = array('approved');
-                «IF ownerPermission»
-                    $showOnlyOwnEntries = (int) FormUtil::getPassedValue('own', ModUtil::getVar('«app.appName»', 'showOnlyOwnEntries', 0), 'GETPOST');
+                IF ownerPermission
+                    $showOnlyOwnEntries = (int) FormUtil::getPassedValue('own', ModUtil::getVar('app.appName', 'showOnlyOwnEntries', 0), 'GETPOST');
                     if ($showOnlyOwnEntries == 1) {
-                        // allow the owner to see his deferred «nameMultiple.formatForDisplay»
+                        // allow the owner to see his deferred nameMultiple.formatForDisplay
                         $onlineStates[] = 'deferred';
                     }
-                «ENDIF»
+                ENDIF
                 $qb->andWhere('tbl.workflowState IN (:onlineStates)')
                    ->setParameter('onlineStates', $onlineStates);
             }
-            «applyDefaultDateRangeFilter»
+            applyDefaultDateRangeFilter
 
             return $qb;
         }
     '''
 
     def private applyDefaultDateRangeFilter(Entity it) '''
-        «val startDateField = getStartDateField»
-        «val endDateField = getEndDateField»
-        «IF startDateField !== null»
-            $startDate = FormUtil::getPassedValue('«startDateField.name.formatForCode»', «startDateField.defaultValueForNow», 'GET');
-            $qb->andWhere('«whereClauseForDateRangeFilter('<=', startDateField, 'startDate')»')
+        val startDateField = getStartDateField
+        val endDateField = getEndDateField
+        IF startDateField !== null
+            $startDate = FormUtil::getPassedValue('startDateField.name.formatForCode', startDateField.defaultValueForNow, 'GET');
+            $qb->andWhere('whereClauseForDateRangeFilter('<=', startDateField, 'startDate')')
                ->setParameter('startDate', $startDate);
-        «ENDIF»
-        «IF endDateField !== null»
-            $endDate = FormUtil::getPassedValue('«endDateField.name.formatForCode»', «endDateField.defaultValueForNow», 'GET');
-            $qb->andWhere('«whereClauseForDateRangeFilter('>=', endDateField, 'endDate')»')
+        ENDIF
+        IF endDateField !== null
+            $endDate = FormUtil::getPassedValue('endDateField.name.formatForCode', endDateField.defaultValueForNow, 'GET');
+            $qb->andWhere('whereClauseForDateRangeFilter('>=', endDateField, 'endDate')')
                ->setParameter('endDate', $endDate);
-        «ENDIF»
+        ENDIF
     '''
 
     def private dispatch defaultValueForNow(EntityField it) '''""'''
@@ -953,9 +953,9 @@ class Repository {
     def private whereClauseForDateRangeFilter(Entity it, String operator, DerivedField dateField, String paramName) {
         val dateFieldName = dateField.name.formatForCode
         if (dateField.mandatory)
-            '''tbl.«dateFieldName» «operator» :«paramName»'''
+            '''tbl.dateFieldName operator :paramName'''
         else
-            '''(tbl.«dateFieldName» «operator» :«paramName» OR tbl.«dateFieldName» IS NULL)'''
+            '''(tbl.dateFieldName operator :paramName OR tbl.dateFieldName IS NULL)'''
     }
 
     def private selectSearch(Entity it) '''
@@ -976,7 +976,7 @@ class Repository {
             $qb = $this->genericBaseQuery('', $orderBy, $useJoins);
             if (count($exclude) > 0) {
                 $exclude = implode(', ', $exclude);
-                $qb->andWhere('tbl.«getFirstPrimaryKey.name.formatForCode» NOT IN (:excludeList)')«/* TODO fix composite keys */»
+                $qb->andWhere('tbl.getFirstPrimaryKey.name.formatForCode NOT IN (:excludeList)')/* TODO fix composite keys */
                    ->setParameter('excludeList', $exclude);
             }
 
@@ -984,13 +984,13 @@ class Repository {
 
             list($query, $count) = $this->getSelectWherePaginatedQuery($qb, $currentPage, $resultsPerPage);
 
-            «IF app.targets('1.3.5')»
+            IF app.targets('1.3.5')
                 $result = $this->retrieveCollectionResult($query, $orderBy, true);
 
                 return array($result, $count);
-            «ELSE»
+            ELSE
                 return $this->retrieveCollectionResult($query, $orderBy, true);
-            «ENDIF»
+            ENDIF
         }
 
         /**
@@ -1009,19 +1009,19 @@ class Repository {
 
             $fragmentIsNumeric = is_numeric($fragment);
 
-            «val searchFields = getDisplayFields.filter[isContainedInTextualSearch]»
-            «val searchFieldsNumeric = getDisplayFields.filter[isContainedInNumericSearch]»
+            val searchFields = getDisplayFields.filter[isContainedInTextualSearch]
+            val searchFieldsNumeric = getDisplayFields.filter[isContainedInNumericSearch]
             $where = '';
             if (!$fragmentIsNumeric) {
-                «FOR field : searchFields»
+                FOR field : searchFields
                     $where .= ((!empty($where)) ? ' OR ' : '');
-                    $where .= 'tbl.«field.name.formatForCode» «IF field.isTextSearch»LIKE \'%' . $fragment . '%\''«ELSE»= \'' . $fragment . '\''«ENDIF»;
-                «ENDFOR»
+                    $where .= 'tbl.field.name.formatForCode IF field.isTextSearchLIKE \'%' . $fragment . '%\''ELSE= \'' . $fragment . '\''ENDIF;
+                ENDFOR
             } else {
-                «FOR field : searchFieldsNumeric»
+                FOR field : searchFieldsNumeric
                     $where .= ((!empty($where)) ? ' OR ' : '');
-                    $where .= 'tbl.«field.name.formatForCode» «IF field.isTextSearch»LIKE \'%' . $fragment . '%\''«ELSE»= \'' . $fragment . '\''«ENDIF»;
-                «ENDFOR»
+                    $where .= 'tbl.field.name.formatForCode IF field.isTextSearchLIKE \'%' . $fragment . '%\''ELSE= \'' . $fragment . '\''ENDIF;
+                ENDFOR
             }
             $where = '(' . $where . ')';
 
@@ -1039,28 +1039,28 @@ class Repository {
          * @param string             $orderBy     The order-by clause to use when retrieving the collection (optional) (default='').
          * @param boolean            $isPaginated Whether the given query uses a paginator or not (optional) (default=false).
          *
-         * @return Array with retrieved collection«IF !app.targets('1.3.5')» and (for paginated queries) the amount of total records affected«ENDIF».
+         * @return Array with retrieved collectionIF !app.targets('1.3.5') and (for paginated queries) the amount of total records affectedENDIF.
          */
         public function retrieveCollectionResult(Query $query, $orderBy = '', $isPaginated = false)
         {
-            «IF app.targets('1.3.5')»
+            IF app.targets('1.3.5')
                 $result = $query->getResult();
-            «ELSE»
+            ELSE
                 if (!$isPaginated) {
                     $result = $query->getResult();
                 } else {
-                    «IF !(outgoing.filter(JoinRelationship).empty && incoming.filter(JoinRelationship).empty)»
+                    IF !(outgoing.filter(JoinRelationship).empty && incoming.filter(JoinRelationship).empty)
                         $paginator = new Paginator($query, true);
-                    «ELSE»
+                    ELSE
                         $paginator = new Paginator($query, false);
-                    «ENDIF»
+                    ENDIF
 
                     $count = count($paginator);
                     $result = $paginator;
                 }
-            «ENDIF»
+            ENDIF
 
-            «IF app.targets('1.3.5')»
+            IF app.targets('1.3.5')
                 if ($orderBy == 'RAND()') {
                     // each entry in $result looks like array(0 => actualRecord, 'randomIdentifiers' => randomId)
                     $resRaw = array();
@@ -1071,13 +1071,13 @@ class Repository {
                 }
 
                 return $result;
-            «ELSE»
+            ELSE
                 if (!$isPaginated) {
                     return $result;
                 } else {
                     return array($result, $count);
                 }
-            «ENDIF»
+            ENDIF
         }
     '''
 
@@ -1095,14 +1095,14 @@ class Repository {
         {
             $useJoins = false;
 
-            $selection = 'COUNT(tbl.«getFirstPrimaryKey.name.formatForCode») AS num«nameMultiple.formatForCodeCapital»';
+            $selection = 'COUNT(tbl.getFirstPrimaryKey.name.formatForCode) AS numnameMultiple.formatForCodeCapital';
             if ($useJoins === true) {
                 $selection .= $this->addJoinsToSelection();
             }
 
             $qb = $this->getEntityManager()->createQueryBuilder();
             $qb->select($selection)
-               ->from('«entityClassName('', false)»', 'tbl');
+               ->from('entityClassName('', false)', 'tbl');
 
             if ($useJoins === true) {
                 $this->addJoinsToFrom($qb);
@@ -1129,9 +1129,9 @@ class Repository {
             $qb = $this->applyDefaultFilters($qb, $parameters);
 
             $query = $qb->getQuery();
-            «IF hasPessimisticReadLock»
-                $query->setLockMode(LockMode::«lockType.lockTypeAsConstant»);
-            «ENDIF»
+            IF hasPessimisticReadLock
+                $query->setLockMode(LockMode::lockType.lockTypeAsConstant);
+            ENDIF
 
             return $query->getSingleScalarResult();
         }
@@ -1143,9 +1143,9 @@ class Repository {
          *
          * @param string $fieldName  The name of the property to be checked
          * @param string $fieldValue The value of the property to be checked
-         * @param int    $excludeId  Id of «nameMultiple.formatForDisplay» to exclude (optional).
+         * @param int    $excludeId  Id of nameMultiple.formatForDisplay to exclude (optional).
          *
-         * @return boolean result of this check, true if the given «name.formatForDisplay» does not already exist
+         * @return boolean result of this check, true if the given name.formatForDisplay does not already exist
          */
         public function detectUniqueState($fieldName, $fieldValue, $excludeId = 0)
         {
@@ -1157,9 +1157,9 @@ class Repository {
 
             $query = $qb->getQuery();
 
-            «IF hasPessimisticReadLock»
-                $query->setLockMode(LockMode::«lockType.lockTypeAsConstant»);
-            «ENDIF»
+            IF hasPessimisticReadLock
+                $query->setLockMode(LockMode::lockType.lockTypeAsConstant);
+            ENDIF
             $count = $query->getSingleScalarResult();
 
             return ($count == 0);
@@ -1185,11 +1185,11 @@ class Repository {
             if ($slimMode === true) {
                 // but for the slim version we select only the basic fields, and no joins
 
-                $selection = '«FOR pkField : getPrimaryKeyFields SEPARATOR ', '»tbl.«pkField.name.formatForCode»«ENDFOR»';
-                «addSelectionPartsForDisplayPattern»
-                «IF hasSluggableFields»
+                $selection = 'FOR pkField : getPrimaryKeyFields SEPARATOR ', 'tbl.pkField.name.formatForCodeENDFOR';
+                addSelectionPartsForDisplayPattern
+                IF hasSluggableFields
                     $selection .= ', tbl.slug';
-                «ENDIF»
+                ENDIF
                 $useJoins = false;
             }
 
@@ -1199,7 +1199,7 @@ class Repository {
 
             $qb = $this->getEntityManager()->createQueryBuilder();
             $qb->select($selection)
-               ->from('«entityClassName('', false)»', 'tbl');
+               ->from('entityClassName('', false)', 'tbl');
 
             if ($useJoins === true) {
                 $this->addJoinsToFrom($qb);
@@ -1213,14 +1213,14 @@ class Repository {
     '''
 
     def private addSelectionPartsForDisplayPattern(Entity it) '''
-        «val patternParts = displayPattern.split('#')»
-        «FOR patternPart : patternParts»
-            «/* check if patternPart equals a field name */»
-            «var matchedFields = fields.filter[name == patternPart]»
-            «IF (!matchedFields.empty || (geographical && (patternPart == 'latitude' || patternPart == 'longitude')))»
-                $selection .= ', tbl.«patternPart.formatForCode»';
-            «ENDIF»
-        «ENDFOR»
+        val patternParts = displayPattern.split('#')
+        FOR patternPart : patternParts
+            /* check if patternPart equals a field name */
+            var matchedFields = fields.filter[name == patternPart]
+            IF (!matchedFields.empty || (geographical && (patternPart == 'latitude' || patternPart == 'longitude')))
+                $selection .= ', tbl.patternPart.formatForCode';
+            ENDIF
+        ENDFOR
     '''
 
     def private genericBaseQueryWhere(Entity it) '''
@@ -1235,9 +1235,9 @@ class Repository {
         protected function genericBaseQueryAddWhere(QueryBuilder $qb, $where = '')
         {
             if (!empty($where)) {
-            «IF app.targets('1.3.5')»
+            IF app.targets('1.3.5')
                 $qb->where($where);
-            «ELSE»
+            ELSE
                 // Use FilterUtil to support generic filtering.
                 //$qb->where($where);
 
@@ -1252,9 +1252,9 @@ class Repository {
                     // If no plugin with default = true given the compare plugin is loaded and used for unconfigured fields.
                     // Multiple objects of the same plugin with different configurations are possible.
                     array(
-                        «IF !fields.filter(AbstractDateField).empty»
-                            new DateFilter(array(«FOR field : fields.filter(AbstractDateField) SEPARATOR ', '»'«field.name.formatForCode»'«ENDFOR»/*, 'tblJoin.someJoinedField'*/))
-                        «ENDIF»
+                        IF !fields.filter(AbstractDateField).empty
+                            new DateFilter(array(FOR field : fields.filter(AbstractDateField) SEPARATOR ', ''field.name.formatForCode'ENDFOR/*, 'tblJoin.someJoinedField'*/))
+                        ENDIF
                     ),
 
                     // Allowed operators per field.
@@ -1262,15 +1262,15 @@ class Repository {
                     // If a field is not set in this array all operators are allowed.
                     array()
                 );
-                «IF categorisable»
+                IF categorisable
 
                     // add category plugins dynamically for all existing registry properties
                     // we need to create one category plugin instance for each one
-                    $categoryProperties = ModUtil::apiFunc('«app.appName»', 'category', 'getAllProperties', array('ot' => '«name.formatForCode»'));
+                    $categoryProperties = ModUtil::apiFunc('app.appName', 'category', 'getAllProperties', array('ot' => 'name.formatForCode'));
                     foreach ($categoryProperties as $propertyName => $registryId) {
-                        $config['plugins'][] = new CategoryFilter('«app.appName»', $propertyName, 'categories' . ucfirst($propertyName));
+                        $config['plugins'][] = new CategoryFilter('app.appName', $propertyName, 'categories' . ucfirst($propertyName));
                     }
-                «ENDIF»
+                ENDIF
 
                 // Request object to obtain the filter string (only needed if the filter is set via GET or it reads values from GET).
                 // We do this not per default (for now) to prevent problems with explicite filters set by blocks or content types.
@@ -1294,17 +1294,17 @@ class Repository {
 
                 // now enrich the query builder
                 $filterUtil->enrichQuery();
-            «ENDIF»
+            ENDIF
             }
-            «IF standardFields»
+            IF standardFields
 
-                $showOnlyOwnEntries = (int) FormUtil::getPassedValue('own', ModUtil::getVar('«app.appName»', 'showOnlyOwnEntries', 0), 'GETPOST');
+                $showOnlyOwnEntries = (int) FormUtil::getPassedValue('own', ModUtil::getVar('app.appName', 'showOnlyOwnEntries', 0), 'GETPOST');
                 if ($showOnlyOwnEntries == 1) {
                     $uid = UserUtil::getVar('uid');
                     $qb->andWhere('tbl.createdUserId = :creator')
                        ->setParameter('creator', $uid);
                 }
-            «ENDIF»
+            ENDIF
 
             return $qb;
         }
@@ -1323,7 +1323,7 @@ class Repository {
         {
             if ($orderBy == 'RAND()') {
                 // random selection
-                $qb->addSelect('MOD(tbl.«getFirstPrimaryKey.name.formatForCode», ' . mt_rand(2, 15) . ') AS «IF !app.targets('1.3.5')»HIDDEN «ENDIF»randomIdentifiers')
+                $qb->addSelect('MOD(tbl.getFirstPrimaryKey.name.formatForCode, ' . mt_rand(2, 15) . ') AS IF !app.targets('1.3.5')HIDDEN ENDIFrandomIdentifiers')
                    ->add('orderBy', 'randomIdentifiers');
                 $orderBy = '';
             } elseif (empty($orderBy)) {
@@ -1353,18 +1353,18 @@ class Repository {
         public function getQueryFromBuilder(QueryBuilder $qb)
         {
             $query = $qb->getQuery();
-            «IF hasTranslatableFields»
+            IF hasTranslatableFields
 
                 // set the translation query hint
                 $query->setHint(
                     Query::HINT_CUSTOM_OUTPUT_WALKER,
                     'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
                 );
-            «ENDIF»
-            «IF hasPessimisticReadLock»
+            ENDIF
+            IF hasPessimisticReadLock
 
-                $query->setLockMode(LockMode::«lockType.lockTypeAsConstant»);
-            «ENDIF»
+                $query->setLockMode(LockMode::lockType.lockTypeAsConstant);
+            ENDIF
 
             return $query;
         }
@@ -1375,14 +1375,14 @@ class Repository {
             DerivedField : {
                 val joins = entity.incoming.filter(JoinRelationship).filter[e|formatForDB(e.getSourceFields.head) == name.formatForDB]
                 if (!joins.empty) '''
-                     '«joins.head.source.name.formatForCode»',
+                     'joins.head.source.name.formatForCode',
                      '''
                 else '''
-                     '«name.formatForCode»',
+                     'name.formatForCode',
                      '''
             }
             CalculatedField: '''
-                     '«name.formatForCode»',
+                     'name.formatForCode',
                      '''
         }
     }
@@ -1417,44 +1417,44 @@ class Repository {
     }
 
     def private extensionSortingFields(Entity it) '''
-        «IF geographical»
+        IF geographical
              'latitude',
              'longitude',
-        «ENDIF»
-        «IF softDeleteable && !app.targets('1.3.5')»
+        ENDIF
+        IF softDeleteable && !app.targets('1.3.5')
              'deletedAt',
-        «ENDIF»
-        «IF standardFields»
+        ENDIF
+        IF standardFields
              'createdUserId',
              'updatedUserId',
              'createdDate',
              'updatedDate',
-        «ENDIF»
+        ENDIF
     '''
 
     def private archiveObjects(Entity it) '''
         /**
-         * Update for «nameMultiple.formatForDisplay» becoming archived.
+         * Update for nameMultiple.formatForDisplay becoming archived.
          *
          * @return bool If everything went right or not.
-         «IF !app.targets('1.3.5')»
+         IF !app.targets('1.3.5')
          *
          * @throws RuntimeException Thrown if workflow action execution fails
-         «ENDIF»
+         ENDIF
          */
         public function archiveObjects()
         {
-            if (PageUtil::getVar('«app.appName»AutomaticArchiving', false) !== true && !SecurityUtil::checkPermission('«app.appName»', '.*', ACCESS_EDIT)) {
+            if (PageUtil::getVar('app.appNameAutomaticArchiving', false) !== true && !SecurityUtil::checkPermission('app.appName', '.*', ACCESS_EDIT)) {
                 // current user has no permission for executing the archive workflow action
                 return true;
             }
 
-            «val endField = getEndDateField»
-            «IF endField instanceof DatetimeField»
+            val endField = getEndDateField
+            IF endField instanceof DatetimeField
                 $today = date('Y-m-d H:i:s');
-            «ELSEIF endField instanceof DateField»
+            ELSEIF endField instanceof DateField
                 $today = date('Y-m-d') . ' 00:00:00';
-            «ENDIF»
+            ENDIF
 
             $qb = $this->genericBaseQuery('', '', false);
 
@@ -1463,7 +1463,7 @@ class Repository {
             $qb->andWhere('tbl.workflowState = :approvedState')
                ->setParameter('approvedState', 'approved');
 
-            $qb->andWhere('tbl.«endField.name.formatForCode» < :today')
+            $qb->andWhere('tbl.endField.name.formatForCode < :today')
                ->setParameter('today', $today);
 
             $query = $this->getQueryFromBuilder($qb);
@@ -1474,11 +1474,11 @@ class Repository {
 
             $currentLegacyControllerType = FormUtil::getPassedValue('lct', 'user', 'GETPOST');
             $action = 'archive';
-            «IF app.targets('1.3.5')»
-                $workflowHelper = new «app.appName»_Util_Workflow($serviceManager);
-            «ELSE»
-                $workflowHelper = $serviceManager->get('«app.appName.formatForDB».workflow_helper');
-            «ENDIF»
+            IF app.targets('1.3.5')
+                $workflowHelper = new app.appName_Util_Workflow($serviceManager);
+            ELSE
+                $workflowHelper = $serviceManager->get('app.appName.formatForDB.workflow_helper');
+            ENDIF
 
             foreach ($affectedEntities as $entity) {
                 $entity->initWorkflow();
@@ -1487,13 +1487,13 @@ class Repository {
 
                 // Let any hooks perform additional validation actions
                 $hookType = 'validate_edit';
-                «IF app.targets('1.3.5')»
+                IF app.targets('1.3.5')
                     $hook = new Zikula_ValidationHook($hookAreaPrefix . '.' . $hookType, new Zikula_Hook_ValidationProviders());
                     $validators = $serviceManager->getService('zikula.hookmanager')->notify($hook)->getValidators();
-                «ELSE»
+                ELSE
                     $hook = new ValidationHook(new ValidationProviders());
                     $validators = $serviceManager->get('hook_dispatcher')->dispatch($hookAreaPrefix . '.' . $hookType, $hook)->getValidators();
-                «ENDIF»
+                ENDIF
                 if ($validators->hasErrors()) {
                     continue;
                 }
@@ -1504,13 +1504,13 @@ class Repository {
                     $success = $workflowHelper->executeAction($entity, $action);
                 } catch(\Exception $e) {
                 	$dom = ZLanguage::getModuleDomain($this->name);
-                    «IF app.targets('1.3.5')»
+                    IF app.targets('1.3.5')
                         LogUtil::registerError(__f('Sorry, but an unknown error occured during the %s action. Please apply the changes again!', array($action), $dom));
-                    «ELSE»
+                    ELSE
                         $serviceManager = ServiceUtil::getManager();
                         $session = $serviceManager->get('session');
                         $session->getFlashBag()->add('error', __f('Sorry, but an unknown error occured during the %s action. Please apply the changes again!', array($action), $dom));
-                    «ENDIF»
+                    ENDIF
                 }
 
                 if (!$success) {
@@ -1520,18 +1520,18 @@ class Repository {
                 // Let any hooks know that we have updated an item
                 $hookType = 'process_edit';
                 $urlArgs = $entity->createUrlArgs();
-                $url = new «IF app.targets('1.3.5')»Zikula_«ENDIF»ModUrl($this->name, '«name.formatForCode»', 'display', ZLanguage::getLanguageCode(), $urlArgs);
-                «IF app.targets('1.3.5')»
+                $url = new IF app.targets('1.3.5')Zikula_ENDIFModUrl($this->name, 'name.formatForCode', 'display', ZLanguage::getLanguageCode(), $urlArgs);
+                IF app.targets('1.3.5')
                     $hook = new Zikula_ProcessHook($hookAreaPrefix . '.' . $hookType, $entity->createCompositeIdentifier(), $url);
                     $serviceManager->getService('zikula.hookmanager')->notify($hook);
-                «ELSE»
+                ELSE
                     $hook = new ProcessHook($entity->createCompositeIdentifier(), $url);
                     $serviceManager->get('hook_dispatcher')->dispatch($hookAreaPrefix . '.' . $hookType, $hook);
-                «ENDIF»
+                ENDIF
 
                 // An item was updated, so we clear all cached pages for this item.
                 $cacheArgs = array('ot' => $entity['_objectType'], 'item' => $entity);
-                ModUtil::apiFunc('«app.appName»', 'cache', 'clearItemCache', $cacheArgs);
+                ModUtil::apiFunc('app.appName', 'cache', 'clearItemCache', $cacheArgs);
             }
 
             return true;
@@ -1540,22 +1540,22 @@ class Repository {
 
 
     def private modelRepositoryImpl(Entity it) '''
-        «IF !app.targets('1.3.5')»
-            namespace «app.appNamespace»\Entity\Repository;
+        IF !app.targets('1.3.5')
+            namespace app.appNamespace\Entity\Repository;
 
-            use «app.appNamespace»\Entity\Repository\«IF isInheriting»«parentType.name.formatForCodeCapital»«ELSE»Base\«name.formatForCodeCapital»«ENDIF» as Base«IF isInheriting»«parentType.name.formatForCodeCapital»«ELSE»«name.formatForCodeCapital»«ENDIF»;
+            use app.appNamespace\Entity\Repository\IF isInheritingparentType.name.formatForCodeCapitalELSEBase\name.formatForCodeCapitalENDIF as BaseIF isInheritingparentType.name.formatForCodeCapitalELSEname.formatForCodeCapitalENDIF;
 
-        «ENDIF»
+        ENDIF
         /**
          * Repository class used to implement own convenience methods for performing certain DQL queries.
          *
-         * This is the concrete repository class for «name.formatForDisplay» entities.
+         * This is the concrete repository class for name.formatForDisplay entities.
          */
-        «IF app.targets('1.3.5')»
-        class «app.appName»_Entity_Repository_«name.formatForCodeCapital» extends «IF isInheriting»«app.appName»_Entity_Repository_«parentType.name.formatForCodeCapital»«ELSE»«app.appName»_Entity_Repository_Base_«name.formatForCodeCapital»«ENDIF»
-        «ELSE»
-        class «name.formatForCodeCapital» extends Base«IF isInheriting»«parentType.name.formatForCodeCapital»«ELSE»«name.formatForCodeCapital»«ENDIF»
-        «ENDIF»
+        IF app.targets('1.3.5')
+        class app.appName_Entity_Repository_name.formatForCodeCapital extends IF isInheritingapp.appName_Entity_Repository_parentType.name.formatForCodeCapitalELSEapp.appName_Entity_Repository_Base_name.formatForCodeCapitalENDIF
+        ELSE
+        class name.formatForCodeCapital extends BaseIF isInheritingparentType.name.formatForCodeCapitalELSEname.formatForCodeCapitalENDIF
+        ENDIF
         {
             // feel free to add your own methods here, like for example reusable DQL queries
         }

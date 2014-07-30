@@ -21,16 +21,16 @@ class FormatIcalText {
 
     def private formatIcalTextImpl(Application it) '''
         /**
-         * The «appName.formatForDB»FormatIcalText modifier outputs a given text for the ics output format.
+         * The appName.formatForDBFormatIcalText modifier outputs a given text for the ics output format.
          *
          * @param string $string The given output string.
          *
          * @return string Processed string for ics.
          */
-        function smarty_modifier_«appName.formatForDB»FormatIcalText($string)
+        function smarty_modifier_appName.formatForDBFormatIcalText($string)
         {
             $result = preg_replace('/<a href="(.*)">.*<\/a>/i', "$1", $string);
-            $result = str_replace("€", "Euro", $result);
+            $result = str_replace("", "Euro", $result);
             $result = ereg_replace("(\r\n|\n|\r)", "=0D=0A", $result);
 
             return ';LANGUAGE={usergetlang};ENCODING=QUOTED-PRINTABLE:' . $result . "\r\n";

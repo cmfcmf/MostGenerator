@@ -55,7 +55,7 @@ class EventListener {
     }
 */
     def private stubMethodsForNowBaseImpl(Entity it) '''
-«/*    def private eventListenerBaseImpl(PostLoad it) {*/»
+/*    def private eventListenerBaseImpl(PostLoad it) {*/
         /**
          * Post-Process the data after the entity has been constructed by the entity manager.
          * The event happens after the entity has been loaded from database or after a refresh call.
@@ -64,32 +64,32 @@ class EventListener {
          *     - no access to entity manager or unit of work apis
          *     - no access to associations (not initialised yet)
          *
-         * @see «entityClassName('', false)»::postLoadCallback()
+         * @see entityClassName('', false)::postLoadCallback()
          * @return boolean true if completed successfully else false.
-         «IF !container.application.targets('1.3.5')»
+         IF !container.application.targets('1.3.5')
          *
          * @throws RuntimeException Thrown if upload file base path retrieval fails
-         «ENDIF»
+         ENDIF
          */
         protected function performPostLoadCallback()
         {
             // echo 'loaded a record ...';
-            «postLoadImpl»
+            postLoadImpl
 
             $this->prepareItemActions();
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
 
                 $serviceManager = ServiceUtil::getManager();
                 $dispatcher = $serviceManager->get('event_dispatcher');
 
-                // create the new Filter«name.formatForCodeCapital»Event and dispatch it
-                $event = new Filter«name.formatForCodeCapital»Event($this);
-                $dispatcher->dispatch(«container.application.name.formatForCodeCapital»Events::«name.formatForDB.toUpperCase»_POST_LOAD, $event);
-            «ENDIF»
+                // create the new Filtername.formatForCodeCapitalEvent and dispatch it
+                $event = new Filtername.formatForCodeCapitalEvent($this);
+                $dispatcher->dispatch(container.application.name.formatForCodeCapitalEvents::name.formatForDB.toUpperCase_POST_LOAD, $event);
+            ENDIF
 
             return true;
         }
-        «IF !getDerivedFields.filter(AbstractStringField).empty»
+        IF !getDerivedFields.filter(AbstractStringField).empty
 
             /**
              * Formats a given textual field depending on it's actual kind of content.
@@ -139,8 +139,8 @@ class EventListener {
             {
                 return preg_match("/<[^<]+>/", $string, $m) != 0;
             }
-        «ENDIF»
-        «IF !getDerivedFields.filter(ObjectField).empty»
+        ENDIF
+        IF !getDerivedFields.filter(ObjectField).empty
 
             /**
              * Formats a given object field.
@@ -163,8 +163,8 @@ class EventListener {
 
                 $this[$fieldName] = (isset($this[$fieldName]) && !empty($this[$fieldName])) ? DataUtil::formatForDisplay($this[$fieldName]) : '';
             }
-        «ENDIF»
-«/*}*/»«/*    def private eventListenerBaseImpl(PrePersist it) {*/»
+        ENDIF
+/*}*//*    def private eventListenerBaseImpl(PrePersist it) {*/
         /**
          * Pre-Process the data prior to an insert operation.
          * The event happens before the entity managers persist operation is executed for this entity.
@@ -176,28 +176,28 @@ class EventListener {
          *       if this method is called by cascade persist
          *     - no creation of other entities allowed
          *
-         * @see «entityClassName('', false)»::prePersistCallback()
+         * @see entityClassName('', false)::prePersistCallback()
          * @return boolean true if completed successfully else false.
          */
         protected function performPrePersistCallback()
         {
             $this->validate();
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
 
                 $serviceManager = ServiceUtil::getManager();
                 $dispatcher = $serviceManager->get('event_dispatcher');
 
-                // create the new Filter«name.formatForCodeCapital»Event and dispatch it
-                $event = new Filter«name.formatForCodeCapital»Event($this);
-                $dispatcher->dispatch(«container.application.name.formatForCodeCapital»Events::«name.formatForDB.toUpperCase»_PRE_PERSIST, $event);
+                // create the new Filtername.formatForCodeCapitalEvent and dispatch it
+                $event = new Filtername.formatForCodeCapitalEvent($this);
+                $dispatcher->dispatch(container.application.name.formatForCodeCapitalEvents::name.formatForDB.toUpperCase_PRE_PERSIST, $event);
                 if ($event->isPropagationStopped()) {
                     return false;
                 }
-            «ENDIF»
+            ENDIF
 
             return true;
         }
-«/*}*/»«/*    def private eventListenerBaseImpl(PostPersist it) {*/»
+/*}*//*    def private eventListenerBaseImpl(PostPersist it) {*/
         /**
          * Post-Process the data after an insert operation.
          * The event happens after the entity has been made persistant.
@@ -207,27 +207,27 @@ class EventListener {
          * Restrictions:
          *     - no access to entity manager or unit of work apis
          *
-         * @see «entityClassName('', false)»::postPersistCallback()
+         * @see entityClassName('', false)::postPersistCallback()
          * @return boolean true if completed successfully else false.
          */
         protected function performPostPersistCallback()
         {
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
                 $serviceManager = ServiceUtil::getManager();
                 $objectId = $this->createCompositeIdentifier();
                 $logger = $serviceManager->get('logger');
-                $logger->debug('{app}: User {user} created the {entity} with id {id}.', array('app' => '«container.application.appName»', 'user' => UserUtil::getVar('uname'), 'entity' => '«name.formatForDisplay»', 'id' => $objectId));
+                $logger->debug('{app}: User {user} created the {entity} with id {id}.', array('app' => 'container.application.appName', 'user' => UserUtil::getVar('uname'), 'entity' => 'name.formatForDisplay', 'id' => $objectId));
 
                 $dispatcher = $serviceManager->get('event_dispatcher');
 
-                // create the new Filter«name.formatForCodeCapital»Event and dispatch it
-                $event = new Filter«name.formatForCodeCapital»Event($this);
-                $dispatcher->dispatch(«container.application.name.formatForCodeCapital»Events::«name.formatForDB.toUpperCase»_POST_PERSIST, $event);
+                // create the new Filtername.formatForCodeCapitalEvent and dispatch it
+                $event = new Filtername.formatForCodeCapitalEvent($this);
+                $dispatcher->dispatch(container.application.name.formatForCodeCapitalEvents::name.formatForDB.toUpperCase_POST_PERSIST, $event);
 
-            «ENDIF»
+            ENDIF
             return true;
         }
-«/*}*/»«/*    def private eventListenerBaseImpl(PreRemove it) {*/»
+/*}*//*    def private eventListenerBaseImpl(PreRemove it) {*/
         /**
          * Pre-Process the data prior a delete operation.
          * The event happens before the entity managers remove operation is executed for this entity.
@@ -236,40 +236,40 @@ class EventListener {
          *     - no access to entity manager or unit of work apis
          *     - will not be called for a DQL DELETE statement
          *
-         * @see «entityClassName('', false)»::preRemoveCallback()
+         * @see entityClassName('', false)::preRemoveCallback()
          * @return boolean true if completed successfully else false.
-         «IF !container.application.targets('1.3.5')»
+         IF !container.application.targets('1.3.5')
          *
          * @throws RuntimeException Thrown if workflow deletion fails
-         «ENDIF»
+         ENDIF
          */
         protected function performPreRemoveCallback()
         {
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
                 $serviceManager = ServiceUtil::getManager();
                 $dispatcher = $serviceManager->get('event_dispatcher');
 
-                // create the new Filter«name.formatForCodeCapital»Event and dispatch it
-                $event = new Filter«name.formatForCodeCapital»Event($this);
-                $dispatcher->dispatch(«container.application.name.formatForCodeCapital»Events::«name.formatForDB.toUpperCase»_PRE_REMOVE, $event);
+                // create the new Filtername.formatForCodeCapitalEvent and dispatch it
+                $event = new Filtername.formatForCodeCapitalEvent($this);
+                $dispatcher->dispatch(container.application.name.formatForCodeCapitalEvents::name.formatForDB.toUpperCase_PRE_REMOVE, $event);
                 if ($event->isPropagationStopped()) {
                     return false;
                 }
 
-            «ENDIF»
+            ENDIF
             // delete workflow for this entity
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
                 $serviceManager = ServiceUtil::getManager();
-                $workflowHelper = $serviceManager->get('«container.application.appName.formatForDB».workflow_helper');
+                $workflowHelper = $serviceManager->get('container.application.appName.formatForDB.workflow_helper');
                 $workflowHelper->normaliseWorkflowData($this);
-            «ENDIF»
+            ENDIF
             $workflow = $this['__WORKFLOW__'];
             if ($workflow['id'] > 0) {
-                «IF container.application.targets('1.3.5')»
+                IF container.application.targets('1.3.5')
                     $result = (bool) DBUtil::deleteObjectByID('workflows', $workflow['id']);
-                «ELSE»
+                ELSE
                     $serviceManager = ServiceUtil::getManager();
-                    $entityManager = $serviceManager->get«IF container.application.targets('1.3.5')»Service«ENDIF»('doctrine.entitymanager');
+                    $entityManager = $serviceManager->getIF container.application.targets('1.3.5')ServiceENDIF('doctrine.entitymanager');
                     $result = true;
                     try {
                         $workflow = $entityManager->find('Zikula\Core\Doctrine\Entity\WorkflowEntity', $workflow['id']);
@@ -278,22 +278,22 @@ class EventListener {
                     } catch (\Exception $e) {
                         $result = false;
                     }
-                «ENDIF»
+                ENDIF
                 if ($result === false) {
-                    $dom = ZLanguage::getModuleDomain('«container.application.appName»');
-                    «IF container.application.targets('1.3.5')»
+                    $dom = ZLanguage::getModuleDomain('container.application.appName');
+                    IF container.application.targets('1.3.5')
                         return LogUtil::registerError(__('Error! Could not remove stored workflow. Deletion has been aborted.', $dom));
-                    «ELSE»
+                    ELSE
                         $session = $serviceManager->get('session');
                         $session->getFlashBag()->add('error', __('Error! Could not remove stored workflow. Deletion has been aborted.', $dom));
                         return false;
-                    «ENDIF»
+                    ENDIF
                 }
             }
 
             return true;
         }
-«/*}*/»«/*    def private eventListenerBaseImpl(PostRemove it) {*/»
+/*}*//*    def private eventListenerBaseImpl(PostRemove it) {*/
         /**
          * Post-Process the data after a delete.
          * The event happens after the entity has been deleted.
@@ -303,53 +303,53 @@ class EventListener {
          *     - no access to entity manager or unit of work apis
          *     - will not be called for a DQL DELETE statement
          *
-         * @see «entityClassName('', false)»::postRemoveCallback()
+         * @see entityClassName('', false)::postRemoveCallback()
          * @return boolean true if completed successfully else false.
          */
         protected function performPostRemoveCallback()
         {
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
                 $serviceManager = ServiceUtil::getManager();
 
-            «ENDIF»
-            «IF it.hasUploadFieldsEntity || !container.application.targets('1.3.5')»
+            ENDIF
+            IF it.hasUploadFieldsEntity || !container.application.targets('1.3.5')
                 $objectId = $this->createCompositeIdentifier();
 
-            «ENDIF»
-            «IF it.hasUploadFieldsEntity»
-                «IF container.application.targets('1.3.5')»
+            ENDIF
+            IF it.hasUploadFieldsEntity
+                IF container.application.targets('1.3.5')
                     // initialise the upload handler
-                    $uploadManager = new «container.application.appName»_UploadHandler();
-                «ELSE»
+                    $uploadManager = new container.application.appName_UploadHandler();
+                ELSE
                     // retrieve the upload handler
-                    $uploadManager = $serviceManager->get('«container.application.appName.formatForDB».upload_handler');
-                «ENDIF»
+                    $uploadManager = $serviceManager->get('container.application.appName.formatForDB.upload_handler');
+                ENDIF
 
-                $uploadFields = array(«FOR uploadField : getUploadFieldsEntity SEPARATOR ', '»'«uploadField.name.formatForCode»'«ENDFOR»);
+                $uploadFields = array(FOR uploadField : getUploadFieldsEntity SEPARATOR ', ''uploadField.name.formatForCode'ENDFOR);
                 foreach ($uploadFields as $uploadField) {
                     if (empty($this->$uploadField)) {
                         continue;
                     }
 
                     // remove upload file (and image thumbnails)
-                    $uploadManager->deleteUploadFile('«it.name.formatForCode»', $this, $uploadField, $objectId);
+                    $uploadManager->deleteUploadFile('it.name.formatForCode', $this, $uploadField, $objectId);
                 }
-            «ENDIF»
-            «IF !container.application.targets('1.3.5')»
+            ENDIF
+            IF !container.application.targets('1.3.5')
 
                 $logger = $serviceManager->get('logger');
-                $logger->debug('{app}: User {user} removed the {entity} with id {id}.', array('app' => '«container.application.appName»', 'user' => UserUtil::getVar('uname'), 'entity' => '«name.formatForDisplay»', 'id' => $objectId));
+                $logger->debug('{app}: User {user} removed the {entity} with id {id}.', array('app' => 'container.application.appName', 'user' => UserUtil::getVar('uname'), 'entity' => 'name.formatForDisplay', 'id' => $objectId));
 
                 $dispatcher = $serviceManager->get('event_dispatcher');
 
-                // create the new Filter«name.formatForCodeCapital»Event and dispatch it
-                $event = new Filter«name.formatForCodeCapital»Event($this);
-                $dispatcher->dispatch(«container.application.name.formatForCodeCapital»Events::«name.formatForDB.toUpperCase»_POST_REMOVE, $event);
-            «ENDIF»
+                // create the new Filtername.formatForCodeCapitalEvent and dispatch it
+                $event = new Filtername.formatForCodeCapitalEvent($this);
+                $dispatcher->dispatch(container.application.name.formatForCodeCapitalEvents::name.formatForDB.toUpperCase_POST_REMOVE, $event);
+            ENDIF
 
             return true;
         }
-«/*}*/»«/*    def private eventListenerBaseImpl(PreUpdate it) {*/»
+/*}*//*    def private eventListenerBaseImpl(PreUpdate it) {*/
         /**
          * Pre-Process the data prior to an update operation.
          * The event happens before the database update operations for the entity data.
@@ -361,28 +361,28 @@ class EventListener {
          *     - changes on properties won't be recognized by flush as well
          *     - no creation of other entities allowed
          *
-         * @see «entityClassName('', false)»::preUpdateCallback()
+         * @see entityClassName('', false)::preUpdateCallback()
          * @return boolean true if completed successfully else false.
          */
         protected function performPreUpdateCallback()
         {
             $this->validate();
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
 
                 $serviceManager = ServiceUtil::getManager();
                 $dispatcher = $serviceManager->get('event_dispatcher');
 
-                // create the new Filter«name.formatForCodeCapital»Event and dispatch it
-                $event = new Filter«name.formatForCodeCapital»Event($this);
-                $dispatcher->dispatch(«container.application.name.formatForCodeCapital»Events::«name.formatForDB.toUpperCase»_PRE_UPDATE, $event);
+                // create the new Filtername.formatForCodeCapitalEvent and dispatch it
+                $event = new Filtername.formatForCodeCapitalEvent($this);
+                $dispatcher->dispatch(container.application.name.formatForCodeCapitalEvents::name.formatForDB.toUpperCase_PRE_UPDATE, $event);
                 if ($event->isPropagationStopped()) {
                     return false;
                 }
-            «ENDIF»
+            ENDIF
 
             return true;
         }
-«/*}*/»«/*    def private eventListenerBaseImpl(PostUpdate it) {*/»
+/*}*//*    def private eventListenerBaseImpl(PostUpdate it) {*/
         /**
          * Post-Process the data after an update operation.
          * The event happens after the database update operations for the entity data.
@@ -391,50 +391,50 @@ class EventListener {
          *     - no access to entity manager or unit of work apis
          *     - will not be called for a DQL UPDATE statement
          *
-         * @see «entityClassName('', false)»::postUpdateCallback()
+         * @see entityClassName('', false)::postUpdateCallback()
          * @return boolean true if completed successfully else false.
          */
         protected function performPostUpdateCallback()
         {
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
                 $serviceManager = ServiceUtil::getManager();
                 $objectId = $this->createCompositeIdentifier();
                 $logger = $serviceManager->get('logger');
-                $logger->debug('{app}: User {user} updated the {entity} with id {id}.', array('app' => '«container.application.appName»', 'user' => UserUtil::getVar('uname'), 'entity' => '«name.formatForDisplay»', 'id' => $objectId));
+                $logger->debug('{app}: User {user} updated the {entity} with id {id}.', array('app' => 'container.application.appName', 'user' => UserUtil::getVar('uname'), 'entity' => 'name.formatForDisplay', 'id' => $objectId));
 
                 $dispatcher = $serviceManager->get('event_dispatcher');
 
-                // create the new Filter«name.formatForCodeCapital»Event and dispatch it
-                $event = new Filter«name.formatForCodeCapital»Event($this);
-                $dispatcher->dispatch(«container.application.name.formatForCodeCapital»Events::«name.formatForDB.toUpperCase»_POST_UPDATE, $event);
+                // create the new Filtername.formatForCodeCapitalEvent and dispatch it
+                $event = new Filtername.formatForCodeCapitalEvent($this);
+                $dispatcher->dispatch(container.application.name.formatForCodeCapitalEvents::name.formatForDB.toUpperCase_POST_UPDATE, $event);
 
-            «ENDIF»
+            ENDIF
             return true;
         }
-«/*}*/»
+/*}*/
         /**
          * Pre-Process the data prior to a save operation.
          * This combines the PrePersist and PreUpdate events.
          * For more information see corresponding callback handlers.
          *
-         * @see «entityClassName('', false)»::preSaveCallback()
+         * @see entityClassName('', false)::preSaveCallback()
          * @return boolean true if completed successfully else false.
          */
         protected function performPreSaveCallback()
         {
             $this->validate();
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
 
                 $serviceManager = ServiceUtil::getManager();
                 $dispatcher = $serviceManager->get('event_dispatcher');
 
-                // create the new Filter«name.formatForCodeCapital»Event and dispatch it
-                $event = new Filter«name.formatForCodeCapital»Event($this);
-                $dispatcher->dispatch(«container.application.name.formatForCodeCapital»Events::«name.formatForDB.toUpperCase»_PRE_SAVE, $event);
+                // create the new Filtername.formatForCodeCapitalEvent and dispatch it
+                $event = new Filtername.formatForCodeCapitalEvent($this);
+                $dispatcher->dispatch(container.application.name.formatForCodeCapitalEvents::name.formatForDB.toUpperCase_PRE_SAVE, $event);
                 if ($event->isPropagationStopped()) {
                     return false;
                 }
-            «ENDIF»
+            ENDIF
 
             return true;
         }
@@ -444,122 +444,122 @@ class EventListener {
          * This combines the PostPersist and PostUpdate events.
          * For more information see corresponding callback handlers.
          *
-         * @see «entityClassName('', false)»::postSaveCallback()
+         * @see entityClassName('', false)::postSaveCallback()
          * @return boolean true if completed successfully else false.
          */
         protected function performPostSaveCallback()
         {
-            «IF !container.application.targets('1.3.5')»
+            IF !container.application.targets('1.3.5')
                 $serviceManager = ServiceUtil::getManager();
                 $objectId = $this->createCompositeIdentifier();
                 $logger = $serviceManager->get('logger');
-                $logger->debug('{app}: User {user} saved the {entity} with id {id}.', array('app' => '«container.application.appName»', 'user' => UserUtil::getVar('uname'), 'entity' => '«name.formatForDisplay»', 'id' => $objectId));
+                $logger->debug('{app}: User {user} saved the {entity} with id {id}.', array('app' => 'container.application.appName', 'user' => UserUtil::getVar('uname'), 'entity' => 'name.formatForDisplay', 'id' => $objectId));
 
                 $dispatcher = $serviceManager->get('event_dispatcher');
 
-                // create the new Filter«name.formatForCodeCapital»Event and dispatch it
-                $event = new Filter«name.formatForCodeCapital»Event($this);
-                $dispatcher->dispatch(«container.application.name.formatForCodeCapital»Events::«name.formatForDB.toUpperCase»_POST_SAVE, $event);
+                // create the new Filtername.formatForCodeCapitalEvent and dispatch it
+                $event = new Filtername.formatForCodeCapitalEvent($this);
+                $dispatcher->dispatch(container.application.name.formatForCodeCapitalEvents::name.formatForDB.toUpperCase_POST_SAVE, $event);
 
-            «ENDIF»
+            ENDIF
             return true;
         }
-«/*}*/»
+/*}*/
     '''
 
 
     def private stubMethodsForNowImpl(Entity it) '''
-«/*    def private eventListenerImpl(PostLoad it) {*/»
+/*    def private eventListenerImpl(PostLoad it) {*/
         /**
          * Post-Process the data after the entity has been constructed by the entity manager.
          *
          * @ORM\PostLoad
-         * @see «entityClassName('', false)»::performPostLoadCallback()
+         * @see entityClassName('', false)::performPostLoadCallback()
          * @return void.
          */
         public function postLoadCallback()
         {
             $this->performPostLoadCallback();
         }
-«/*}*/»«/*    def private eventListenerImpl(PrePersist it) {*/»
+/*}*//*    def private eventListenerImpl(PrePersist it) {*/
         /**
          * Pre-Process the data prior to an insert operation.
          *
          * @ORM\PrePersist
-         * @see «entityClassName('', false)»::performPrePersistCallback()
+         * @see entityClassName('', false)::performPrePersistCallback()
          * @return void.
          */
         public function prePersistCallback()
         {
             $this->performPrePersistCallback();
         }
-«/*}*/»«/*    def private eventListenerImpl(PostPersist it) {*/»
+/*}*//*    def private eventListenerImpl(PostPersist it) {*/
         /**
          * Post-Process the data after an insert operation.
          *
          * @ORM\PostPersist
-         * @see «entityClassName('', false)»::performPostPersistCallback()
+         * @see entityClassName('', false)::performPostPersistCallback()
          * @return void.
          */
         public function postPersistCallback()
         {
             $this->performPostPersistCallback();
         }
-«/*}*/»«/*    def private eventListenerImpl(PreRemove it) {*/»
+/*}*//*    def private eventListenerImpl(PreRemove it) {*/
         /**
          * Pre-Process the data prior a delete operation.
          *
          * @ORM\PreRemove
-         * @see «entityClassName('', false)»::performPreRemoveCallback()
+         * @see entityClassName('', false)::performPreRemoveCallback()
          * @return void.
          */
         public function preRemoveCallback()
         {
             $this->performPreRemoveCallback();
         }
-«/*}*/»«/*    def private eventListenerImpl(PostRemove it) {*/»
+/*}*//*    def private eventListenerImpl(PostRemove it) {*/
         /**
          * Post-Process the data after a delete.
          *
          * @ORM\PostRemove
-         * @see «entityClassName('', false)»::performPostRemoveCallback()
+         * @see entityClassName('', false)::performPostRemoveCallback()
          * @return void
          */
         public function postRemoveCallback()
         {
             $this->performPostRemoveCallback();
         }
-«/*}*/»«/*    def private eventListenerImpl(PreUpdate it) {*/»
+/*}*//*    def private eventListenerImpl(PreUpdate it) {*/
         /**
          * Pre-Process the data prior to an update operation.
          *
          * @ORM\PreUpdate
-         * @see «entityClassName('', false)»::performPreUpdateCallback()
+         * @see entityClassName('', false)::performPreUpdateCallback()
          * @return void.
          */
         public function preUpdateCallback()
         {
             $this->performPreUpdateCallback();
         }
-«/*}*/»«/*    def private eventListenerImpl(PostUpdate it) {*/»
+/*}*//*    def private eventListenerImpl(PostUpdate it) {*/
         /**
          * Post-Process the data after an update operation.
          *
          * @ORM\PostUpdate
-         * @see «entityClassName('', false)»::performPostUpdateCallback()
+         * @see entityClassName('', false)::performPostUpdateCallback()
          * @return void.
          */
         public function postUpdateCallback()
         {
             $this->performPostUpdateCallback();
         }
-«/*}*/»
+/*}*/
         /**
          * Pre-Process the data prior to a save operation.
          *
          * @ORM\PrePersist
          * @ORM\PreUpdate
-         * @see «entityClassName('', false)»::performPreSaveCallback()
+         * @see entityClassName('', false)::performPreSaveCallback()
          * @return void.
          */
         public function preSaveCallback()
@@ -572,56 +572,56 @@ class EventListener {
          *
          * @ORM\PostPersist
          * @ORM\PostUpdate
-         * @see «entityClassName('', false)»::performPostSaveCallback()
+         * @see entityClassName('', false)::performPostSaveCallback()
          * @return void.
          */
         public function postSaveCallback()
         {
             $this->performPostSaveCallback();
         }
-«/*}*/»
+/*}*/
     '''
 
 
     def private postLoadImpl(Entity it/* PostLoad it */) '''
-        «val app = container.application»
-        $currentFunc = FormUtil::getPassedValue('func', '«IF app.targets('1.3.5')»main«ELSE»index«ENDIF»', 'GETPOST', FILTER_SANITIZE_STRING);
-        «IF app.targets('1.3.5')»
+        val app = container.application
+        $currentFunc = FormUtil::getPassedValue('func', 'IF app.targets('1.3.5')mainELSEindexENDIF', 'GETPOST', FILTER_SANITIZE_STRING);
+        IF app.targets('1.3.5')
             $usesCsvOutput = FormUtil::getPassedValue('usecsvext', false, 'GETPOST', FILTER_VALIDATE_BOOLEAN);
-        «ELSE»
+        ELSE
             $serviceManager = ServiceUtil::getManager();
             $requestStack = $serviceManager->get('request_stack');
             $usesCsvOutput = $requestStack->getCurrentRequest()->getRequestFormat() == 'csv' ? true : false;
-        «ENDIF»
-        «IF hasUploadFieldsEntity»
+        ENDIF
+        IF hasUploadFieldsEntity
 
             // initialise the upload handler
-            «IF app.targets('1.3.5')»
-                $uploadManager = new «app.appName»_UploadHandler();
-            «ELSE»
-                $uploadManager = $serviceManager->get('«app.appName.formatForDB».upload_handler');
-            «ENDIF»
-            «IF app.targets('1.3.5')»
+            IF app.targets('1.3.5')
+                $uploadManager = new app.appName_UploadHandler();
+            ELSE
+                $uploadManager = $serviceManager->get('app.appName.formatForDB.upload_handler');
+            ENDIF
+            IF app.targets('1.3.5')
                 $serviceManager = ServiceUtil::getManager();
-                $controllerHelper = new «app.appName»_Util_Controller($serviceManager);
-            «ELSE»
-                $controllerHelper = $serviceManager->get('«app.appName.formatForDB».controller_helper');
-            «ENDIF»
-        «ENDIF»
+                $controllerHelper = new app.appName_Util_Controller($serviceManager);
+            ELSE
+                $controllerHelper = $serviceManager->get('app.appName.formatForDB.controller_helper');
+            ENDIF
+        ENDIF
 
-        «FOR field : fields»«field.sanitizeForOutput»«ENDFOR»
+        FOR field : fieldsfield.sanitizeForOutputENDFOR
     '''
 
     def private sanitizeForOutput(EntityField it) {
         switch it {
             BooleanField: '''
-                             $this['«name.formatForCode»'] = (bool) $this['«name.formatForCode»'];
+                             $this['name.formatForCode'] = (bool) $this['name.formatForCode'];
                          '''
             AbstractIntegerField: '''
-                             $this['«name.formatForCode»'] = (int) ((isset($this['«name.formatForCode»']) && !empty($this['«name.formatForCode»'])) ? DataUtil::formatForDisplay($this['«name.formatForCode»']) : 0);
+                             $this['name.formatForCode'] = (int) ((isset($this['name.formatForCode']) && !empty($this['name.formatForCode'])) ? DataUtil::formatForDisplay($this['name.formatForCode']) : 0);
                          '''
             DecimalField: '''
-                             $this['«name.formatForCode»'] = (float) ((isset($this['«name.formatForCode»']) && !empty($this['«name.formatForCode»'])) ? DataUtil::formatForDisplay($this['«name.formatForCode»']) : 0.00);
+                             $this['name.formatForCode'] = (float) ((isset($this['name.formatForCode']) && !empty($this['name.formatForCode'])) ? DataUtil::formatForDisplay($this['name.formatForCode']) : 0.00);
                          '''
             StringField: sanitizeForOutputHTML
             TextField: sanitizeForOutputHTML
@@ -629,53 +629,53 @@ class EventListener {
             ListField: sanitizeForOutputHTMLWithZero
             UploadField: sanitizeForOutputUpload
             ArrayField: '''
-                            $this['«name.formatForCode»'] = ((isset($this['«name.formatForCode»']) && is_array($this['«name.formatForCode»'])) ? DataUtil::formatForDisplay($this['«name.formatForCode»']) : array());
+                            $this['name.formatForCode'] = ((isset($this['name.formatForCode']) && is_array($this['name.formatForCode'])) ? DataUtil::formatForDisplay($this['name.formatForCode']) : array());
                          '''
             ObjectField: '''
-                            $this->formatObjectField('«it.name.formatForCode»', $currentFunc, $usesCsvOutput);
+                            $this->formatObjectField('it.name.formatForCode', $currentFunc, $usesCsvOutput);
             '''
             AbstractDateField: ''
             FloatField: '''
-                            $this['«name.formatForCode»'] = (float) ((isset($this['«name.formatForCode»']) && !empty($this['«name.formatForCode»'])) ? DataUtil::formatForDisplay($this['«name.formatForCode»']) : 0.00);
+                            $this['name.formatForCode'] = (float) ((isset($this['name.formatForCode']) && !empty($this['name.formatForCode'])) ? DataUtil::formatForDisplay($this['name.formatForCode']) : 0.00);
                          '''
             default: '''
-                            $this['«it.name.formatForCode»'] = ((isset($this['«it.name.formatForCode»']) && !empty($this['«it.name.formatForCode»'])) ? DataUtil::formatForDisplay($this['«it.name.formatForCode»']) : '');
+                            $this['it.name.formatForCode'] = ((isset($this['it.name.formatForCode']) && !empty($this['it.name.formatForCode'])) ? DataUtil::formatForDisplay($this['it.name.formatForCode']) : '');
                     '''
         }
     }
 
     def private sanitizeForOutputHTML(EntityField it) '''
-        $this->formatTextualField('«it.name.formatForCode»', $currentFunc, $usesCsvOutput);
+        $this->formatTextualField('it.name.formatForCode', $currentFunc, $usesCsvOutput);
     '''
 
     def private sanitizeForOutputHTMLWithZero(EntityField it) '''
-        $this->formatTextualField('«it.name.formatForCode»', $currentFunc, $usesCsvOutput, true);
+        $this->formatTextualField('it.name.formatForCode', $currentFunc, $usesCsvOutput, true);
     '''
 
     def private sanitizeForOutputUpload(UploadField it) '''
-        «val realName = name.formatForCode»
-        if (!empty($this['«realName»'])) {
+        val realName = name.formatForCode
+        if (!empty($this['realName'])) {
             try {
-                $basePath = $controllerHelper->getFileBaseFolder('«entity.name.formatForCode»', '«realName»');
+                $basePath = $controllerHelper->getFileBaseFolder('entity.name.formatForCode', 'realName');
             } catch (\Exception $e) {
-                «IF entity.container.application.targets('1.3.5')»
+                IF entity.container.application.targets('1.3.5')
                     return LogUtil::registerError($e->getMessage());
-                «ELSE»
+                ELSE
                     $serviceManager = ServiceUtil::getManager();
                     $session = $serviceManager->get('session');
                     $session->getFlashBag()->add('error', $e->getMessage());
                     return false;
-                «ENDIF»
+                ENDIF
             }
 
-            $fullPath = $basePath .  $this['«realName»'];
-            $this['«realName»FullPath'] = $fullPath;
-            $this['«realName»FullPathURL'] = System::getBaseUrl() . $fullPath;
+            $fullPath = $basePath .  $this['realName'];
+            $this['realNameFullPath'] = $fullPath;
+            $this['realNameFullPathURL'] = System::getBaseUrl() . $fullPath;
 
-            // just some backwards compatibility stuff«/*TODO: remove somewhen*/»
-            /*if (!isset($this['«realName»Meta']) || !is_array($this['«realName»Meta']) || !count($this['«realName»Meta'])) {
+            // just some backwards compatibility stuff/*TODO: remove somewhen*/
+            /*if (!isset($this['realNameMeta']) || !is_array($this['realNameMeta']) || !count($this['realNameMeta'])) {
                 // assign new meta data
-                $this['«realName»Meta'] = $uploadManager->readMetaDataForFile($this['«realName»'], $fullPath);
+                $this['realNameMeta'] = $uploadManager->readMetaDataForFile($this['realName'], $fullPath);
             }*/
         }
     '''

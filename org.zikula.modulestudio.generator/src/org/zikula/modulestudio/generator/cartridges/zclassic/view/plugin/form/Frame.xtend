@@ -28,17 +28,17 @@ class Frame {
     }
 
     def private formFrameImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Form\Plugin;
+        IF !targets('1.3.5')
+            namespace appNamespace\Form\Plugin;
 
             use Zikula_Form_AbstractPlugin;
             use Zikula_Form_View;
 
-        «ENDIF»
+        ENDIF
         /**
          * Wrapper class for styling <div> elements and a validation summary.
          */
-        class «IF targets('1.3.5')»«appName»_Form_Plugin_«ENDIF»FormFrame extends Zikula_Form_AbstractPlugin
+        class IF targets('1.3.5')appName_Form_Plugin_ENDIFFormFrame extends Zikula_Form_AbstractPlugin
         {
             /**
              * Whether a tabbed panel should be used or not.
@@ -97,7 +97,7 @@ class Frame {
             {
                 $tabClass = $this->useTabs ? ' ' . $this->cssClass : '';
 
-                return '<div class="«appName.toLowerCase»-form' . $tabClass . '">' . "\n";
+                return '<div class="appName.toLowerCase-form' . $tabClass . '">' . "\n";
             }
 
             /**
@@ -118,7 +118,7 @@ class Frame {
 
     def private formFramePluginImpl(Application it) '''
         /**
-         * The «appName.formatForDB»FormFrame plugin adds styling <div> elements and a validation summary.
+         * The appName.formatForDBFormFrame plugin adds styling <div> elements and a validation summary.
          *
          * Available parameters:
          *   - assign:   If set, the results are assigned to the corresponding variable instead of printed out.
@@ -129,7 +129,7 @@ class Frame {
          *
          * @return string The output of the plugin.
          */
-        function smarty_block_«appName.formatForDB»FormFrame($params, $content, $view)
+        function smarty_block_appName.formatForDBFormFrame($params, $content, $view)
         {
             // As with all Forms plugins, we must remember to register our plugin.
             // In this case we also register a validation summary so we don't have to
@@ -137,7 +137,7 @@ class Frame {
 
             // We need to concatenate the output of boths plugins.
             $result = $view->registerPlugin('\\Zikula_Form_Plugin_ValidationSummary', $params);
-            $result .= $view->registerBlock('«IF targets('1.3.5')»«appName»_Form_Plugin_FormFrame«ELSE»\\«vendor.formatForCodeCapital»\\«name.formatForCodeCapital»Module\\Form\\Plugin\\FormFrame«ENDIF»', $params, $content);
+            $result .= $view->registerBlock('IF targets('1.3.5')appName_Form_Plugin_FormFrameELSE\\vendor.formatForCodeCapital\\name.formatForCodeCapitalModule\\Form\\Plugin\\FormFrameENDIF', $params, $content);
 
             return $result;
         }

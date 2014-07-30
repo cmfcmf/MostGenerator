@@ -29,25 +29,25 @@ class ListEntries {
     }
 
     def private listFieldFunctionsBaseImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Util\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Util\Base;
 
             use Zikula_AbstractBase;
-        «ENDIF»
+        ENDIF
         /**
          * Utility base class for list field entries related methods.
          */
-        class «IF targets('1.3.5')»«appName»_Util_Base_ListEntries«ELSE»ListEntriesUtil«ENDIF» extends Zikula_AbstractBase
+        class IF targets('1.3.5')appName_Util_Base_ListEntriesELSEListEntriesUtilENDIF extends Zikula_AbstractBase
         {
-            «resolve»
+            resolve
 
-            «extractMultiList»
+            extractMultiList
 
-            «hasMultipleSelection»
+            hasMultipleSelection
 
-            «getEntries»
+            getEntries
 
-            «additions»
+            additions
         }
     '''
 
@@ -144,17 +144,17 @@ class ListEntries {
 
             $result = false;
             switch ($objectType) {
-                «FOR entity : getAllEntities.filter[hasListFieldsEntity]»
-                    case '«entity.name.formatForCode»':
+                FOR entity : getAllEntities.filter[hasListFieldsEntity]
+                    case 'entity.name.formatForCode':
                         switch ($fieldName) {
-                            «FOR listField : entity.getListFieldsEntity»
-                                case '«listField.name.formatForCode»':
-                                    $result = «listField.multiple.displayBool»;
+                            FOR listField : entity.getListFieldsEntity
+                                case 'listField.name.formatForCode':
+                                    $result = listField.multiple.displayBool;
                                     break;
-                            «ENDFOR»
+                            ENDFOR
                         }
                         break;
-                «ENDFOR»
+                ENDFOR
             }
 
             return $result;
@@ -179,17 +179,17 @@ class ListEntries {
 
             $entries = array();
             switch ($objectType) {
-                «FOR entity : getAllEntities.filter[hasListFieldsEntity]»
-                    case '«entity.name.formatForCode»':
+                FOR entity : getAllEntities.filter[hasListFieldsEntity]
+                    case 'entity.name.formatForCode':
                         switch ($fieldName) {
-                            «FOR listField : entity.getListFieldsEntity»
-                                case '«listField.name.formatForCode»':
-                                    $entries = $this->get«listField.name.formatForCodeCapital»EntriesFor«entity.name.formatForCodeCapital»();
+                            FOR listField : entity.getListFieldsEntity
+                                case 'listField.name.formatForCode':
+                                    $entries = $this->getlistField.name.formatForCodeCapitalEntriesForentity.name.formatForCodeCapital();
                                     break;
-                            «ENDFOR»
+                            ENDFOR
                         }
                         break;
-                «ENDFOR»
+                ENDFOR
             }
 
             return $entries;
@@ -197,64 +197,64 @@ class ListEntries {
     '''
 
     def private additions(Application it) '''
-        «FOR listField : getAllListFields»
+        FOR listField : getAllListFields
 
-            «listField.getItemsImpl»
-        «ENDFOR»
+            listField.getItemsImpl
+        ENDFOR
     '''
 
     def private getItemsImpl(ListField it) '''
         /**
-         * Get '«name.formatForDisplay»' list entries.
+         * Get 'name.formatForDisplay' list entries.
          *
          * @return array Array with desired list entries.
          */
-        public function get«name.formatForCodeCapital»EntriesFor«entity.name.formatForCodeCapital»()
+        public function getname.formatForCodeCapitalEntriesForentity.name.formatForCodeCapital()
         {
             $states = array();
-            «IF name == 'workflowState'»
-                «val visibleStates = items.filter[value != 'initial' && value != 'deleted']»
-                «FOR item : visibleStates»«item.entryInfo»«ENDFOR»
-                «FOR item : visibleStates»«item.entryInfoNegative»«ENDFOR»
-            «ELSE»
-                «FOR item : items»«item.entryInfo»«ENDFOR»
-            «ENDIF»
+            IF name == 'workflowState'
+                val visibleStates = items.filter[value != 'initial' && value != 'deleted']
+                FOR item : visibleStatesitem.entryInfoENDFOR
+                FOR item : visibleStatesitem.entryInfoNegativeENDFOR
+            ELSE
+                FOR item : itemsitem.entryInfoENDFOR
+            ENDIF
 
             return $states;
         }
     '''
 
     def private entryInfo(ListFieldItem it) '''
-        $states[] = array('value'   => '«value.replace("'", "")»',
-                          'text'    => $this->__('«name.formatForDisplayCapital.replace("'", "")»'),
-                          'title'   => «IF documentation !== null && documentation != ''»$this->__('«documentation.replace("'", "")»')«ELSE»''«ENDIF»,
-                          'image'   => '«IF image !== null && image != ''»«image».png«ENDIF»',
-                          'default' => «^default.displayBool»);
+        $states[] = array('value'   => 'value.replace("'", "")',
+                          'text'    => $this->__('name.formatForDisplayCapital.replace("'", "")'),
+                          'title'   => IF documentation !== null && documentation != ''$this->__('documentation.replace("'", "")')ELSE''ENDIF,
+                          'image'   => 'IF image !== null && image != ''image.pngENDIF',
+                          'default' => ^default.displayBool);
     '''
 
     def private entryInfoNegative(ListFieldItem it) '''
-        $states[] = array('value'   => '!«value.replace("'", "")»',
-                          'text'    => $this->__('All except «name.formatForDisplay.replace("'", "")»'),
-                          'title'   => $this->__('Shows all items except these which are «name.formatForDisplay.replace("'", "")»'),
+        $states[] = array('value'   => '!value.replace("'", "")',
+                          'text'    => $this->__('All except name.formatForDisplay.replace("'", "")'),
+                          'title'   => $this->__('Shows all items except these which are name.formatForDisplay.replace("'", "")'),
                           'image'   => '',
                           'default' => false);
     '''
 
     def private listFieldFunctionsImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Util;
+        IF !targets('1.3.5')
+            namespace appNamespace\Util;
 
-            use «appNamespace»\Util\Base\ListEntriesUtil as BaseListEntriesUtil;
+            use appNamespace\Util\Base\ListEntriesUtil as BaseListEntriesUtil;
 
-        «ENDIF»
+        ENDIF
         /**
          * Utility implementation class for list field entries related methods.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Util_ListEntries extends «appName»_Util_Base_ListEntries
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Util_ListEntries extends appName_Util_Base_ListEntries
+        ELSE
         class ListEntriesUtil extends BaseListEntriesUtil
-        «ENDIF»
+        ENDIF
         {
             // feel free to add your own convenience methods here
         }

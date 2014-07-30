@@ -39,25 +39,25 @@ class Translatable {
     }
 
     def private translatableFunctionsBaseImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Util\Base;
+        IF !targets('1.3.5')
+            namespace appNamespace\Util\Base;
 
             use ServiceUtil;
             use System;
             use Zikula_AbstractBase;
             use ZLanguage;
 
-        «ENDIF»
+        ENDIF
         /**
          * Utility base class for translatable helper methods.
          */
-        class «IF targets('1.3.5')»«appName»_Util_Base_Translatable«ELSE»TranslatableUtil«ENDIF» extends Zikula_AbstractBase
+        class IF targets('1.3.5')appName_Util_Base_TranslatableELSETranslatableUtilENDIF extends Zikula_AbstractBase
         {
-            «getTranslatableFieldsImpl»
+            getTranslatableFieldsImpl
 
-            «prepareEntityForEdit»
+            prepareEntityForEdit
 
-            «processEntityAfterEdit»
+            processEntityAfterEdit
         }
     '''
 
@@ -75,9 +75,9 @@ class Translatable {
         {
             $fields = array();
             switch ($objectType) {
-                «FOR entity : getTranslatableEntities»
-                    «entity.translatableFieldList»
-                «ENDFOR»
+                FOR entity : getTranslatableEntities
+                    entity.translatableFieldList
+                ENDFOR
             }
 
             return $fields;
@@ -116,17 +116,17 @@ class Translatable {
             }
 
             // prepare form data to edit multiple translations at once
-            «IF targets('1.3.5')»
-                $entityManager = $this->serviceManager->get«IF targets('1.3.5')»Service«ENDIF»('doctrine.entitymanager');
-            «ENDIF»
+            IF targets('1.3.5')
+                $entityManager = $this->serviceManager->getIF targets('1.3.5')ServiceENDIF('doctrine.entitymanager');
+            ENDIF
 
             // get translations
-            «IF targets('1.3.5')»
-                $entityClass = '«appName»_Entity_' . ucfirst($objectType) . 'Translation';
+            IF targets('1.3.5')
+                $entityClass = 'appName_Entity_' . ucfirst($objectType) . 'Translation';
                 $repository = $entityManager->getRepository($entityClass);
-            «ELSE»
-                $repository = $this->serviceManager->get('«appName.formatForDB».' . $objectType . '_factory')->getRepository();
-            «ENDIF»
+            ELSE
+                $repository = $this->serviceManager->get('appName.formatForDB.' . $objectType . '_factory')->getRepository();
+            ENDIF
             $entityTranslations = $repository->findTranslations($entity);
 
             $supportedLocales = ZLanguage::getInstalledLanguages();
@@ -205,27 +205,27 @@ class Translatable {
     '''
 
     def private translatableFieldList(Entity it) '''
-            case '«name.formatForCode»':
+            case 'name.formatForCode':
                 $fields = array(
-                    «translatableFieldDefinition»
+                    translatableFieldDefinition
                 );
                 break;
     '''
 
     def private translatableFieldDefinition(Entity it) '''
-        «FOR field : getTranslatableFields SEPARATOR ','»«field.translatableFieldDefinition»«ENDFOR»
-«/*no slug input element yet, see https://github.com/l3pp4rd/DoctrineExtensions/issues/140
-«IF hasTranslatableSlug»,
+        FOR field : getTranslatableFields SEPARATOR ','field.translatableFieldDefinitionENDFOR
+/*no slug input element yet, see https://github.com/l3pp4rd/DoctrineExtensions/issues/140
+IF hasTranslatableSlug,
                     array('name' => 'slug',
                           'default' => '')
-«ENDIF»*/»
+ENDIF*/
     '''
 
     def private translatableFieldDefinition(EntityField it) {
         switch it {
             BooleanField: '''
-                    array('name' => '«name»',
-                          'default' => «IF it.defaultValue !== null && it.defaultValue != ''»«(it.defaultValue == 'true').displayBool»«ELSE»false«ENDIF»)'''
+                    array('name' => 'name',
+                          'default' => IF it.defaultValue !== null && it.defaultValue != ''(it.defaultValue == 'true').displayBoolELSEfalseENDIF)'''
             AbstractIntegerField: translatableFieldDefinitionNumeric
             DecimalField: translatableFieldDefinitionNumeric
             FloatField: translatableFieldDefinitionNumeric
@@ -233,40 +233,40 @@ class Translatable {
             ArrayField: translatableFieldDefinitionNoDefault
             ObjectField: translatableFieldDefinitionNoDefault
             AbstractDateField: '''
-                    array('name' => '«name»',
-                          'default' => '«IF it.defaultValue !== null && it.defaultValue != ''»«it.defaultValue»«ENDIF»')'''
+                    array('name' => 'name',
+                          'default' => 'IF it.defaultValue !== null && it.defaultValue != ''it.defaultValueENDIF')'''
             DerivedField: '''
-                    array('name' => '«name»',
-                          'default' => $this->__('«IF it.defaultValue !== null && it.defaultValue != ''»«it.defaultValue»«ELSE»«name.formatForDisplayCapital»«ENDIF»'))'''
+                    array('name' => 'name',
+                          'default' => $this->__('IF it.defaultValue !== null && it.defaultValue != ''it.defaultValueELSEname.formatForDisplayCapitalENDIF'))'''
             CalculatedField: '''
-                    array('name'    => '«name»',
-                          'default' => $this->__('«name.formatForDisplayCapital»'))'''
+                    array('name'    => 'name',
+                          'default' => $this->__('name.formatForDisplayCapital'))'''
         }
     }
 
     def private translatableFieldDefinitionNumeric(DerivedField it) '''
-                    array('name' => '«name»',
+                    array('name' => 'name',
                           'default' => 0)'''
 
     def private translatableFieldDefinitionNoDefault(DerivedField it) '''
-                    array('name' => '«name»',
+                    array('name' => 'name',
                           'default' => '')'''
 
     def private translatableFunctionsImpl(Application it) '''
-        «IF !targets('1.3.5')»
-            namespace «appNamespace»\Util;
+        IF !targets('1.3.5')
+            namespace appNamespace\Util;
 
-            use «appNamespace»\Util\Base\TranslatableUtil as BaseTranslatableUtil;
+            use appNamespace\Util\Base\TranslatableUtil as BaseTranslatableUtil;
 
-        «ENDIF»
+        ENDIF
         /**
          * Utility implementation class for translatable helper methods.
          */
-        «IF targets('1.3.5')»
-        class «appName»_Util_Translatable extends «appName»_Util_Base_Translatable
-        «ELSE»
+        IF targets('1.3.5')
+        class appName_Util_Translatable extends appName_Util_Base_Translatable
+        ELSE
         class TranslatableUtil extends BaseTranslatableUtil
-        «ENDIF»
+        ENDIF
         {
             // feel free to add your own convenience methods here
         }

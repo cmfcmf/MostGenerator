@@ -39,29 +39,29 @@ class Categories {
         {* purpose of this template: reusable display of entity categories *}
         {if isset($obj.categories)}
             {if isset($panel) && $panel eq true}
-                «IF targets('1.3.5')»
-                    <h3 class="categories z-panel-header z-panel-indicator «IF targets('1.3.5')»z«ELSE»cursor«ENDIF»-pointer">{gt text='Categories'}</h3>
+                IF targets('1.3.5')
+                    <h3 class="categories z-panel-header z-panel-indicator IF targets('1.3.5')zELSEcursorENDIF-pointer">{gt text='Categories'}</h3>
                     <div class="categories z-panel-content" style="display: none">
-                «ELSE»
+                ELSE
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseCategories">{gt text='Categories'}</a></h3>
                         </div>
                         <div id="collapseCategories" class="panel-collapse collapse in">
                             <div class="panel-body">
-                «ENDIF»
+                ENDIF
             {else}
                 <h3 class="categories">{gt text='Categories'}</h3>
             {/if}
-            «viewBody»
+            viewBody
             {if isset($panel) && $panel eq true}
-                «IF targets('1.3.5')»
+                IF targets('1.3.5')
                     </div>
-                «ELSE»
+                ELSE
                             </div>
                         </div>
                     </div>
-                «ENDIF»
+                ENDIF
             {/if}
         {/if}
     '''
@@ -81,30 +81,30 @@ class Categories {
     def private categoriesEditImpl(Application it) '''
         {* purpose of this template: reusable editing of entity attributes *}
         {if isset($panel) && $panel eq true}
-            «IF targets('1.3.5')»
-                <h3 class="categories z-panel-header z-panel-indicator «IF targets('1.3.5')»z«ELSE»cursor«ENDIF»-pointer">{gt text='Categories'}</h3>
+            IF targets('1.3.5')
+                <h3 class="categories z-panel-header z-panel-indicator IF targets('1.3.5')zELSEcursorENDIF-pointer">{gt text='Categories'}</h3>
                 <fieldset class="categories z-panel-content" style="display: none">
-            «ELSE»
+            ELSE
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseCategories">{gt text='Categories'}</a></h3>
                     </div>
                     <div id="collapseCategories" class="panel-collapse collapse in">
                         <div class="panel-body">
-            «ENDIF»
+            ENDIF
         {else}
             <fieldset class="categories">
         {/if}
             <legend>{gt text='Categories'}</legend>
-            «editBody»
+            editBody
         {if isset($panel) && $panel eq true}
-            «IF targets('1.3.5')»
+            IF targets('1.3.5')
                 </fieldset>
-            «ELSE»
+            ELSE
                         </div>
                     </div>
                 </div>
-            «ENDIF»
+            ENDIF
         {else}
             </fieldset>
         {/if}
@@ -119,17 +119,17 @@ class Categories {
                 {gt text='Categories' assign='categorySelectorLabel'}
                 {assign var='selectionMode' value='multiple'}
             {/if}
-            <div class="«IF targets('1.3.5')»z-formrow«ELSE»form-group«ENDIF»">
-                {formlabel for="category_`$registryId`" text=$categorySelectorLabel«IF !targets('1.3.5')» cssClass='col-lg-3 control-label'«ENDIF»}
-                «IF !targets('1.3.5')»
+            <div class="IF targets('1.3.5')z-formrowELSEform-groupENDIF">
+                {formlabel for="category_`$registryId`" text=$categorySelectorLabelIF !targets('1.3.5') cssClass='col-lg-3 control-label'ENDIF}
+                IF !targets('1.3.5')
                     <div class="col-lg-9">
-                «ENDIF»
+                ENDIF
                     {formcategoryselector id="category_`$registryId`" category=$registryCid
                                           dataField='categories' group=$groupName registryId=$registryId doctrine2=true
                                           selectionMode=$selectionMode}
-                «IF !targets('1.3.5')»
+                IF !targets('1.3.5')
                     </div>
-                «ENDIF»
+                ENDIF
             </div>
         {/foreach}
         {/formvolatile}

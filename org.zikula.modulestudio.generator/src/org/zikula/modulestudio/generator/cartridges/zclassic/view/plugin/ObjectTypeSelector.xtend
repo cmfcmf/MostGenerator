@@ -23,7 +23,7 @@ class ObjectTypeSelector {
 
     def private selectorObjectTypesImpl(Application it) '''
         /**
-         * The «appName.formatForDB»ObjectTypeSelector plugin provides items for a dropdown selector.
+         * The appName.formatForDBObjectTypeSelector plugin provides items for a dropdown selector.
          *
          * Available parameters:
          *   - assign: If set, the results are assigned to the corresponding variable instead of printed out.
@@ -33,12 +33,12 @@ class ObjectTypeSelector {
          *
          * @return string The output of the plugin.
          */
-        function smarty_function_«appName.formatForDB»ObjectTypeSelector($params, $view)
+        function smarty_function_appName.formatForDBObjectTypeSelector($params, $view)
         {
-            $dom = «IF !targets('1.3.5')»\«ENDIF»ZLanguage::getModuleDomain('«appName»');
+            $dom = IF !targets('1.3.5')\ENDIFZLanguage::getModuleDomain('appName');
             $result = array();
 
-            «entityEntries»
+            entityEntries
 
             if (array_key_exists('assign', $params)) {
                 $view->assign($params['assign'], $result);
@@ -51,8 +51,8 @@ class ObjectTypeSelector {
     '''
 
     def private entityEntries(Application it) '''
-        «FOR entity : getAllEntities»
-            $result[] = array('text' => __('«entity.nameMultiple.formatForDisplayCapital»', $dom), 'value' => '«entity.name.formatForCode»');
-        «ENDFOR»
+        FOR entity : getAllEntities
+            $result[] = array('text' => __('entity.nameMultiple.formatForDisplayCapital', $dom), 'value' => 'entity.name.formatForCode');
+        ENDFOR
     '''
 }

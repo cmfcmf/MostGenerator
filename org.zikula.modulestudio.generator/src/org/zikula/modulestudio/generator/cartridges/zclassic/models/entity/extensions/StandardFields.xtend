@@ -29,22 +29,22 @@ class StandardFields extends AbstractExtension implements EntityExtensionInterfa
         /**
          * @ORM\Column(type="integer")
          * @ZK\StandardFields(type="userid", on="create")
-         «IF !container.application.targets('1.3.5')»
+         IF !container.application.targets('1.3.5')
          * @Assert\Type(type="integer")
-         «ENDIF»
+         ENDIF
          * @var integer $createdUserId.
          */
         protected $createdUserId;
 
         /**
-         «IF loggable»
+         IF loggable
              * @Gedmo\Versioned
-         «ENDIF»
+         ENDIF
          * @ORM\Column(type="integer")
          * @ZK\StandardFields(type="userid", on="update")
-         «IF !container.application.targets('1.3.5')»
+         IF !container.application.targets('1.3.5')
          * @Assert\Type(type="integer")
-         «ENDIF»
+         ENDIF
          * @var integer $updatedUserId.
          */
         protected $updatedUserId;
@@ -52,22 +52,22 @@ class StandardFields extends AbstractExtension implements EntityExtensionInterfa
         /**
          * @ORM\Column(type="datetime")
          * @Gedmo\Timestampable(on="create")
-         «IF !container.application.targets('1.3.5')»
+         IF !container.application.targets('1.3.5')
          * @Assert\DateTime()
-         «ENDIF»
+         ENDIF
          * @var datetime $createdDate.
          */
         protected $createdDate;
 
         /**
-         «IF loggable»
+         IF loggable
              * @Gedmo\Versioned
-         «ENDIF»
+         ENDIF
          * @ORM\Column(type="datetime")
          * @Gedmo\Timestampable(on="update")
-         «IF !container.application.targets('1.3.5')»
+         IF !container.application.targets('1.3.5')
          * @Assert\DateTime()
-         «ENDIF»
+         ENDIF
          * @var datetime $updatedDate.
          */
         protected $updatedDate;
@@ -77,10 +77,10 @@ class StandardFields extends AbstractExtension implements EntityExtensionInterfa
      * Generates additional accessor methods.
      */
     override accessors(Entity it) '''
-        «val fh = new FileHelper»
-        «fh.getterAndSetterMethods(it, 'createdUserId', 'integer', false, false, '', '')»
-        «fh.getterAndSetterMethods(it, 'updatedUserId', 'integer', false, false, '', '')»
-        «fh.getterAndSetterMethods(it, 'createdDate', 'datetime', false, false, '', '')»
-        «fh.getterAndSetterMethods(it, 'updatedDate', 'datetime', false, false, '', '')»
+        val fh = new FileHelper
+        fh.getterAndSetterMethods(it, 'createdUserId', 'integer', false, false, '', '')
+        fh.getterAndSetterMethods(it, 'updatedUserId', 'integer', false, false, '', '')
+        fh.getterAndSetterMethods(it, 'createdDate', 'datetime', false, false, '', '')
+        fh.getterAndSetterMethods(it, 'updatedDate', 'datetime', false, false, '', '')
     '''
 }

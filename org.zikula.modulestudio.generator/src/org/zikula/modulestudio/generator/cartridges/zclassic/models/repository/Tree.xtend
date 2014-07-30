@@ -9,17 +9,17 @@ class Tree {
     extension FormattingExtensions = new FormattingExtensions
 
     def generate(Entity it, Application app) '''
-        «IF tree != EntityTreeType::NONE»
+        IF tree != EntityTreeType::NONE
 
-            «selectTree»
+            selectTree
 
-            «selectAllTrees»
-        «ENDIF»
+            selectAllTrees
+        ENDIF
     '''
 
     def private selectTree(Entity it) '''
         /**
-         * Selects tree of «nameMultiple.formatForCode».
+         * Selects tree of nameMultiple.formatForCode.
          *
          * @param integer $rootId   Optional id of root node to use as a branch, defaults to 0 which corresponds to the whole tree.
          * @param boolean $useJoins Whether to include joining related objects (optional) (default=true).
